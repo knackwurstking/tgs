@@ -1,6 +1,21 @@
 # Telegram Scripts
 
-## Telegram API:
+## Notes & Todos
+
+### Notes
+
+- Server
+    - Commands via config (yaml) or hardcoded?
+    - Create example configuration and build server around this configuration
+    - Server runs "getUpdates" command, grep user command, check config and handle system command from configuration
+
+### TODOs
+
+- [ ] Get IP command (no deps.)
+- [ ] Get server logs (journalctl) command (no deps.)
+- [ ] Control picow led server - Toggle all lights on/off
+
+### Telegram API:
 
 https://core.telegram.org/bots/api
 
@@ -29,8 +44,3 @@ curl -X POST \
     -d '{"parse_mode": "HTML", "chat_id": "<CHAT_ID>", "text": "<b>My title</b>%0AMy body"}' \
     https://api.telegram.org/bot<YOUR_BOT_TOKEN>/sendMessage
 ```
-
-## TODOs
-
-- [ ] Get IP command (no deps.)
-- [ ] Get server logs (journalctl) command (no deps.)
