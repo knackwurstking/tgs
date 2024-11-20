@@ -1,0 +1,10 @@
+token: <BOT_TOKEN>
+commands:
+    - command: /ip
+      run:
+          - curl api.ipify.org
+      target:
+          user:
+              - <USER_ID>
+          chat:
+              - <CHAT_ID>
