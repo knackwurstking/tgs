@@ -4,11 +4,11 @@
 
 https://core.telegram.org/bots/api
 
-```
+```bash
 curl https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getMe | jq
 ```
 
-```
+```bash
 curl https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates | jq
 ```
 
