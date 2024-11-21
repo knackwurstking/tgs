@@ -1,6 +1,12 @@
 package tgs
 
-import "fmt"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+)
 
 type GetRequest interface {
 	Token
@@ -33,9 +39,31 @@ func (r *RequestGetMe) Get() (*ResponseGetMe, error) {
 		return nil, fmt.Errorf("missing token")
 	}
 
-	// TODO: ...
+	data, err := json.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, fmt.Errorf("under construction")
+	body := bytes.NewBuffer(data)
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/getMe", r.token)
+	req, err := http.NewRequest("GET", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	bodyData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var getMe ResponseGetMe
+	err = json.Unmarshal(bodyData, &getMe)
+	return &getMe, err
 }
 
 type RequestGetUpdates struct {
