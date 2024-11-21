@@ -12,11 +12,11 @@ commands:
           - curl api.ipify.org
 
       # (Optional) If not set, the global targets will be used
-      target:
-          user:
-              - ...
-          chat:
-              - ...
+      #target:
+      #    user:
+      #        - ...
+      #    chat:
+      #        - ...
 
     - command: /picowstatus
       run:
