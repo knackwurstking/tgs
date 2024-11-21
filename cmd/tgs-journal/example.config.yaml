@@ -1,0 +1,5 @@
+token: <BOT_TOKEN>
+user:
+    - <USER_SERVICE>
+system:
+    - <SYSTEM_SERVICE>
