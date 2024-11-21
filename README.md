@@ -5,7 +5,7 @@
 ### Notes
 
 - Server
-    - Commands via config (yaml) or hardcoded?
+    - Commands via config (yaml)
     - Create example configuration and build server around this configuration
     - Server runs "getUpdates" command, grep user command, check config and handle system command from configuration
 
