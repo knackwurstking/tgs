@@ -1,10 +1,41 @@
 token: <BOT_TOKEN>
+
+target:
+    user:
+        - <USER_ID>
+    chat:
+        - <CHAT_ID>
+
 commands:
     - command: /ip
       run:
           - curl api.ipify.org
+
+      # (Optional) If not set, the global targets will be used
       target:
           user:
-              - <USER_ID>
+              - ...
           chat:
-              - <CHAT_ID>
+              - ...
+
+    - command: /picowstatus
+      run:
+          - ...
+
+    - command: /picowon
+      run:
+          - ...
+
+    - command: /picowoff
+      run:
+          - ...
+
+    # This command should ask for the episode to grep
+    - command: /opmanga
+      run:
+          - ...
+
+    # This will send the user a complete episodes list as a text file?
+    - command: /opmangalist
+      run:
+          - ...
