@@ -8,16 +8,6 @@ import (
 	"net/http"
 )
 
-type GetRequest interface {
-	Token
-	Get() (any, error)
-}
-
-type PostRequest interface {
-	Token
-	Post() (any, error)
-}
-
 type Token struct {
 	token string
 }
@@ -34,6 +24,7 @@ type RequestGetMe struct {
 	Token
 }
 
+// TODO: Remove... Moved to "./tgs.go"
 func (r *RequestGetMe) Get() (*ResponseGetMe, error) {
 	if r.token == "" {
 		return nil, fmt.Errorf("missing token")
@@ -75,6 +66,7 @@ type RequestGetUpdates struct {
 	AllowedUpdates []string `json:"allowed_updates"`
 }
 
+// TODO: Remove... Moved to "./tgs.go"
 func (r *RequestGetUpdates) Get() (*ResponseGetUpdates, error) {
 	if r.token == "" {
 		return nil, fmt.Errorf("missing token")
