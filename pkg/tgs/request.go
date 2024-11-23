@@ -5,7 +5,13 @@ import (
 )
 
 type RequestGetMe struct {
-	Server
+	API
+}
+
+func NewRequestGetMe(api API) *RequestGetMe {
+	return &RequestGetMe{
+		API: api,
+	}
 }
 
 func (r *RequestGetMe) Command() Command {
@@ -13,7 +19,7 @@ func (r *RequestGetMe) Command() Command {
 }
 
 func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
-	data, err := r.Server.Send(r)
+	data, err := r.API.Send(r)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +29,7 @@ func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
 }
 
 type RequestGetUpdates struct {
-	Server
+	API
 
 	Offset         *int     `json:"offset"`
 	Limit          *int     `json:"limit"`   // Limit defaults to 100
@@ -31,12 +37,18 @@ type RequestGetUpdates struct {
 	AllowedUpdates []string `json:"allowed_updates"`
 }
 
+func NewRequestGetUpdates(api API) *RequestGetUpdates {
+	return &RequestGetUpdates{
+		API: api,
+	}
+}
+
 func (r *RequestGetUpdates) Command() Command {
 	return CommandGetUpdates
 }
 
 func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
-	data, err := r.Server.Send(r)
+	data, err := r.API.Send(r)
 	if err != nil {
 		return nil, err
 	}
