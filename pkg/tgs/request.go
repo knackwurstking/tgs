@@ -1,64 +1,29 @@
 package tgs
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
 )
 
-type Token struct {
-	token string
-}
-
-func (t *Token) Token() string {
-	return t.token
-}
-
-func (t *Token) SetToken(token string) {
-	t.token = token
-}
-
 type RequestGetMe struct {
-	Token
+	Server
 }
 
-// TODO: Remove... Moved to "./tgs.go"
-func (r *RequestGetMe) Get() (*ResponseGetMe, error) {
-	if r.token == "" {
-		return nil, fmt.Errorf("missing token")
-	}
+func (r *RequestGetMe) Command() Command {
+	return CommandGetMe
+}
 
-	data, err := json.Marshal(r)
+func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
+	data, err := r.Server.Send(r)
 	if err != nil {
 		return nil, err
 	}
 
-	body := bytes.NewBuffer(data)
-	url := fmt.Sprintf("https://api.telegram.org/bot%s/getMe", r.token)
-	req, err := http.NewRequest("GET", url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	bodyData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var getMe ResponseGetMe
-	err = json.Unmarshal(bodyData, &getMe)
-	return &getMe, err
+	var response ResponseGetMe
+	return &response, json.Unmarshal(data, &response)
 }
 
 type RequestGetUpdates struct {
-	Token
+	Server
 
 	Offset         *int     `json:"offset"`
 	Limit          *int     `json:"limit"`   // Limit defaults to 100
@@ -66,15 +31,18 @@ type RequestGetUpdates struct {
 	AllowedUpdates []string `json:"allowed_updates"`
 }
 
-// TODO: Remove... Moved to "./tgs.go"
-func (r *RequestGetUpdates) Get() (*ResponseGetUpdates, error) {
-	if r.token == "" {
-		return nil, fmt.Errorf("missing token")
+func (r *RequestGetUpdates) Command() Command {
+	return CommandGetUpdates
+}
+
+func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
+	data, err := r.Server.Send(r)
+	if err != nil {
+		return nil, err
 	}
 
-	// TODO: ...
-
-	return nil, fmt.Errorf("under construction")
+	var response ResponseGetUpdates
+	return &response, json.Unmarshal(data, &response)
 }
 
 // TODO: "setMyCommands"
