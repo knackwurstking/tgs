@@ -1,34 +1,30 @@
 token: <BOT_TOKEN>
 
+# Global targets, Used as fallback for commands
 targets:
-    - <USER_ID/CHAT_ID>
+    users:
+        - id: <USER_ID>
+    chats:
+        - id: <CHAT_ID>
 
 commands:
     ip:
         targets:
-            - <USER_ID/CHAT_ID>
+            users:
+                - <USER_ID>
+            chats:
+                - <CHAT_ID>
 
     journallist:
-        #targets:
 
     journal:
-        targets:
-            - <USER_ID/CHAT_ID>
 
     picowstatus:
-        targets:
-            - <USER_ID/CHAT_ID>
 
     picowon:
-        targets:
-            - <USER_ID/CHAT_ID>
 
     picowoff:
-        targets:
-            - <USER_ID/CHAT_ID>
 
     opmanga:
-        #targets:
 
     opmangalist:
-        #targets:
