@@ -1,23 +1,29 @@
 package tgs
 
 type User struct {
-	ID                      int     `json:"id"`
-	IsBot                   bool    `json:"is_bot"`
-	FirstName               string  `json:"first_name"`
-	LastName                *string `json:"last_name"`
-	Username                *string `json:"username"`
-	LanguageCode            *string `json:"language_code"`
-	IsPremium               *bool   `json:"is_premium"`
-	AddedToAttachmentMenu   *bool   `json:"added_to_attachment_menu"`
-	CanJoinGroups           *bool   `json:"can_join_groups"`
-	CanReadAllGroupMessages *bool   `json:"can_read_all_group_messages"`
-	SupportsInlineQueries   *bool   `json:"supports_inline_queries"`
-	CanConnectToBusiness    *bool   `json:"can_connect_to_business"`
-	HasMainWebApp           *bool   `json:"has_main_web_app"`
+	ID                      int     `json:"id" yaml:"id"`
+	IsBot                   bool    `json:"is_bot" yaml:"is_bot"`
+	FirstName               string  `json:"first_name" yaml:"first_name"`
+	LastName                *string `json:"last_name" yaml:"last_name"`
+	Username                *string `json:"username" yaml:"username"`
+	LanguageCode            *string `json:"language_code" yaml:"language_code"`
+	IsPremium               *bool   `json:"is_premium" yaml:"is_premium"`
+	AddedToAttachmentMenu   *bool   `json:"added_to_attachment_menu" yaml:"added_to_attachment_menu"`
+	CanJoinGroups           *bool   `json:"can_join_groups" yaml:"can_join_groups"`
+	CanReadAllGroupMessages *bool   `json:"can_read_all_group_messages" yaml:"can_read_all_group_messages"`
+	SupportsInlineQueries   *bool   `json:"supports_inline_queries" yaml:"supports_inline_queries"`
+	CanConnectToBusiness    *bool   `json:"can_connect_to_business" yaml:"can_connect_to_business"`
+	HasMainWebApp           *bool   `json:"has_main_web_app" yaml:"has_main_web_app"`
 }
 
 type Chat struct {
-	// TODO: ...
+	ID        int     `json:"id" yaml:"id"`                 // Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.
+	Type      string  `json:"type" yaml:"type"`             // Possible types: "private", “group”, “supergroup” or “channel”
+	Title     *string `json:"title" yaml:"title"`           // Optional. Title, for supergroups, channels and group chats
+	Username  *string `json:"username" yaml:"username"`     // Optional. Username, for private chats, supergroups and channels if available
+	FirstName *string `json:"first_name" yaml:"first_name"` // Optional. First name of the other party in a private chat
+	LastName  *string `json:"last_name" yaml:"last_name"`   // Optional. Last name of the other party in a private chat
+	IsForum   *bool   `json:"is_forum" yaml:"is_forum"`     // Optional. True, if the supergroup chat is a forum (has topics enabled)
 }
 
 type MessageOrigin struct {
@@ -37,13 +43,13 @@ type Story struct {
 }
 
 type MessageEntity struct {
-	Type          string  `json:"type"`
-	Offset        int     `json:"offset"`
-	Length        int     `json:"length"`
-	URL           *string `json:"url"`
-	User          *User   `json:"user"`
-	Language      *string `json:"language"`
-	CustomEmojiID *string `json:"custom_emoji_id"`
+	Type          string  `json:"type" yaml:"type"`
+	Offset        int     `json:"offset" yaml:"offset"`
+	Length        int     `json:"length" yaml:"length"`
+	URL           *string `json:"url" yaml:"url"`
+	User          *User   `json:"user" yaml:"user"`
+	Language      *string `json:"language" yaml:"language"`
+	CustomEmojiID *string `json:"custom_emoji_id" yaml:"custom_emoji_id"`
 }
 
 type LinkPreviewOptions struct {
@@ -91,46 +97,46 @@ type Caption struct {
 }
 
 type Message struct {
-	MessageID             int                 `json:"message_id"`
-	MessageThreadID       *int                `json:"message_thread_id"`
-	From                  *User               `json:"from"`
-	SenderChat            *Chat               `json:"sender_chat"`
-	SenderBoostCount      *int                `json:"sender_boost_count"`
-	SenderBusinessBot     *User               `json:"sender_business_bot"`
-	Date                  int                 `json:"date"`
-	BusinessConnectionID  *int                `json:"business_connection_id"`
-	Chat                  Chat                `json:"chat"`
-	ForwardOrigin         *MessageOrigin      `json:"forward_origin"`
-	IsTopicMessage        *bool               `json:"is_topic_message"`
-	IsAutomaticForward    *bool               `json:"is_automatic_forward"`
-	ReplyToMessage        *Message            `json:"reply_to_message"`
-	ExternalReply         *ExternalReplyInfo  `json:"external_reply"`
-	Quote                 *TextQuote          `json:"quote"`
-	ReplyToStory          *Story              `json:"reply_to_story"`
-	ViaBot                *User               `json:"via_bot"`
-	EditDate              *int                `json:"edit_date"`
-	HasProtectedContent   *bool               `json:"has_protected_content"`
-	IsFromOffline         *bool               `json:"is_from_offline"`
-	MediaGroupID          *string             `json:"media_group_id"`
-	AuthorSignature       *string             `json:"author_signature"`
-	Text                  *string             `json:"text"`
-	Entities              []MessageEntity     `json:"entities"`
-	LinkPreviewOptions    *LinkPreviewOptions `json:"link_preview_options"`
-	EffectID              *string             `json:"effect_id"`
-	Animation             *Animation          `json:"animation"`
-	Audio                 *Audio              `json:"audio"`
-	Document              *Document           `json:"document"`
-	PaidMedia             *PaidMediaInfo      `json:"paid_media"`
-	Photo                 []PhotoSize         `json:"photo"`
-	Sticker               *Sticker            `json:"sticker"`
-	Story                 *Story              `json:"story"`
-	Video                 *Video              `json:"video"`
-	VideoNote             *VideoNote          `json:"video_note"`
-	Voice                 *Voice              `json:"voice"`
-	Caption               *string             `json:"caption"`
-	CaptionEntities       []MessageEntity     `json:"caption_entities"`
-	ShowCaptionAboveMedia *bool               `json:"show_caption_above_media"`
-	HasMediaSpoiler       *bool               `json:"has_media_spoiler"`
+	MessageID             int                 `json:"message_id" yaml:"message_id"`
+	MessageThreadID       *int                `json:"message_thread_id" yaml:"message_thread_id"`
+	From                  *User               `json:"from" yaml:"from"`
+	SenderChat            *Chat               `json:"sender_chat" yaml:"sender_chat"`
+	SenderBoostCount      *int                `json:"sender_boost_count" yaml:"sender_boost_count"`
+	SenderBusinessBot     *User               `json:"sender_business_bot" yaml:"sender_business_bot"`
+	Date                  int                 `json:"date" yaml:"date"`
+	BusinessConnectionID  *int                `json:"business_connection_id" yaml:"business_connection_id"`
+	Chat                  Chat                `json:"chat" yaml:"chat"`
+	ForwardOrigin         *MessageOrigin      `json:"forward_origin" yaml:"forward_origin"`
+	IsTopicMessage        *bool               `json:"is_topic_message" yaml:"is_topic_message"`
+	IsAutomaticForward    *bool               `json:"is_automatic_forward" yaml:"is_automatic_forward"`
+	ReplyToMessage        *Message            `json:"reply_to_message" yaml:"reply_to_message"`
+	ExternalReply         *ExternalReplyInfo  `json:"external_reply" yaml:"external_reply"`
+	Quote                 *TextQuote          `json:"quote" yaml:"quote"`
+	ReplyToStory          *Story              `json:"reply_to_story" yaml:"reply_to_story"`
+	ViaBot                *User               `json:"via_bot" yaml:"via_bot"`
+	EditDate              *int                `json:"edit_date" yaml:"edit_date"`
+	HasProtectedContent   *bool               `json:"has_protected_content" yaml:"has_protected_content"`
+	IsFromOffline         *bool               `json:"is_from_offline" yaml:"is_from_offline"`
+	MediaGroupID          *string             `json:"media_group_id" yaml:"media_group_id"`
+	AuthorSignature       *string             `json:"author_signature" yaml:"author_signature"`
+	Text                  *string             `json:"text" yaml:"text"`
+	Entities              []MessageEntity     `json:"entities" yaml:"entities"`
+	LinkPreviewOptions    *LinkPreviewOptions `json:"link_preview_options" yaml:"link_preview_options"`
+	EffectID              *string             `json:"effect_id" yaml:"effect_id"`
+	Animation             *Animation          `json:"animation" yaml:"animation"`
+	Audio                 *Audio              `json:"audio" yaml:"audio"`
+	Document              *Document           `json:"document" yaml:"document"`
+	PaidMedia             *PaidMediaInfo      `json:"paid_media" yaml:"paid_media"`
+	Photo                 []PhotoSize         `json:"photo" yaml:"photo"`
+	Sticker               *Sticker            `json:"sticker" yaml:"sticker"`
+	Story                 *Story              `json:"story" yaml:"story"`
+	Video                 *Video              `json:"video" yaml:"video"`
+	VideoNote             *VideoNote          `json:"video_note" yaml:"video_note"`
+	Voice                 *Voice              `json:"voice" yaml:"voice"`
+	Caption               *string             `json:"caption" yaml:"caption"`
+	CaptionEntities       []MessageEntity     `json:"caption_entities" yaml:"caption_entities"`
+	ShowCaptionAboveMedia *bool               `json:"show_caption_above_media" yaml:"show_caption_above_media"`
+	HasMediaSpoiler       *bool               `json:"has_media_spoiler" yaml:"has_media_spoiler"`
 	// TODO: ...
 }
 
@@ -199,28 +205,28 @@ type ChatBoostRemoved struct {
 }
 
 type Update struct {
-	UpdateID                int                          `json:"update_id"`
-	Message                 *Message                     `json:"message"`
-	EditedMessage           *Message                     `json:"edited_message"`
-	ChannelPost             *Message                     `json:"channel_post"`
-	EditedChannelPost       *Message                     `json:"edited_channel_post"`
-	BusinessConnection      *BusinessConnection          `json:"business_connection"`
-	BusinessMessage         *Message                     `json:"business_message"`
-	EditedBusinessMessage   *Message                     `json:"edited_business_message"`
-	DeletedBusinessMessages *BusinessMessagesDeleted     `json:"deleted_business_messages"`
-	MessageReaction         *MessageReactionUpdated      `json:"message_reaction"`
-	MessageReactionCount    *MessageReactionCountUpdated `json:"message_reaction_count"`
-	InlineQuery             *InlineQuery                 `json:"inline_query"`
-	ChosenInlineResult      *ChosenInlineResult          `json:"chosen_inline_result"`
-	CallbackQuery           *CallbackQuery               `json:"callback_query"`
-	ShippingQuery           *ShippingQuery               `json:"shipping_query"`
-	PreCheckoutQuery        *PreCheckoutQuery            `json:"pre_checkout_query"`
-	PurchasedPaidMedia      *PaidMediaPurchased          `json:"purchased_paid_media"`
-	Poll                    *Poll                        `json:"poll"`
-	PollAnswer              *PollAnswer                  `json:"poll_answer"`
-	MyChatMember            *ChatMemberUpdated           `json:"my_chat_member"`
-	ChatMember              *ChatMemberUpdated           `json:"chat_member"`
-	ChatJoinRequest         *ChatJoinRequest             `json:"chat_join_request"`
-	ChatBoost               *ChatBoostUpdated            `json:"chat_boost"`
-	RemovedChatBoost        *ChatBoostRemoved            `json:"removed_chat_boost"`
+	UpdateID                int                          `json:"update_id" yaml:"update_id"`
+	Message                 *Message                     `json:"message" yaml:"message"`
+	EditedMessage           *Message                     `json:"edited_message" yaml:"edited_message"`
+	ChannelPost             *Message                     `json:"channel_post" yaml:"channel_post"`
+	EditedChannelPost       *Message                     `json:"edited_channel_post" yaml:"edited_channel_post"`
+	BusinessConnection      *BusinessConnection          `json:"business_connection" yaml:"business_connection"`
+	BusinessMessage         *Message                     `json:"business_message" yaml:"business_message"`
+	EditedBusinessMessage   *Message                     `json:"edited_business_message" yaml:"edited_business_message"`
+	DeletedBusinessMessages *BusinessMessagesDeleted     `json:"deleted_business_messages" yaml:"deleted_business_messages"`
+	MessageReaction         *MessageReactionUpdated      `json:"message_reaction" yaml:"message_reaction"`
+	MessageReactionCount    *MessageReactionCountUpdated `json:"message_reaction_count" yaml:"message_reaction_count"`
+	InlineQuery             *InlineQuery                 `json:"inline_query" yaml:"inline_query"`
+	ChosenInlineResult      *ChosenInlineResult          `json:"chosen_inline_result" yaml:"chosen_inline_result"`
+	CallbackQuery           *CallbackQuery               `json:"callback_query" yaml:"callback_query"`
+	ShippingQuery           *ShippingQuery               `json:"shipping_query" yaml:"shipping_query"`
+	PreCheckoutQuery        *PreCheckoutQuery            `json:"pre_checkout_query" yaml:"pre_checkout_query"`
+	PurchasedPaidMedia      *PaidMediaPurchased          `json:"purchased_paid_media" yaml:"purchased_paid_media"`
+	Poll                    *Poll                        `json:"poll" yaml:"poll"`
+	PollAnswer              *PollAnswer                  `json:"poll_answer" yaml:"poll_answer"`
+	MyChatMember            *ChatMemberUpdated           `json:"my_chat_member" yaml:"my_chat_member"`
+	ChatMember              *ChatMemberUpdated           `json:"chat_member" yaml:"chat_member"`
+	ChatJoinRequest         *ChatJoinRequest             `json:"chat_join_request" yaml:"chat_join_request"`
+	ChatBoost               *ChatBoostUpdated            `json:"chat_boost" yaml:"chat_boost"`
+	RemovedChatBoost        *ChatBoostRemoved            `json:"removed_chat_boost" yaml:"removed_chat_boost"`
 }

@@ -31,10 +31,10 @@ func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
 type RequestGetUpdates struct {
 	API
 
-	Offset         *int     `json:"offset"`
-	Limit          *int     `json:"limit"`   // Limit defaults to 100
-	Timeout        *int     `json:"timeout"` // Timeout defaults to 0 (Short Polling)
-	AllowedUpdates []string `json:"allowed_updates"`
+	Offset         *int     `json:"offset" yaml:"offset"`
+	Limit          *int     `json:"limit" yaml:"limit"`     // Limit defaults to 100
+	Timeout        *int     `json:"timeout" yaml:"timeout"` // Timeout defaults to 0 (Short Polling)
+	AllowedUpdates []string `json:"allowed_updates" yaml:"allowed_updates"`
 }
 
 func NewRequestGetUpdates(api API) *RequestGetUpdates {
