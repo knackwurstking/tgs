@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	handledUpdateIDs = make([]int, 0)
+	handledIDs = make([]int, 0) // Contains update ids already handled
 )
 
 func main() {
@@ -70,7 +70,18 @@ func main() {
 }
 
 func handleUpdates(result []tgs.Update) error {
-	defer cleanUpHandledUpdateIDs(result)
+	defer func() {
+		newHandledIDs := make([]int, 0)
+		for _, handledID := range handledIDs {
+			for _, update := range result {
+				if update.UpdateID == handledID {
+					newHandledIDs = append(newHandledIDs, handledID)
+					break
+				}
+			}
+		}
+		handledIDs = newHandledIDs
+	}()
 
 	for _, update := range result {
 		if !isNewUpdateID(update.UpdateID) {
@@ -84,28 +95,13 @@ func handleUpdates(result []tgs.Update) error {
 }
 
 func isNewUpdateID(id int) bool {
-	for _, handledID := range handledUpdateIDs {
+	for _, handledID := range handledIDs {
 		if handledID == id {
 			return false
 		}
 	}
 
 	return true
-}
-
-func cleanUpHandledUpdateIDs(result []tgs.Update) {
-	newHandledUpdateIDs := make([]int, 0)
-
-	for _, handledID := range handledUpdateIDs {
-		for _, update := range result {
-			if update.UpdateID == handledID {
-				newHandledUpdateIDs = append(newHandledUpdateIDs, handledID)
-				break
-			}
-		}
-	}
-
-	handledUpdateIDs = newHandledUpdateIDs
 }
 
 func checkConfig(config *Config) error {
