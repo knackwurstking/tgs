@@ -4,13 +4,17 @@ import (
 	"encoding/json"
 )
 
-type RequestGetMe struct {
-	API
+type Request interface {
+	Command() Command
 }
 
-func NewRequestGetMe(api API) *RequestGetMe {
+type RequestGetMe struct {
+	TelegramBotAPI
+}
+
+func NewRequestGetMe(api TelegramBotAPI) *RequestGetMe {
 	return &RequestGetMe{
-		API: api,
+		TelegramBotAPI: api,
 	}
 }
 
@@ -19,7 +23,7 @@ func (r *RequestGetMe) Command() Command {
 }
 
 func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
-	data, err := r.API.Send(r)
+	data, err := r.TelegramBotAPI.SendRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +33,7 @@ func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
 }
 
 type RequestGetUpdates struct {
-	API
+	TelegramBotAPI
 
 	Offset         *int     `json:"offset" yaml:"offset"`
 	Limit          *int     `json:"limit" yaml:"limit"`     // Limit defaults to 100
@@ -37,9 +41,9 @@ type RequestGetUpdates struct {
 	AllowedUpdates []string `json:"allowed_updates" yaml:"allowed_updates"`
 }
 
-func NewRequestGetUpdates(api API) *RequestGetUpdates {
+func NewRequestGetUpdates(api TelegramBotAPI) *RequestGetUpdates {
 	return &RequestGetUpdates{
-		API: api,
+		TelegramBotAPI: api,
 	}
 }
 
@@ -48,7 +52,7 @@ func (r *RequestGetUpdates) Command() Command {
 }
 
 func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
-	data, err := r.API.Send(r)
+	data, err := r.TelegramBotAPI.SendRequest(r)
 	if err != nil {
 		return nil, err
 	}

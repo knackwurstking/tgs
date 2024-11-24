@@ -12,7 +12,7 @@ type TelegramBotAPI struct {
 	token string
 }
 
-func NewTelegramBotAPI(token string) API {
+func NewTelegramBotAPI(token string) *TelegramBotAPI {
 	return &TelegramBotAPI{
 		token: token,
 	}
@@ -30,7 +30,7 @@ func (api *TelegramBotAPI) URL(command Command) string {
 	return fmt.Sprintf("https://api.telegram.org/bot%s/%s", api.Token(), command)
 }
 
-func (api *TelegramBotAPI) Send(request Request) ([]byte, error) {
+func (api *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 	if api.Token() == "" {
 		return nil, fmt.Errorf("missing token")
 	}
