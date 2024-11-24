@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SuperPaintman/nice/cli"
+	"github.com/knackwurstking/tgs/internal/commands"
 	"github.com/knackwurstking/tgs/pkg/data"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
@@ -40,6 +41,7 @@ func main() {
 
 				requestTimeout := 60 // 1 Minute
 				getUpdates := tgs.RequestGetUpdates{
+					API:     tgs.NewTelegramBotAPI(config.Token),
 					Timeout: &requestTimeout,
 				}
 				for {
@@ -54,10 +56,7 @@ func main() {
 						return fmt.Errorf("request updates failed")
 					}
 
-					if err := handleUpdates(config, resp.Result); err != nil {
-						slog.Warn("Command not found for response", "response", *resp)
-						continue
-					}
+					handleUpdates(config, resp.Result)
 				}
 			}
 		}),
@@ -70,7 +69,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func handleUpdates(config *Config, result []data.Update) error {
+func handleUpdates(config *Config, result []data.Update) {
 	defer func() {
 		newHandledIDs := make([]int, 0)
 		for _, handledID := range handledIDs {
@@ -89,11 +88,13 @@ func handleUpdates(config *Config, result []data.Update) error {
 			continue
 		}
 
-		if update.Message == nil || update.Message.Entities == nil || update.Message.Text == nil {
+		if update.Message == nil {
 			continue
 		}
 
-		slog.Debug("Got a new update from result", "update", update)
+		if update.Message.Entities == nil || update.Message.Text == nil {
+			continue
+		}
 
 		botCommand := ""
 		for _, entity := range update.Message.Entities {
@@ -103,14 +104,51 @@ func handleUpdates(config *Config, result []data.Update) error {
 			}
 		}
 
-		if botCommand == "" {
+		commandConfig, err := config.Commands.Get(botCommand)
+		if err != nil {
+			slog.Warn("Command not found", "command", botCommand, "error", err)
 			continue
 		}
 
-		// TODO: Handle command for targets in config (check from, check chat for target ids)
+		if !isValidTarget(*update.Message, commandConfig.Targets, config.Targets) {
+			continue
+		}
+
+		slog.Debug("Handle bot command", "command", botCommand, "message", *update.Message)
+
+		// TODO: Handle command
+		switch botCommand {
+		case "/ip":
+			ip := commands.IP{}
+			// ...
+			break
+		}
+	}
+}
+
+func isValidTarget(message data.Message, commandTargets *Targets, fallbackTargets Targets) bool {
+	targets := fallbackTargets
+	if commandTargets != nil {
+		targets = *commandTargets
 	}
 
-	return fmt.Errorf("under construction")
+	if message.From != nil && targets.Users != nil {
+		for _, user := range targets.Users {
+			if user.ID == message.From.ID {
+				return true
+			}
+		}
+	}
+
+	if targets.Chats != nil {
+		for _, chat := range targets.Chats {
+			if chat.ID == message.Chat.ID {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func isNewUpdateID(id int) bool {
