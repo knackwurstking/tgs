@@ -26,5 +26,3 @@ type Update struct {
 	ChatBoost               *ChatBoostUpdated            `json:"chat_boost" yaml:"chat_boost"`
 	RemovedChatBoost        *ChatBoostRemoved            `json:"removed_chat_boost" yaml:"removed_chat_boost"`
 }
-
-// TODO: New method: search messages for bot command
