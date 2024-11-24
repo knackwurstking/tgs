@@ -53,7 +53,7 @@ func main() {
 						return fmt.Errorf("request updates failed")
 					}
 
-					if err := handleUpdates(resp.Result); err != nil {
+					if err := handleUpdates(config, resp.Result); err != nil {
 						slog.Warn("Command not found for response", "response", *resp)
 						continue
 					}
@@ -69,7 +69,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func handleUpdates(result []tgs.Update) error {
+func handleUpdates(config *Config, result []tgs.Update) error {
 	defer func() {
 		newHandledIDs := make([]int, 0)
 		for _, handledID := range handledIDs {
@@ -88,7 +88,8 @@ func handleUpdates(result []tgs.Update) error {
 			continue
 		}
 
-		// TODO: ...
+		// TODO: Get command from update
+		// TODO: Handle command for targets in config
 	}
 
 	return fmt.Errorf("under construction")
