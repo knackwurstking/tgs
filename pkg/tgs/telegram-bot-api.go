@@ -60,5 +60,12 @@ func (api *TelegramBotAPI) Send(request Request) ([]byte, error) {
 		return nil, err
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(
+			"telegram request to \"%s\" returned status code %d (%s)",
+			req.URL, resp.StatusCode, resp.Status,
+		)
+	}
+
 	return io.ReadAll(resp.Body)
 }

@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log/slog"
+	"os"
 
 	"github.com/SuperPaintman/nice/cli"
+	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 func main() {
@@ -25,9 +29,33 @@ func main() {
 					return err
 				}
 
-				// TODO: Check token, register commands, enter the main loop and wait for updates
+				if err := checkConfig(config); err != nil {
+					return err
+				}
 
-				return nil
+				requestTimeout := 60 // 1 Minute
+				getUpdates := tgs.RequestGetUpdates{
+					Timeout: &requestTimeout,
+				}
+				for {
+					resp, err := getUpdates.Send()
+					if err != nil {
+						slog.Warn("Request updates", "error", err)
+						continue
+					}
+
+					if !resp.OK {
+						slog.Error("Request updates", "response", *resp)
+						return fmt.Errorf("request updates failed")
+					}
+
+					if botCommand, err := parseUpdatesResponse(resp); err != nil {
+						slog.Warn("Command not found for response", "response", *resp)
+						continue
+					} else {
+						// TODO: Handle command
+					}
+				}
 			}
 		}),
 		CommandFlags: []cli.CommandFlag{
@@ -39,8 +67,29 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func loadConfig(config *Config, path string) error {
-	// TODO: Load YAML configuration
+func parseUpdatesResponse(resp *tgs.ResponseGetUpdates) (*BotCommand, error) {
+	// TODO: Check response for commands, dont forget to validate IDs
 
-	return fmt.Errorf("under construction")
+	return nil, fmt.Errorf("under construction")
+}
+
+func checkConfig(config *Config) error {
+	if config.Token == "" {
+		return fmt.Errorf("token missing")
+	}
+
+	if config.Targets.Chats == nil && config.Targets.Users == nil {
+		return fmt.Errorf("missing targets")
+	}
+
+	return nil
+}
+
+func loadConfig(config *Config, path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(data, config)
 }

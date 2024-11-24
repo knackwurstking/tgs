@@ -9,4 +9,5 @@ type API interface {
 
 type Request interface {
 	Command() Command
+	Send() (any, error)
 }

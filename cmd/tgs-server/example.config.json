@@ -1,0 +1,23 @@
+{
+    "token": "<BOT_TOKEN>",
+    "targets": {
+        "users": [{ "id": "<USER_ID>" }],
+        "chats": [{ "id": "<CHAT_ID>" }]
+    },
+    "commands": {
+        "ip": {
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }],
+                "chats": [{ "id": "<CHAT_ID>" }]
+            }
+        },
+        "journallist": {},
+        "journal": {},
+        "journal": {},
+        "picowstatus": {},
+        "picowon": {},
+        "picowoff": {},
+        "opmanga": {},
+        "opmangalist": {}
+    }
+}
