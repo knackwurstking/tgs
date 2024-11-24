@@ -49,11 +49,9 @@ func main() {
 						return fmt.Errorf("request updates failed")
 					}
 
-					if botCommand, err := parseUpdatesResponse(resp); err != nil {
+					if err := handleUpdatesResponse(resp); err != nil {
 						slog.Warn("Command not found for response", "response", *resp)
 						continue
-					} else {
-						// TODO: Handle command
 					}
 				}
 			}
@@ -67,10 +65,10 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func parseUpdatesResponse(resp *tgs.ResponseGetUpdates) (*BotCommand, error) {
+func handleUpdatesResponse(resp *tgs.ResponseGetUpdates) error {
 	// TODO: Check response for commands, dont forget to validate IDs
 
-	return nil, fmt.Errorf("under construction")
+	return fmt.Errorf("under construction")
 }
 
 func checkConfig(config *Config) error {
