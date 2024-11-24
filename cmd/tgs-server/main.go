@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SuperPaintman/nice/cli"
+	"github.com/knackwurstking/tgs/pkg/data"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -69,7 +70,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func handleUpdates(config *Config, result []tgs.Update) error {
+func handleUpdates(config *Config, result []data.Update) error {
 	defer func() {
 		newHandledIDs := make([]int, 0)
 		for _, handledID := range handledIDs {
@@ -88,8 +89,9 @@ func handleUpdates(config *Config, result []tgs.Update) error {
 			continue
 		}
 
-		// TODO: Get command from update
-		// TODO: Handle command for targets in config
+		// TODO: Get command from update, check entities for "bot_command" type and get
+		//   	 offset & length
+		// TODO: Handle command for targets in config (check from, check chat for target ids)
 	}
 
 	return fmt.Errorf("under construction")

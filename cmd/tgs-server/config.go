@@ -1,11 +1,9 @@
 package main
 
-import (
-	"github.com/knackwurstking/tgs/pkg/tgs"
-)
+import "github.com/knackwurstking/tgs/pkg/data"
 
-type Users []*tgs.User
-type Chats []*tgs.Chat
+type Users []*data.User
+type Chats []*data.Chat
 
 type Config struct {
 	Token    string         `json:"token" yaml:"token"`
