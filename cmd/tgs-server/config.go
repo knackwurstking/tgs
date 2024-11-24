@@ -8,9 +8,9 @@ type Users []*tgs.User
 type Chats []*tgs.Chat
 
 type Config struct {
-	Token    string      `json:"token" yaml:"token"`
-	Targets  Targets     `json:"targets" yaml:"targets"`
-	Commands BotCommands `json:"commands" yaml:"commands"`
+	Token    string         `json:"token" yaml:"token"`
+	Targets  Targets        `json:"targets" yaml:"targets"`
+	Commands CommandConfigs `json:"commands" yaml:"commands"`
 }
 
 func NewConfig() *Config {
@@ -19,7 +19,7 @@ func NewConfig() *Config {
 			Users: make(Users, 0),
 			Chats: make(Chats, 0),
 		},
-		Commands: BotCommands{},
+		Commands: CommandConfigs{},
 	}
 }
 
@@ -28,17 +28,17 @@ type Targets struct {
 	Chats Chats `json:"chats" yaml:"chats"`
 }
 
-type BotCommands struct {
-	IP          BotCommand `json:"ip" yaml:"ip"`
-	JournalList BotCommand `json:"journallist" yaml:"journallist"`
-	Journal     BotCommand `json:"journal" yaml:"journal"`
-	PicowStatus BotCommand `json:"picowstatus" yaml:"picowstatus"`
-	PicowOn     BotCommand `json:"picowon" yaml:"picowon"`
-	PicowOff    BotCommand `json:"picowoff" yaml:"picowoff"`
-	OPManga     BotCommand `json:"opmanga" yaml:"opmanga"`
-	OPMangaList BotCommand `json:"opmangalist" yaml:"opmangalist"`
+type CommandConfigs struct {
+	IP          CommandConfig `json:"ip" yaml:"ip"`
+	JournalList CommandConfig `json:"journallist" yaml:"journallist"`
+	Journal     CommandConfig `json:"journal" yaml:"journal"`
+	PicowStatus CommandConfig `json:"picowstatus" yaml:"picowstatus"`
+	PicowOn     CommandConfig `json:"picowon" yaml:"picowon"`
+	PicowOff    CommandConfig `json:"picowoff" yaml:"picowoff"`
+	OPManga     CommandConfig `json:"opmanga" yaml:"opmanga"`
+	OPMangaList CommandConfig `json:"opmangalist" yaml:"opmangalist"`
 }
 
-type BotCommand struct {
+type CommandConfig struct {
 	Targets *Targets `json:"targets" yaml:"targets"`
 }
