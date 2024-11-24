@@ -10,6 +10,10 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+var (
+	handledUpdateIDs = make([]int, 0)
+)
+
 func main() {
 	app := cli.App{
 		Name:  "tgs-server",
@@ -49,7 +53,7 @@ func main() {
 						return fmt.Errorf("request updates failed")
 					}
 
-					if err := handleUpdatesResponse(resp); err != nil {
+					if err := handleUpdates(resp.Result); err != nil {
 						slog.Warn("Command not found for response", "response", *resp)
 						continue
 					}
@@ -65,10 +69,43 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func handleUpdatesResponse(resp *tgs.ResponseGetUpdates) error {
-	// TODO: Check response for commands, dont forget to validate IDs
+func handleUpdates(result []tgs.Update) error {
+	defer cleanUpHandledUpdateIDs(result)
+
+	for _, update := range result {
+		if !isNewUpdateID(update.UpdateID) {
+			continue
+		}
+
+		// TODO: ...
+	}
 
 	return fmt.Errorf("under construction")
+}
+
+func isNewUpdateID(id int) bool {
+	for _, handledID := range handledUpdateIDs {
+		if handledID == id {
+			return false
+		}
+	}
+
+	return true
+}
+
+func cleanUpHandledUpdateIDs(result []tgs.Update) {
+	newHandledUpdateIDs := make([]int, 0)
+
+	for _, handledID := range handledUpdateIDs {
+		for _, update := range result {
+			if update.UpdateID == handledID {
+				newHandledUpdateIDs = append(newHandledUpdateIDs, handledID)
+				break
+			}
+		}
+	}
+
+	handledUpdateIDs = newHandledUpdateIDs
 }
 
 func checkConfig(config *Config) error {
