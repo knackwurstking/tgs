@@ -89,8 +89,24 @@ func handleUpdates(config *Config, result []data.Update) error {
 			continue
 		}
 
-		// TODO: Get command from update, check entities for "bot_command" type and get
-		//   	 offset & length
+		if update.Message == nil || update.Message.Entities == nil || update.Message.Text == nil {
+			continue
+		}
+
+		slog.Debug("Got a new update from result", "update", update)
+
+		botCommand := ""
+		for _, entity := range update.Message.Entities {
+			if entity.Type == "bot_command" {
+				botCommand = (*update.Message.Text)[entity.Offset:entity.Length]
+				break
+			}
+		}
+
+		if botCommand == "" {
+			continue
+		}
+
 		// TODO: Handle command for targets in config (check from, check chat for target ids)
 	}
 
