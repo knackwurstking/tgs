@@ -44,7 +44,7 @@ func (ip *IP) Run() error {
 		return err
 	}
 
-	// TODO: Send response with address back to client, need a new request type here
+	// TODO: Create message and send
 	_, err = ip.RequestSendMessage.Send()
 	if err != nil {
 		return err
