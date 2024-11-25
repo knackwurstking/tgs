@@ -96,14 +96,14 @@ func handleUpdates(config *Config, result []data.Update) {
 			continue
 		}
 
-		if update.Message.Entities == nil || update.Message.Text == nil {
+		if update.Message.Entities == nil || update.Message.Text == "" {
 			continue
 		}
 
 		botCommand := ""
 		for _, entity := range update.Message.Entities {
 			if entity.Type == "bot_command" {
-				botCommand = (*update.Message.Text)[entity.Offset:entity.Length]
+				botCommand = update.Message.Text[entity.Offset:entity.Length]
 				break
 			}
 		}
@@ -124,7 +124,7 @@ func handleUpdates(config *Config, result []data.Update) {
 		switch botCommand {
 		case BotCommandIP:
 			ip := commands.NewIP(tgs.NewTelegramBotAPI(config.Token), nil)
-			// ...
+			ip.Run(update.Message.Chat.ID)
 			break
 		}
 	}
@@ -136,7 +136,7 @@ func isValidTarget(message data.Message, commandTargets *Targets, fallbackTarget
 		targets = *commandTargets
 	}
 
-	if message.From != nil && targets.Users != nil {
+	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
 				return true
