@@ -13,4 +13,8 @@ type ResponseGetUpdates struct {
 }
 
 // TODO: "setMyCommands"
-// TODO: "sendMessage"
+
+type ResponseSendMessage struct {
+	OK     bool         `json:"ok" yaml:"ok"`
+	Result data.Message `json:"result" yaml:"result"`
+}

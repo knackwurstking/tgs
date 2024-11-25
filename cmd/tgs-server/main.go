@@ -12,6 +12,10 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+const (
+	BotCommandIP string = "/ip"
+)
+
 var (
 	handledIDs = make([]int, 0) // Contains update ids already handled
 )
@@ -116,10 +120,10 @@ func handleUpdates(config *Config, result []data.Update) {
 
 		slog.Debug("Handle bot command", "command", botCommand, "message", *update.Message)
 
-		// TODO: Handle command
+		// TODO: Handle commands
 		switch botCommand {
-		case "/ip":
-			ip := commands.IP{}
+		case BotCommandIP:
+			ip := commands.NewIP(tgs.NewTelegramBotAPI(config.Token), nil)
 			// ...
 			break
 		}

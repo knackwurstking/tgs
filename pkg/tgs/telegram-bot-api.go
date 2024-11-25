@@ -35,6 +35,10 @@ func (api *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 		return nil, fmt.Errorf("missing token")
 	}
 
+	if request == nil {
+		return nil, fmt.Errorf("missing request")
+	}
+
 	data, err := json.Marshal(request)
 	if err != nil {
 		return nil, err

@@ -55,4 +55,28 @@ func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 }
 
 // TODO: "setMyCommands"
-// TODO: "sendMessage"
+
+type RequestSendMessage struct {
+	API
+
+	// TODO: Request data missing here for "sendMessage"
+}
+
+func (r *RequestSendMessage) Command() Command {
+	return CommandSendMessage
+}
+
+// TODO: Message type missing here
+func (r *RequestSendMessage) Send(message any) (*ResponseSendMessage, error) {
+	if r.API == nil {
+		return nil, fmt.Errorf("missing API")
+	}
+
+	data, err := r.API.SendRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ResponseSendMessage
+	return &response, json.Unmarshal(data, &response)
+}
