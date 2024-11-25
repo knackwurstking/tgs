@@ -3,6 +3,8 @@ package tgs
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/knackwurstking/tgs/pkg/data"
 )
 
 type RequestGetMe struct {
@@ -59,15 +61,31 @@ func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 type RequestSendMessage struct {
 	API
 
-	// TODO: Request data missing here for "sendMessage"
+	BusinessConnectionID string `json:"business_connection_id"` // [Optional] Unique identifier of the business connection on behalf of which the message will be sent
+
+	// NOTE: Valid types: int or string, only use int for now
+	ChatID int `json:"chat_id"` // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+
+	MessageThreadID     int                     `json:"message_thread_id"`    // [Optional] Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+	Text                string                  `json:"text"`                 // Text of the message to be sent, 1-4096 characters after entities parsing
+	ParseMode           string                  `json:"parse_mode"`           // [Optional] Mode for parsing entities in the message text. See formatting options for more details.
+	Entities            []data.MessageEntity    `json:"entities"`             // [Optional] A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
+	LinkPreviewOptions  data.LinkPreviewOptions `json:"link_preview_options"` // [Optional] Link preview generation options for the message
+	DisableNotification bool                    `json:"disable_notification"` // [Optional] Sends the message silently. Users will receive a notification with no sound.
+	ProtectContent      bool                    `json:"protect_content"`      // [Optional] Protects the contents of the sent message from forwarding and saving
+	AllowPaidBroadcast  bool                    `json:"allow_paid_broadcast"` // [Optional] Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	MessageEffectID     string                  `json:"message_effect_id"`    // [Optional] Unique identifier of the message effect to be added to the message; for private chats only
+	ReplyParameters     data.ReplyParameters    `json:"reply_parameters"`     // [Optional] Description of the message to reply to
+
+	// NOTE: Ignore this for now
+	//ReplyMarkup      (InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply)    `json:"reply_markup"`   // [Optional] Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
 }
 
 func (r *RequestSendMessage) Command() Command {
 	return CommandSendMessage
 }
 
-// TODO: Message type missing here
-func (r *RequestSendMessage) Send(message any) (*ResponseSendMessage, error) {
+func (r *RequestSendMessage) Send() (*ResponseSendMessage, error) {
 	if r.API == nil {
 		return nil, fmt.Errorf("missing API")
 	}
