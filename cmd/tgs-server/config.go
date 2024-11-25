@@ -43,21 +43,21 @@ type CommandConfigs struct {
 
 func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 	switch command {
-	case "/ip":
+	case BotCommandIP:
 		return &c.IP, nil
-	case "/journallist":
+	case BotCommandJournalList:
 		return &c.JournalList, nil
-	case "/journal":
+	case BotCommandJournal:
 		return &c.Journal, nil
-	case "/picowstatus":
+	case BotCommandPicowStatus:
 		return &c.PicowStatus, nil
-	case "/picowon":
+	case BotCommandPicowON:
 		return &c.PicowOn, nil
-	case "/picowoff":
+	case BotCommandPicowOFF:
 		return &c.PicowOff, nil
-	case "/opmanga":
+	case BotCommandOPManga:
 		return &c.OPManga, nil
-	case "/opmangalist":
+	case BotCommandOPMangaList:
 		return &c.OPMangaList, nil
 	default:
 		return nil, fmt.Errorf("command %s not found", command)
