@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/knackwurstking/tgs/pkg/data"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -30,7 +31,7 @@ func NewIP(api tgs.API, url *string) *IP {
 	}
 }
 
-func (ip *IP) Run() error {
+func (ip *IP) Run(chatID int) error {
 	if ip.RequestSendMessage == nil {
 		return fmt.Errorf("missing sendMessage request")
 	}
@@ -44,7 +45,10 @@ func (ip *IP) Run() error {
 		return err
 	}
 
-	// TODO: Create message and send
+	ip.RequestSendMessage.ParseMode = data.ParseModeMarkdownV2
+	ip.RequestSendMessage.Text = fmt.Sprintf("`%s`", address)
+	ip.RequestSendMessage.ChatID = chatID
+
 	_, err = ip.RequestSendMessage.Send()
 	if err != nil {
 		return err
