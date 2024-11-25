@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	DefaultIPAddress string = "ifconfig.io"
+	defaultIPAddress string = "ifconfig.io"
 )
 
 type IP struct {
@@ -22,7 +22,7 @@ type IP struct {
 
 func NewIP(api tgs.API, url *string) *IP {
 	if url == nil {
-		url = &DefaultIPAddress
+		url = &defaultIPAddress
 	}
 
 	return &IP{
@@ -34,10 +34,6 @@ func NewIP(api tgs.API, url *string) *IP {
 func (ip *IP) Run(chatID int) error {
 	if ip.RequestSendMessage == nil {
 		return fmt.Errorf("missing sendMessage request")
-	}
-
-	if ip.URL == nil {
-		ip.URL = &DefaultIPAddress
 	}
 
 	address, err := ip.fetchAddressFromURL()
@@ -58,14 +54,10 @@ func (ip *IP) Run(chatID int) error {
 }
 
 func (ip *IP) fetchAddressFromURL() (string, error) {
-	if ip.URL == nil {
-		ip.URL = &DefaultIPAddress
-	}
-
 	var ret string
 
 	switch *ip.URL {
-	case DefaultIPAddress:
+	case defaultIPAddress:
 		// TODO: Fetch ip address from this URL
 		break
 	}
