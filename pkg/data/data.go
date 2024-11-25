@@ -123,3 +123,7 @@ type ChatBoostUpdated struct {
 type ChatBoostRemoved struct {
 	// TODO: ...
 }
+
+type ReplyParameters struct {
+	// TODO: ...
+}
