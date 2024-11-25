@@ -10,9 +10,9 @@ type Users []data.User
 type Chats []data.Chat
 
 type Config struct {
-	Token    string         `json:"token" yaml:"token"`
-	Targets  Targets        `json:"targets" yaml:"targets"`
-	Commands CommandConfigs `json:"commands" yaml:"commands"`
+	Token    string         `json:"token"`
+	Targets  Targets        `json:"targets"`
+	Commands CommandConfigs `json:"commands"`
 }
 
 func NewConfig() *Config {
@@ -26,19 +26,19 @@ func NewConfig() *Config {
 }
 
 type Targets struct {
-	Users Users `json:"users" yaml:"users"`
-	Chats Chats `json:"chats" yaml:"chats"`
+	Users Users `json:"users"`
+	Chats Chats `json:"chats"`
 }
 
 type CommandConfigs struct {
-	IP          CommandConfig `json:"ip" yaml:"ip"`
-	JournalList CommandConfig `json:"journallist" yaml:"journallist"`
-	Journal     CommandConfig `json:"journal" yaml:"journal"`
-	PicowStatus CommandConfig `json:"picowstatus" yaml:"picowstatus"`
-	PicowOn     CommandConfig `json:"picowon" yaml:"picowon"`
-	PicowOff    CommandConfig `json:"picowoff" yaml:"picowoff"`
-	OPManga     CommandConfig `json:"opmanga" yaml:"opmanga"`
-	OPMangaList CommandConfig `json:"opmangalist" yaml:"opmangalist"`
+	IP          CommandConfig `json:"ip"`
+	JournalList CommandConfig `json:"journallist"`
+	Journal     CommandConfig `json:"journal"`
+	PicowStatus CommandConfig `json:"picowstatus"`
+	PicowOn     CommandConfig `json:"picowon"`
+	PicowOff    CommandConfig `json:"picowoff"`
+	OPManga     CommandConfig `json:"opmanga"`
+	OPMangaList CommandConfig `json:"opmangalist"`
 }
 
 func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
@@ -65,5 +65,5 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 }
 
 type CommandConfig struct {
-	Targets *Targets `json:"targets" yaml:"targets"`
+	Targets *Targets `json:"targets"`
 }

@@ -12,11 +12,11 @@ var (
 )
 
 type IP struct {
-	RequestSendMessage *tgs.RequestSendMessage `json:"-" yaml:"-"`
+	RequestSendMessage *tgs.RequestSendMessage `json:"-"`
 
-	Address string `json:"address" yaml:"address"`
+	Address string `json:"address"`
 
-	URL *string `json:"-" yaml:"-"` // Defaults to "ifconfig.io"
+	URL *string `json:"-"` // Defaults to "ifconfig.io"
 }
 
 func NewIP(api tgs.API, url *string) *IP {
