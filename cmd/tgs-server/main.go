@@ -127,12 +127,15 @@ func handleUpdates(config *Config, result []data.Update) {
 
 		slog.Debug("Handle bot command", "command", botCommand, "message", *update.Message)
 
-		// TODO: Handle commands
+		var tgCommandHandler commands.TelegramCommandHandler
 		switch botCommand {
 		case BotCommandIP:
-			ip := commands.NewIP(tgs.NewTelegramBotAPI(config.Token), nil)
-			ip.Run(update.Message.Chat.ID)
+			tgCommandHandler = commands.NewIP(tgs.NewTelegramBotAPI(config.Token))
 			break
+		}
+
+		if tgCommandHandler != nil {
+			tgCommandHandler.Run(update.Message.Chat.ID)
 		}
 	}
 }
