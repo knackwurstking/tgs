@@ -49,6 +49,9 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 	case CommandGetMe, CommandGetUpdates:
 		method = "GET"
 		break
+	case CommandSetMyCommands, CommandSendMessage:
+		method = "POST"
+		break
 	default:
 		return nil, fmt.Errorf(fmt.Sprintf("unknown command: %s", request.Command()))
 	}
