@@ -50,6 +50,8 @@ func main() {
 					return err
 				}
 
+				// TODO: Send the bot commands list first, continue here...
+
 				requestTimeout := 60 // 1 Minute
 				getUpdates := tgs.RequestGetUpdates{
 					API:     tgs.NewTelegramBotAPI(config.Token),
