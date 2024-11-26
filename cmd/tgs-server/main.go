@@ -132,6 +132,30 @@ func handleUpdates(config *Config, result []data.Update) {
 		case BotCommandIP:
 			tgCommandHandler = commands.NewIP(tgs.NewTelegramBotAPI(config.Token))
 			break
+
+		case BotCommandJournalList:
+			// TODO: ...
+			break
+		case BotCommandJournal:
+			// TODO: ...
+			break
+
+		case BotCommandPicowStatus:
+			// TODO: ...
+			break
+		case BotCommandPicowON:
+			// TODO: ...
+			break
+		case BotCommandPicowOFF:
+			// TODO: ...
+			break
+
+		case BotCommandOPMangaList:
+			// TODO: ...
+			break
+		case BotCommandOPManga:
+			// TODO: ...
+			break
 		}
 
 		if tgCommandHandler != nil {
