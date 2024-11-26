@@ -266,6 +266,8 @@ func checkConfig(config *Config) error {
 }
 
 func loadConfig(config *Config, path string) error {
+	// TODO: Check config file type and load json / yaml configuration
+
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
