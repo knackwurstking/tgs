@@ -40,9 +40,12 @@ func (this *IP) Run(chatID int) error {
 	this.RequestSendMessage.Text = fmt.Sprintf("`%s`", address)
 	this.RequestSendMessage.ChatID = chatID
 
-	_, err = this.RequestSendMessage.Send()
+	resp, err := this.RequestSendMessage.Send()
 	if err != nil {
 		return err
+	}
+	if !resp.OK {
+		return fmt.Errorf("send message returned: %+v", resp)
 	}
 
 	return nil
