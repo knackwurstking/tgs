@@ -184,7 +184,7 @@ func handleUpdates(config *Config, result []data.Update) {
 			continue
 		}
 
-		if !isValidTarget(*update.Message, commandConfig.Targets, config.Targets) {
+		if !isValidTarget(*update.Message, commandConfig.Targets) {
 			continue
 		}
 
@@ -227,12 +227,7 @@ func handleUpdates(config *Config, result []data.Update) {
 	}
 }
 
-func isValidTarget(message data.Message, commandTargets *Targets, fallbackTargets Targets) bool {
-	targets := fallbackTargets
-	if commandTargets != nil {
-		targets = *commandTargets
-	}
-
+func isValidTarget(message data.Message, targets *Targets) bool {
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
@@ -243,7 +238,7 @@ func isValidTarget(message data.Message, commandTargets *Targets, fallbackTarget
 
 	if targets.Chats != nil {
 		for _, chat := range targets.Chats {
-			if chat.ID == message.Chat.ID {
+			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type && chat.Type != "") {
 				return true
 			}
 		}
@@ -264,11 +259,7 @@ func isNewUpdateID(id int) bool {
 
 func checkConfig(config *Config) error {
 	if config.Token == "" {
-		return fmt.Errorf("token missing")
-	}
-
-	if config.Targets.Chats == nil && config.Targets.Users == nil {
-		return fmt.Errorf("missing targets")
+		return fmt.Errorf("missing token")
 	}
 
 	return nil

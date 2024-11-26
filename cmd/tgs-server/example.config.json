@@ -6,17 +6,52 @@
     },
     "commands": {
         "ip": {
+            "scope": "default",
             "targets": {
-                "users": [{ "id": "<USER_ID>" }],
-                "chats": [{ "id": "<CHAT_ID>" }]
+                "users": [{ "id": "<USER_ID>" }]
             }
         },
-        "journallist": {},
-        "journal": {},
-        "picowstatus": {},
-        "picowon": {},
-        "picowoff": {},
-        "opmanga": {},
-        "opmangalist": {}
+        "journallist": {
+            "scope": "default",
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }]
+            }
+        },
+        "journal": {
+            "scope": "default",
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }]
+            }
+        },
+        "picowstatus": {
+            "scope": "default",
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }]
+            }
+        },
+        "picowon": {
+            "scope": "default",
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }]
+            }
+        },
+        "picowoff": {
+            "scope": "default",
+            "targets": {
+                "users": [{ "id": "<USER_ID>" }]
+            }
+        },
+        "opmanga": {
+            "scope": "chat",
+            "targets": {
+                "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
+            }
+        },
+        "opmangalist": {
+            "scope": "chat",
+            "targets": {
+                "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
+            }
+        }
     }
 }

@@ -2,43 +2,37 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/knackwurstking/tgs/pkg/data"
 )
 
-type Users []data.User
-type Chats []data.Chat
+type Users []struct {
+	ID int `json:"id" yaml:"id"`
+}
+
+type Chats []struct {
+	ID   int    `json:"id" yaml:"id"`
+	Type string `json:"type" yaml:"type"`
+}
 
 type Config struct {
-	Token    string         `json:"token"`
-	Targets  Targets        `json:"targets"`
-	Commands CommandConfigs `json:"commands"`
+	Token    string         `json:"token" yaml:"token"`
+	Commands CommandConfigs `json:"commands" yaml:"commands"`
 }
 
 func NewConfig() *Config {
 	return &Config{
-		Targets: Targets{
-			Users: make(Users, 0),
-			Chats: make(Chats, 0),
-		},
 		Commands: CommandConfigs{},
 	}
 }
 
-type Targets struct {
-	Users Users `json:"users"`
-	Chats Chats `json:"chats"`
-}
-
 type CommandConfigs struct {
-	IP          CommandConfig `json:"ip"`
-	JournalList CommandConfig `json:"journallist"`
-	Journal     CommandConfig `json:"journal"`
-	PicowStatus CommandConfig `json:"picowstatus"`
-	PicowOn     CommandConfig `json:"picowon"`
-	PicowOff    CommandConfig `json:"picowoff"`
-	OPManga     CommandConfig `json:"opmanga"`
-	OPMangaList CommandConfig `json:"opmangalist"`
+	IP          CommandConfig `json:"ip" yaml:"ip"`
+	JournalList CommandConfig `json:"journallist" yaml:"journallist"`
+	Journal     CommandConfig `json:"journal" yaml:"journal"`
+	PicowStatus CommandConfig `json:"picowstatus" yaml:"picowstatus"`
+	PicowOn     CommandConfig `json:"picowon" yaml:"picowon"`
+	PicowOff    CommandConfig `json:"picowoff" yaml:"picowoff"`
+	OPManga     CommandConfig `json:"opmanga" yaml:"opmanga"`
+	OPMangaList CommandConfig `json:"opmangalist" yaml:"opmangalist"`
 }
 
 func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
@@ -68,6 +62,11 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 }
 
 type CommandConfig struct {
-	Targets  *Targets `json:"targets,omitempty"` // [Optional]
-	Disabled bool     `json:"disabled"`          // [Optional]
+	Targets  *Targets `json:"targets,omitempty" yaml:"targets,omitempty"`   // [Optional]
+	Disabled bool     `json:"disabled,omitempty" json:"disabled,omitempty"` // [Optional]
+}
+
+type Targets struct {
+	Users Users `json:"users" yaml:"users"`
+	Chats Chats `json:"chats" yaml:"chats"`
 }
