@@ -50,7 +50,7 @@ func main() {
 					return err
 				}
 
-				// TODO: Send the bot commands list first, continue here...
+				// TODO: Send the bot commands list first
 
 				requestTimeout := 60 // 1 Minute
 				getUpdates := tgs.RequestGetUpdates{
