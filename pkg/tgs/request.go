@@ -11,16 +11,16 @@ type RequestGetMe struct {
 	API
 }
 
-func (r *RequestGetMe) Command() Command {
+func (*RequestGetMe) Command() Command {
 	return CommandGetMe
 }
 
-func (r *RequestGetMe) Send() (*ResponseGetMe, error) {
-	if r.API == nil {
+func (this *RequestGetMe) Send() (*ResponseGetMe, error) {
+	if this.API == nil {
 		return nil, fmt.Errorf("missing API")
 	}
 
-	data, err := r.API.SendRequest(r)
+	data, err := this.API.SendRequest(this)
 	if err != nil {
 		return nil, err
 	}
@@ -38,16 +38,16 @@ type RequestGetUpdates struct {
 	AllowedUpdates []string `json:"allowed_updates" yaml:"allowed_updates"`
 }
 
-func (r *RequestGetUpdates) Command() Command {
+func (*RequestGetUpdates) Command() Command {
 	return CommandGetUpdates
 }
 
-func (r *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
-	if r.API == nil {
+func (this *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
+	if this.API == nil {
 		return nil, fmt.Errorf("missing API")
 	}
 
-	data, err := r.API.SendRequest(r)
+	data, err := this.API.SendRequest(this)
 	if err != nil {
 		return nil, err
 	}
@@ -81,16 +81,16 @@ type RequestSendMessage struct {
 	//ReplyMarkup      (InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply)    `json:"reply_markup"`   // [Optional] Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
 }
 
-func (r *RequestSendMessage) Command() Command {
+func (*RequestSendMessage) Command() Command {
 	return CommandSendMessage
 }
 
-func (r *RequestSendMessage) Send() (*ResponseSendMessage, error) {
-	if r.API == nil {
+func (this *RequestSendMessage) Send() (*ResponseSendMessage, error) {
+	if this.API == nil {
 		return nil, fmt.Errorf("missing API")
 	}
 
-	data, err := r.API.SendRequest(r)
+	data, err := this.API.SendRequest(this)
 	if err != nil {
 		return nil, err
 	}

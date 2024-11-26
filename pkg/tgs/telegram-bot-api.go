@@ -18,20 +18,20 @@ func NewTelegramBotAPI(token string) *TelegramBotAPI {
 	}
 }
 
-func (api *TelegramBotAPI) Token() string {
-	return api.token
+func (this *TelegramBotAPI) Token() string {
+	return this.token
 }
 
-func (api *TelegramBotAPI) SetToken(token string) {
-	api.token = token
+func (this *TelegramBotAPI) SetToken(token string) {
+	this.token = token
 }
 
-func (api *TelegramBotAPI) URL(command Command) string {
-	return fmt.Sprintf("https://api.telegram.org/bot%s/%s", api.Token(), command)
+func (this *TelegramBotAPI) URL(command Command) string {
+	return fmt.Sprintf("https://api.telegram.org/bot%s/%s", this.Token(), command)
 }
 
-func (api *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
-	if api.Token() == "" {
+func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
+	if this.Token() == "" {
 		return nil, fmt.Errorf("missing token")
 	}
 
@@ -54,7 +54,7 @@ func (api *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 	}
 
 	body := bytes.NewBuffer(data)
-	req, err := http.NewRequest(method, api.URL(request.Command()), body)
+	req, err := http.NewRequest(method, this.URL(request.Command()), body)
 	if err != nil {
 		return nil, err
 	}
