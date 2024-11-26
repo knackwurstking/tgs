@@ -2,9 +2,14 @@ package tgs
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/knackwurstking/tgs/pkg/data"
+)
+
+var (
+	MissingAPIError = errors.New("missing API")
 )
 
 type RequestGetMe struct {
@@ -17,7 +22,7 @@ func (*RequestGetMe) Command() Command {
 
 func (this *RequestGetMe) Send() (*ResponseGetMe, error) {
 	if this.API == nil {
-		return nil, fmt.Errorf("missing API")
+		return nil, MissingAPIError
 	}
 
 	data, err := this.API.SendRequest(this)
@@ -44,7 +49,7 @@ func (*RequestGetUpdates) Command() Command {
 
 func (this *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 	if this.API == nil {
-		return nil, fmt.Errorf("missing API")
+		return nil, MissingAPIError
 	}
 
 	data, err := this.API.SendRequest(this)
@@ -57,6 +62,21 @@ func (this *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 }
 
 // TODO: "setMyCommands"
+type RequestSetMyCommands struct {
+	API
+
+	// TODO: Add missing fields here
+}
+
+func (*RequestSetMyCommands) Command() Command {
+	return CommandSetMyCommands
+}
+
+func (*RequestSetMyCommands) Send() (*ResponseSetMyCommands, error) {
+	// TODO: Continue here... (Check, Send, Parse)
+
+	return nil, fmt.Errorf("under construction")
+}
 
 type RequestSendMessage struct {
 	API
@@ -87,7 +107,7 @@ func (*RequestSendMessage) Command() Command {
 
 func (this *RequestSendMessage) Send() (*ResponseSendMessage, error) {
 	if this.API == nil {
-		return nil, fmt.Errorf("missing API")
+		return nil, MissingAPIError
 	}
 
 	data, err := this.API.SendRequest(this)
