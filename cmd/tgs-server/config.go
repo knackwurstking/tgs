@@ -66,4 +66,5 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 
 type CommandConfig struct {
 	Targets *Targets `json:"targets,omitempty"` // [Optional]
+	Disable bool     `json:"disable"`           // [Optional]
 }
