@@ -50,27 +50,15 @@ func main() {
 					return err
 				}
 
-				// TODO: Send the bot commands list first, maybe clear (delete) all existing commands first?
-
-				requestTimeout := 60 // 1 Minute
-				getUpdates := tgs.RequestGetUpdates{
-					API:     tgs.NewTelegramBotAPI(config.Token),
-					Timeout: &requestTimeout,
+				if err := setBotCommands(); err != nil {
+					return err
 				}
-				for {
-					resp, err := getUpdates.Send()
-					if err != nil {
-						slog.Warn("Request updates", "error", err)
-						continue
-					}
 
-					if !resp.OK {
-						slog.Error("Request updates", "response", *resp)
-						return fmt.Errorf("request updates failed")
-					}
-
-					handleUpdates(config, resp.Result)
+				if err := updateLoop(config); err != nil {
+					return err
 				}
+
+				return nil
 			}
 		}),
 		CommandFlags: []cli.CommandFlag{
@@ -80,6 +68,46 @@ func main() {
 	}
 
 	app.HandleError(app.Run())
+}
+
+func updateLoop(config *Config) error {
+	requestTimeout := 60 // 1 Minute
+	getUpdates := tgs.RequestGetUpdates{
+		API:     tgs.NewTelegramBotAPI(config.Token),
+		Timeout: &requestTimeout,
+	}
+	for {
+		resp, err := getUpdates.Send()
+		if err != nil {
+			slog.Warn("Request updates", "error", err)
+			continue
+		}
+
+		if !resp.OK {
+			slog.Error("Request updates", "response", *resp)
+			return fmt.Errorf("request updates failed")
+		}
+
+		handleUpdates(config, resp.Result)
+	}
+}
+
+func setBotCommands() error {
+	// TODO: Send the bot commands list first, maybe clear (delete) all existing commands first?
+	scopes := []data.BotCommandScopeType{
+		data.BotCommandScopeTypeDefault,
+		data.BotCommandScopeTypeAllPrivateChats,
+		data.BotCommandScopeTypeAllGroupChats,
+		data.BotCommandScopeTypeAllChatAdministrators,
+		data.BotCommandScopeTypeChat,
+		data.BotCommandScopeTypeChatAdministrators,
+		data.BotCommandScopeTypeChatMember,
+	}
+	for _, scope := range scopes {
+
+	}
+
+	return fmt.Errorf("under construction")
 }
 
 func handleUpdates(config *Config, result []data.Update) {
