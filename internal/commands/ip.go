@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 
 	"github.com/knackwurstking/tgs/pkg/data"
@@ -31,36 +33,53 @@ func NewIP(api tgs.API, url *string) *IP {
 	}
 }
 
-func (ip *IP) Run(chatID int) error {
-	if ip.RequestSendMessage == nil {
+func (this *IP) Run(chatID int) error {
+	if this.RequestSendMessage == nil {
 		return fmt.Errorf("missing sendMessage request")
 	}
 
-	address, err := ip.fetchAddressFromURL()
+	address, err := this.fetchAddressFromURL()
 	if err != nil {
 		return err
 	}
 
-	ip.RequestSendMessage.ParseMode = data.ParseModeMarkdownV2
-	ip.RequestSendMessage.Text = fmt.Sprintf("`%s`", address)
-	ip.RequestSendMessage.ChatID = chatID
+	this.RequestSendMessage.ParseMode = data.ParseModeMarkdownV2
+	this.RequestSendMessage.Text = fmt.Sprintf("`%s`", address)
+	this.RequestSendMessage.ChatID = chatID
 
-	_, err = ip.RequestSendMessage.Send()
+	_, err = this.RequestSendMessage.Send()
 	if err != nil {
 		return err
 	}
 
-	return fmt.Errorf("under construction")
+	return nil
 }
 
-func (ip *IP) fetchAddressFromURL() (string, error) {
-	var ret string
-
-	switch *ip.URL {
+func (this *IP) fetchAddressFromURL() (address string, err error) {
+	switch *this.URL {
 	case defaultIPAddress:
-		// TODO: Fetch ip address from this URL
+		address, err = this.fetchAddressFromDefault()
 		break
 	}
 
-	return strings.Trim(ret, "\n\t "), fmt.Errorf("under construction")
+	return address, nil
+}
+
+func (*IP) fetchAddressFromDefault() (address string, err error) {
+	resp, err := http.Get(defaultIPAddress)
+	if err != nil {
+		return address, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return address, fmt.Errorf("request to %s: %d (%s)",
+			defaultIPAddress, resp.StatusCode, resp.Status,
+		)
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return address, err
+	}
+
+	return strings.Trim(string(data), "\n\r\t "), nil
 }
