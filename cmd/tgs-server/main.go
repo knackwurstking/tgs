@@ -50,7 +50,7 @@ func main() {
 					return err
 				}
 
-				if err := setBotCommands(); err != nil {
+				if err := setBotCommands(config); err != nil {
 					return err
 				}
 
@@ -92,19 +92,52 @@ func updateLoop(config *Config) error {
 	}
 }
 
-func setBotCommands() error {
+func setBotCommands(config *Config) error {
 	// TODO: Send the bot commands list first, maybe clear (delete) all existing commands first?
-	scopes := []data.BotCommandScopeType{
-		data.BotCommandScopeTypeDefault,
-		data.BotCommandScopeTypeAllPrivateChats,
-		data.BotCommandScopeTypeAllGroupChats,
-		data.BotCommandScopeTypeAllChatAdministrators,
-		data.BotCommandScopeTypeChat,
-		data.BotCommandScopeTypeChatAdministrators,
-		data.BotCommandScopeTypeChatMember,
+	scopes := map[data.BotCommandScopeType][]data.BotCommand{
+		data.BotCommandScopeTypeDefault:               {},
+		data.BotCommandScopeTypeAllPrivateChats:       {},
+		data.BotCommandScopeTypeAllGroupChats:         {},
+		data.BotCommandScopeTypeAllChatAdministrators: {},
+		data.BotCommandScopeTypeChat:                  {},
+		data.BotCommandScopeTypeChatAdministrators:    {},
+		data.BotCommandScopeTypeChatMember:            {},
 	}
-	for _, scope := range scopes {
 
+	if !config.Commands.IP.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.JournalList.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.Journal.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.PicowStatus.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.PicowOn.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.PicowOff.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.OPMangaList.Disabled {
+		// TODO: ...
+	}
+
+	if !config.Commands.OPManga.Disabled {
+		// TODO: ...
+	}
+
+	for scope, botCommands := range scopes {
+		// TODO: Set commands (request)
 	}
 
 	return fmt.Errorf("under construction")
