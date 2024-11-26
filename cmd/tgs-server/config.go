@@ -45,16 +45,19 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 	switch command {
 	case BotCommandIP:
 		return &c.IP, nil
+
 	case BotCommandJournalList:
 		return &c.JournalList, nil
 	case BotCommandJournal:
 		return &c.Journal, nil
+
 	case BotCommandPicowStatus:
 		return &c.PicowStatus, nil
 	case BotCommandPicowON:
 		return &c.PicowOn, nil
 	case BotCommandPicowOFF:
 		return &c.PicowOff, nil
+
 	case BotCommandOPManga:
 		return &c.OPManga, nil
 	case BotCommandOPMangaList:
@@ -65,6 +68,6 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 }
 
 type CommandConfig struct {
-	Targets *Targets `json:"targets,omitempty"` // [Optional]
-	Disable bool     `json:"disable"`           // [Optional]
+	Targets  *Targets `json:"targets,omitempty"` // [Optional]
+	Disabled bool     `json:"disabled"`          // [Optional]
 }
