@@ -18,18 +18,11 @@ type IP struct {
 	RequestSendMessage *tgs.RequestSendMessage `json:"-"`
 
 	Address string `json:"address"`
-
-	URL *string `json:"-"` // Defaults to "ifconfig.io"
 }
 
-func NewIP(api tgs.API, url *string) *IP {
-	if url == nil {
-		url = &defaultIPAddress
-	}
-
+func NewIP(api tgs.API) *IP {
 	return &IP{
 		RequestSendMessage: nil,
-		URL:                url,
 	}
 }
 
@@ -56,16 +49,6 @@ func (this *IP) Run(chatID int) error {
 }
 
 func (this *IP) fetchAddressFromURL() (address string, err error) {
-	switch *this.URL {
-	case defaultIPAddress:
-		address, err = this.fetchAddressFromDefault()
-		break
-	}
-
-	return address, nil
-}
-
-func (*IP) fetchAddressFromDefault() (address string, err error) {
 	resp, err := http.Get(defaultIPAddress)
 	if err != nil {
 		return address, err
