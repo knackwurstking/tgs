@@ -3,7 +3,6 @@ package tgs
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/knackwurstking/tgs/pkg/data"
 )
@@ -65,17 +64,32 @@ func (this *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 type RequestSetMyCommands struct {
 	API
 
-	// TODO: Add missing fields here
+	/*
+		TODO: Add missing fields here
+			commands	Array of BotCommand	Yes	A JSON-serialized list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
+
+			scope	BotCommandScope	Optional	A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to BotCommandScopeDefault.
+
+			language_code	String	Optional	A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
+	*/
 }
 
 func (*RequestSetMyCommands) Command() Command {
 	return CommandSetMyCommands
 }
 
-func (*RequestSetMyCommands) Send() (*ResponseSetMyCommands, error) {
-	// TODO: Continue here... (Check, Send, Parse)
+func (this *RequestSetMyCommands) Send() (*ResponseSetMyCommands, error) {
+	if this.API == nil {
+		return nil, MissingAPIError
+	}
 
-	return nil, fmt.Errorf("under construction")
+	data, err := this.API.SendRequest(this)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ResponseSetMyCommands
+	return &response, json.Unmarshal(data, &response)
 }
 
 type RequestSendMessage struct {
