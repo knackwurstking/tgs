@@ -98,6 +98,34 @@ func (this *RequestSetMyCommands) Send() (*ResponseSetMyCommands, error) {
 	return &response, json.Unmarshal(data, &response)
 }
 
+type RequestDeleteMyCommands struct {
+	API
+
+	Scope data.BotCommandScope `json:"scope"` // [Optional] A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to BotCommandScopeDefault.
+}
+
+func (*RequestDeleteMyCommands) Command() Command {
+	return CommandDeleteMyCommands
+}
+
+func (this *RequestDeleteMyCommands) Body() any {
+	return this
+}
+
+func (this *RequestDeleteMyCommands) Send() (*ResponseDeleteMyCommands, error) {
+	if this.API == nil {
+		return nil, MissingAPIError
+	}
+
+	data, err := this.API.SendRequest(this)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ResponseDeleteMyCommands
+	return &response, json.Unmarshal(data, &response)
+}
+
 type RequestSendMessage struct {
 	API
 

@@ -17,6 +17,11 @@ type ResponseSetMyCommands struct {
 	Result bool `json:"result" yaml:"result"`
 }
 
+type ResponseDeleteMyCommands struct {
+	OK     bool `json:"ok" yaml:"ok"`
+	Result bool `json:"result" yaml:"result"`
+}
+
 type ResponseSendMessage struct {
 	OK     bool         `json:"ok" yaml:"ok"`
 	Result data.Message `json:"result" yaml:"result"`

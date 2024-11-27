@@ -52,8 +52,10 @@ func main() {
 					return err
 				}
 
-				if err := setBotCommands(config); err != nil {
+				if cleanUp, err := setBotCommands(config); err != nil {
 					return err
+				} else {
+					defer cleanUp()
 				}
 
 				if err := updateLoop(config); err != nil {
@@ -95,7 +97,7 @@ func updateLoop(config *Config) error {
 }
 
 // TODO: Need to clear all existing commands first
-func setBotCommands(config *Config) error {
+func setBotCommands(config *Config) (cleanUp func(), err error) {
 	api := tgs.NewTelegramBotAPI(config.Token)
 	requests := make([]tgs.RequestSetMyCommands, 0)
 
@@ -198,14 +200,27 @@ func setBotCommands(config *Config) error {
 	for _, request := range requests {
 		resp, err := request.Send()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if !resp.OK || !resp.Result {
-			return fmt.Errorf("Set commands failed on Telegram %+v", resp)
+			return nil, fmt.Errorf("Set commands failed on Telegram %+v", resp)
 		}
 	}
 
-	return nil
+	return func() {
+		for _, request := range requests {
+			resp, err := (&tgs.RequestDeleteMyCommands{
+				API:   api,
+				Scope: request.Scope,
+			}).Send()
+			if err != nil {
+				slog.Warn("Delete commands request", "scope", request.Scope, "error", err)
+			}
+			if !resp.OK || !resp.Result {
+				slog.Warn("Delete commands request", "resp", resp)
+			}
+		}
+	}, nil
 }
 
 func handleUpdates(config *Config, result []data.Update) {
