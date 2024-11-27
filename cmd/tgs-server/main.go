@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/SuperPaintman/nice/cli"
-	"github.com/knackwurstking/tgs/internal/commands"
-	"github.com/knackwurstking/tgs/pkg/data"
-	"github.com/knackwurstking/tgs/pkg/tgs"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
+
+	botcommands "github.com/knackwurstking/tgs/internal/bot-commands"
 )
 
 const (
@@ -23,10 +23,6 @@ const (
 	BotCommandPicowOFF    string = "/picowoff"
 	BotCommandOPManga     string = "/opmanga"
 	BotCommandOPMangaList string = "/opmangalist"
-)
-
-var (
-	handledIDs = make([]int, 0) // Contains update ids already handled
 )
 
 func main() {
@@ -52,14 +48,46 @@ func main() {
 					return err
 				}
 
-				if cleanUp, err := setBotCommands(config); err != nil {
+				bot, err := tgbotapi.NewBotAPI(config.Token)
+				if err != nil {
 					return err
-				} else {
-					defer cleanUp()
 				}
 
-				if err := updateLoop(config); err != nil {
-					return err
+				slog.Info("Authorized bot", "username", bot.Self.UserName)
+
+				update := tgbotapi.NewUpdate(0)
+				update.Timeout = 60 // 1min
+
+				for update := range bot.GetUpdatesChan(update) {
+					if !update.Message.IsCommand() {
+						continue
+					}
+
+					if isValidTarget(update.Message, nil) {
+						continue
+					}
+
+					switch update.Message.Command() {
+					case BotCommandIP:
+						if err := botcommands.NewIP(bot).Run(update.Message.Chat.ID); err != nil {
+							slog.Error("Command failed", "command", BotCommandIP, "error", err)
+						}
+
+						break
+
+					case BotCommandJournalList:
+					case BotCommandJournal:
+
+					case BotCommandPicowStatus:
+					case BotCommandPicowON:
+					case BotCommandPicowOFF:
+
+					case BotCommandOPMangaList:
+					case BotCommandOPManga:
+
+					default:
+						slog.Warn("Command not found", "command", update.Message.Command())
+					}
 				}
 
 				return nil
@@ -74,238 +102,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func updateLoop(config *Config) error {
-	requestTimeout := 60 // 1 Minute
-	getUpdates := tgs.RequestGetUpdates{
-		API:     tgs.NewTelegramBotAPI(config.Token),
-		Timeout: &requestTimeout,
-	}
-	for {
-		resp, err := getUpdates.Send()
-		if err != nil {
-			slog.Warn("Request updates", "error", err)
-			continue
-		}
-
-		if !resp.OK {
-			return fmt.Errorf("request updates: %d: %s", resp.ErrorCode, resp.Description)
-		}
-
-		handleUpdates(config, resp.Result)
-	}
-}
-
-func setBotCommands(config *Config) (cleanUp func(), err error) {
-	api := tgs.NewTelegramBotAPI(config.Token)
-	requests := make([]tgs.RequestSetMyCommands, 0)
-
-	getRequest := func(scope Scope) *tgs.RequestSetMyCommands {
-		for i, r := range requests {
-			if r.Scope.Type == scope.Scope &&
-				r.Scope.UserID == scope.UserID &&
-				r.Scope.ChatID == scope.ChatID {
-
-				return &requests[i]
-			}
-		}
-
-		return nil
-	}
-
-	addCommandToRequests := func(scopes []Scope, botCommand data.BotCommand) {
-		if scopes == nil {
-			return
-		}
-
-		var request *tgs.RequestSetMyCommands
-
-		for _, scope := range config.Commands.IP.Scopes {
-			if request = getRequest(scope); request != nil {
-				request.Commands = append(request.Commands, botCommand)
-			} else {
-				requests = append(
-					requests,
-					tgs.RequestSetMyCommands{
-						API:      api,
-						Commands: []data.BotCommand{botCommand},
-						Scope: data.BotCommandScope{
-							Type:   scope.Scope,
-							ChatID: scope.ChatID,
-							UserID: scope.UserID,
-						},
-					},
-				)
-			}
-		}
-	}
-
-	if !config.Commands.IP.Disabled {
-		addCommandToRequests(config.Commands.IP.Scopes, data.BotCommand{
-			Command:     BotCommandIP,
-			Description: "Get server ip",
-		})
-	}
-
-	if !config.Commands.JournalList.Disabled {
-		addCommandToRequests(config.Commands.IP.Scopes, data.BotCommand{
-			Command:     BotCommandJournalList,
-			Description: "List available journals",
-		})
-	}
-
-	if !config.Commands.Journal.Disabled {
-		addCommandToRequests(config.Commands.Journal.Scopes, data.BotCommand{
-			Command:     BotCommandJournal,
-			Description: "Get a journal",
-		})
-	}
-
-	if !config.Commands.PicowStatus.Disabled {
-		addCommandToRequests(config.Commands.PicowStatus.Scopes, data.BotCommand{
-			Command:     BotCommandPicowStatus,
-			Description: "Lights power status",
-		})
-	}
-
-	if !config.Commands.PicowOn.Disabled {
-		addCommandToRequests(config.Commands.PicowOn.Scopes, data.BotCommand{
-			Command:     BotCommandPicowON,
-			Description: "Power on the lights",
-		})
-	}
-
-	if !config.Commands.PicowOff.Disabled {
-		addCommandToRequests(config.Commands.PicowOff.Scopes, data.BotCommand{
-			Command:     BotCommandPicowOFF,
-			Description: "Power off the lights",
-		})
-	}
-
-	if !config.Commands.OPMangaList.Disabled {
-		addCommandToRequests(config.Commands.OPMangaList.Scopes, data.BotCommand{
-			Command:     BotCommandOPMangaList,
-			Description: "List One Piece mangas available",
-		})
-	}
-
-	if !config.Commands.OPManga.Disabled {
-		addCommandToRequests(config.Commands.OPManga.Scopes, data.BotCommand{
-			Command:     BotCommandOPManga,
-			Description: "Get a One Piece manga episode",
-		})
-	}
-
-	for _, request := range requests {
-		resp, err := request.Send()
-		if err != nil {
-			return nil, err
-		}
-		if !resp.OK || !resp.Result {
-			return nil, fmt.Errorf("Set commands failed on Telegram %+v", resp)
-		}
-	}
-
-	return func() {
-		for _, request := range requests {
-			resp, err := (&tgs.RequestDeleteMyCommands{
-				API:   api,
-				Scope: request.Scope,
-			}).Send()
-			if err != nil {
-				slog.Warn("Delete commands request", "scope", request.Scope, "error", err)
-			}
-			if !resp.OK || !resp.Result {
-				slog.Warn("Delete commands request", "resp", resp)
-			}
-		}
-	}, nil
-}
-
-func handleUpdates(config *Config, result []data.Update) {
-	defer func() {
-		newHandledIDs := make([]int, 0)
-		for _, handledID := range handledIDs {
-			for _, update := range result {
-				if update.UpdateID == handledID {
-					newHandledIDs = append(newHandledIDs, handledID)
-					break
-				}
-			}
-		}
-		handledIDs = newHandledIDs
-	}()
-
-	for _, update := range result {
-		if !isNewUpdateID(update.UpdateID) {
-			continue
-		}
-
-		if update.Message == nil {
-			continue
-		}
-
-		if update.Message.Entities == nil || update.Message.Text == "" {
-			continue
-		}
-
-		botCommand := ""
-		for _, entity := range update.Message.Entities {
-			if entity.Type == "bot_command" {
-				botCommand = update.Message.Text[entity.Offset:entity.Length]
-				break
-			}
-		}
-
-		commandConfig, err := config.Commands.Get(botCommand)
-		if err != nil {
-			slog.Warn("Command not found", "command", botCommand, "error", err)
-			continue
-		}
-
-		if !isValidTarget(*update.Message, commandConfig.Targets) {
-			continue
-		}
-
-		slog.Debug("Handle bot command", "command", botCommand, "message", *update.Message)
-
-		var tgCommandHandler commands.TelegramCommandHandler
-		switch botCommand {
-		case BotCommandIP:
-			tgCommandHandler = commands.NewIP(tgs.NewTelegramBotAPI(config.Token))
-			break
-
-		case BotCommandJournalList:
-			// TODO: ...
-			break
-		case BotCommandJournal:
-			// TODO: ...
-			break
-
-		case BotCommandPicowStatus:
-			// TODO: ...
-			break
-		case BotCommandPicowON:
-			// TODO: ...
-			break
-		case BotCommandPicowOFF:
-			// TODO: ...
-			break
-
-		case BotCommandOPMangaList:
-			// TODO: ...
-			break
-		case BotCommandOPManga:
-			// TODO: ...
-			break
-		}
-
-		if tgCommandHandler != nil {
-			tgCommandHandler.Run(update.Message.Chat.ID)
-		}
-	}
-}
-
-func isValidTarget(message data.Message, targets *Targets) bool {
+func isValidTarget(message *tgbotapi.Message, targets *TargetsConfig) bool {
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
@@ -323,16 +120,6 @@ func isValidTarget(message data.Message, targets *Targets) bool {
 	}
 
 	return false
-}
-
-func isNewUpdateID(id int) bool {
-	for _, handledID := range handledIDs {
-		if handledID == id {
-			return false
-		}
-	}
-
-	return true
 }
 
 func checkConfig(config *Config) error {
