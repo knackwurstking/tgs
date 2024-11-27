@@ -96,7 +96,6 @@ func updateLoop(config *Config) error {
 	}
 }
 
-// TODO: Need to clear all existing commands first
 func setBotCommands(config *Config) (cleanUp func(), err error) {
 	api := tgs.NewTelegramBotAPI(config.Token)
 	requests := make([]tgs.RequestSetMyCommands, 0)
