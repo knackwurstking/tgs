@@ -88,8 +88,7 @@ func updateLoop(config *Config) error {
 		}
 
 		if !resp.OK {
-			slog.Error("Request updates", "response", *resp)
-			return fmt.Errorf("request updates failed")
+			return fmt.Errorf("request updates: %d: %s", resp.ErrorCode, resp.Description)
 		}
 
 		handleUpdates(config, resp.Result)
