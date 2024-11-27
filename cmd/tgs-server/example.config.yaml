@@ -1,11 +1,16 @@
-token: <BOT_TOKEN>
+define:
+    - &UserID <number>
+    - &ChatID -<number>
+
+token: <token>
 
 ip:
-    targets:
-        users:
-            - id: User ID [Optional]
-        chats:
-            - id: Chat ID [Optional]
+    register:
+        - id: *ChatID
+          type: chat
 
+    targets:
+        chats:
+            - id: *ChatID
               # Type of chat, can be either "private", "group", "supergroup" or "channel"
-              type: group
+              type: supergroup

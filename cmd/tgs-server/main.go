@@ -58,9 +58,10 @@ func main() {
 
 				myBotCommands := mybotcommands.New()
 
-				myBotCommands.Add(BotCommandIP, "Get server ip", []tgbotapi.BotCommandScope{
-					{Type: "chat", ChatID: -1002493320266},
-				})
+				myBotCommands.Add(
+					BotCommandIP, "Get server ip",
+					config.IPCommandConfig.Register,
+				)
 
 				if err := myBotCommands.Register(bot); err != nil {
 					return err
@@ -76,7 +77,7 @@ func main() {
 
 					switch update.Message.Command() {
 					case BotCommandIP:
-						if isValidTarget(update.Message, config.IPCommandConfig.Targets) {
+						if isValidTarget(update.Message, config.IPCommandConfig.ValidationsConfig) {
 							continue
 						}
 
@@ -115,7 +116,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *TargetsConfig) bool {
+func isValidTarget(message *tgbotapi.Message, targets *ValidationsConfig) bool {
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
