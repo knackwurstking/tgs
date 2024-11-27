@@ -92,14 +92,32 @@ func main() {
 						break
 
 					case config.BotCommandJournalList:
+						// TODO: ...
+						break
+
 					case config.BotCommandJournal:
+						// TODO: ...
+						break
 
 					case config.BotCommandPicowStatus:
+						// TODO: ...
+						break
+
 					case config.BotCommandPicowON:
+						// TODO: ...
+						break
+
 					case config.BotCommandPicowOFF:
+						// TODO: ...
+						break
 
 					case config.BotCommandOPMangaList:
+						// TODO: ...
+						break
+
 					case config.BotCommandOPManga:
+						// TODO: ...
+						break
 
 					default:
 						slog.Warn("Command not found", "command", update.Message.Command())
