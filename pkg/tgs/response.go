@@ -1,6 +1,8 @@
 package tgs
 
-import "github.com/knackwurstking/tgs/pkg/data"
+import (
+	"github.com/knackwurstking/tgs/pkg/data"
+)
 
 type ResponseGetMe struct {
 	OK          bool      `json:"ok" yaml:"ok"`
