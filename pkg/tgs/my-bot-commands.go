@@ -1,4 +1,4 @@
-package mybotcommands
+package tgs
 
 import (
 	"fmt"
@@ -7,10 +7,6 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
-
-func New() *MyBotCommands {
-	return NewMyBotCommands()
-}
 
 type MyBotCommands struct {
 	Commands map[string][]tgbotapi.BotCommand
@@ -22,7 +18,7 @@ func NewMyBotCommands() *MyBotCommands {
 	}
 }
 
-func (this *MyBotCommands) Add(command string, description string, scopes []tgbotapi.BotCommandScope) {
+func (this *MyBotCommands) Add(command string, description string, scopes []BotCommandScope) {
 	for _, scope := range scopes {
 		scopeString := fmt.Sprintf("%s:%d:%d", scope.Type, scope.ChatID, scope.UserID)
 
@@ -48,11 +44,11 @@ func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
 		setMyCommandsConfig := tgbotapi.NewSetMyCommands(botCommands...)
 		setMyCommandsConfig.Scope = &tgbotapi.BotCommandScope{
 			Type:   scopeType,
-			ChatID: int64(scopeChatID),
-			UserID: int64(scopeUserID),
+			ChatID: scopeChatID,
+			UserID: scopeUserID,
 		}
 
-		_, err := bot.Send(setMyCommandsConfig)
+		_, err := bot.Request(setMyCommandsConfig)
 		if err != nil {
 			return err
 		}
