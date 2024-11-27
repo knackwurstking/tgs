@@ -205,7 +205,7 @@ func setBotCommands(config *Config) error {
 		}
 	}
 
-	return fmt.Errorf("under construction")
+	return nil
 }
 
 func handleUpdates(config *Config, result []data.Update) {
