@@ -55,7 +55,15 @@ func main() {
 
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
+				botCommands := NewBotCommands()
+
+				botCommands.Add(BotCommandIP, "Get server ip", []tgbotapi.BotCommandScope{
+					{Type: "chat", ChatID: -1002493320266},
+				})
+
 				// TODO: Register commands
+
+				botCommands.Register(bot)
 
 				update := tgbotapi.NewUpdate(0)
 				update.Timeout = 60 // 1min

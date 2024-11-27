@@ -6,5 +6,6 @@ ip:
             - id: User ID [Optional]
         chats:
             - id: Chat ID [Optional]
+
               # Type of chat, can be either "private", "group", "supergroup" or "channel"
               type: group
