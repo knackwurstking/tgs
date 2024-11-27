@@ -55,6 +55,8 @@ func main() {
 
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
+				// TODO: Register commands
+
 				update := tgbotapi.NewUpdate(0)
 				update.Timeout = 60 // 1min
 
@@ -63,12 +65,12 @@ func main() {
 						continue
 					}
 
-					if isValidTarget(update.Message, nil) {
-						continue
-					}
-
 					switch update.Message.Command() {
 					case BotCommandIP:
+						if isValidTarget(update.Message, config.IPCommandConfig.Targets) {
+							continue
+						}
+
 						if err := botcommands.NewIP(bot).Run(update.Message.Chat.ID); err != nil {
 							slog.Error("Command failed", "command", BotCommandIP, "error", err)
 						}
