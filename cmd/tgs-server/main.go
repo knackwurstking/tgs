@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/SuperPaintman/nice/cli"
 	"github.com/knackwurstking/tgs/internal/commands"
 	"github.com/knackwurstking/tgs/pkg/data"
 	"github.com/knackwurstking/tgs/pkg/tgs"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -93,51 +95,113 @@ func updateLoop(config *Config) error {
 }
 
 func setBotCommands(config *Config) error {
-	// TODO: Send the bot commands list first, maybe clear (delete) all existing commands first?
-	scopes := map[data.BotCommandScopeType][]data.BotCommand{
-		data.BotCommandScopeTypeDefault:               {},
-		data.BotCommandScopeTypeAllPrivateChats:       {},
-		data.BotCommandScopeTypeAllGroupChats:         {},
-		data.BotCommandScopeTypeAllChatAdministrators: {},
-		data.BotCommandScopeTypeChat:                  {},
-		data.BotCommandScopeTypeChatAdministrators:    {},
-		data.BotCommandScopeTypeChatMember:            {},
+	api := tgs.NewTelegramBotAPI(config.Token)
+	requests := make([]tgs.RequestSetMyCommands, 0)
+
+	getRequest := func(scope Scope) *tgs.RequestSetMyCommands {
+		for i, r := range requests {
+			if r.Scope.Type == scope.Scope &&
+				r.Scope.UserID == scope.UserID &&
+				r.Scope.ChatID == scope.ChatID {
+
+				return &requests[i]
+			}
+		}
+
+		return nil
+	}
+
+	addCommandToRequests := func(scopes []Scope, botCommand data.BotCommand) {
+		if scopes == nil {
+			return
+		}
+
+		var request *tgs.RequestSetMyCommands
+
+		for _, scope := range config.Commands.IP.Scopes {
+			if request = getRequest(scope); request != nil {
+				request.Commands = append(request.Commands, botCommand)
+			} else {
+				requests = append(
+					requests,
+					tgs.RequestSetMyCommands{
+						API:      api,
+						Commands: []data.BotCommand{botCommand},
+						Scope: data.BotCommandScope{
+							Type:   scope.Scope,
+							ChatID: scope.ChatID,
+							UserID: scope.UserID,
+						},
+					},
+				)
+			}
+		}
 	}
 
 	if !config.Commands.IP.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.IP.Scopes, data.BotCommand{
+			Command:     BotCommandIP,
+			Description: "Get server ip",
+		})
 	}
 
 	if !config.Commands.JournalList.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.IP.Scopes, data.BotCommand{
+			Command:     BotCommandJournalList,
+			Description: "List available journals",
+		})
 	}
 
 	if !config.Commands.Journal.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.Journal.Scopes, data.BotCommand{
+			Command:     BotCommandJournal,
+			Description: "Get a journal",
+		})
 	}
 
 	if !config.Commands.PicowStatus.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.PicowStatus.Scopes, data.BotCommand{
+			Command:     BotCommandPicowStatus,
+			Description: "Lights power status",
+		})
 	}
 
 	if !config.Commands.PicowOn.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.PicowOn.Scopes, data.BotCommand{
+			Command:     BotCommandPicowON,
+			Description: "Power on the lights",
+		})
 	}
 
 	if !config.Commands.PicowOff.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.PicowOff.Scopes, data.BotCommand{
+			Command:     BotCommandPicowOFF,
+			Description: "Power off the lights",
+		})
 	}
 
 	if !config.Commands.OPMangaList.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.OPMangaList.Scopes, data.BotCommand{
+			Command:     BotCommandOPMangaList,
+			Description: "List One Piece mangas available",
+		})
 	}
 
 	if !config.Commands.OPManga.Disabled {
-		// TODO: ...
+		addCommandToRequests(config.Commands.OPManga.Scopes, data.BotCommand{
+			Command:     BotCommandOPManga,
+			Description: "Get a One Piece manga episode",
+		})
 	}
 
-	for scope, botCommands := range scopes {
-		// TODO: Set commands (request)
+	for _, request := range requests {
+		resp, err := request.Send()
+		if err != nil {
+			return err
+		}
+		if !resp.OK || !resp.Result {
+			return fmt.Errorf("Set commands failed on Telegram %+v", resp)
+		}
 	}
 
 	return fmt.Errorf("under construction")
@@ -266,11 +330,18 @@ func checkConfig(config *Config) error {
 }
 
 func loadConfig(config *Config, path string) error {
-	// TODO: Check config file type and load json / yaml configuration
+	extension := filepath.Ext(path)
+	if extension != ".yaml" && extension != ".json" {
+		return fmt.Errorf("unknown file type: %s", extension)
+	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
+	}
+
+	if extension == ".yaml" {
+		return yaml.Unmarshal(data, config)
 	}
 
 	return json.Unmarshal(data, config)

@@ -64,6 +64,13 @@ func (c *CommandConfigs) Get(command string) (*CommandConfig, error) {
 type CommandConfig struct {
 	Targets  *Targets `json:"targets,omitempty" yaml:"targets,omitempty"`   // [Optional]
 	Disabled bool     `json:"disabled,omitempty" json:"disabled,omitempty"` // [Optional]
+	Scopes   []Scope  `json:"scopes" yaml:"scopes"`                         // [Optional]
+}
+
+type Scope struct {
+	Scope  string `json:"scope" yaml:"scope"`
+	ChatID int    `json:"chat_id" yaml:"chat_id"`
+	UserID int    `json:"user_id" yaml:"user_id"`
 }
 
 type Targets struct {

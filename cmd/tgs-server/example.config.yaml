@@ -16,49 +16,69 @@ token: <BOT_TOKEN>
 #   - channel
 commands:
     ip:
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     journallist:
         disabled: true
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     journal:
         disabled: true
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     picowstatus:
         disabled: true
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     picowon:
         disabled: true
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     picowoff:
         disabled: true
-        scope: default
+        scopes:
+            - scope: default
         targets:
             users:
                 - id: <USER_ID>
 
     opmangalist:
         disabled: true
-        scope: chat
+        scopes:
+            - scope: chat
+              chat_id:
+                  - <CHAT_ID>
+        targets:
+            chats:
+                - id: <CHAT_ID>
+                  type: group
+
+    opmanga:
+        disabled: true
+        scopes:
+            - scope: chat
+              chat_id:
+                  - <CHAT_ID>
         targets:
             chats:
                 - id: <CHAT_ID>
