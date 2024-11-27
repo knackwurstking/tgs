@@ -1,60 +1,9 @@
 {
     "token": "<BOT_TOKEN>",
-    "commands": {
-        "ip": {
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "journallist": {
-            "disabled": true,
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "journal": {
-            "disabled": true,
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "picowstatus": {
-            "disabled": true,
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "picowon": {
-            "disabled": true,
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "picowoff": {
-            "disabled": true,
-            "scope": "default",
-            "targets": {
-                "users": [{ "id": "<USER_ID>" }]
-            }
-        },
-        "opmanga": {
-            "disabled": true,
-            "scope": "chat",
-            "targets": {
-                "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
-            }
-        },
-        "opmangalist": {
-            "disabled": true,
-            "scope": "chat",
-            "targets": {
-                "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
-            }
+    "ip": {
+        "targets": {
+            "users": [{ "id": "<USER_ID>" }],
+            "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
         }
     }
 }

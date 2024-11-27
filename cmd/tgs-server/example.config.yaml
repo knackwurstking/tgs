@@ -1,85 +1,10 @@
 token: <BOT_TOKEN>
 
-# Valid scopes:
-#   - default
-#   - all_private_chats
-#   - all_group_chats
-#   - all_chat_administrators
-#   - chat
-#   - chat_administrators
-#   - chat_member
-#
-# Valid target chat types:
-#   - private
-#   - group
-#   - supergroup
-#   - channel
-commands:
-    ip:
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    journallist:
-        disabled: true
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    journal:
-        disabled: true
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    picowstatus:
-        disabled: true
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    picowon:
-        disabled: true
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    picowoff:
-        disabled: true
-        scopes:
-            - scope: default
-        targets:
-            users:
-                - id: <USER_ID>
-
-    opmangalist:
-        disabled: true
-        scopes:
-            - scope: chat
-              chat_id:
-                  - <CHAT_ID>
-        targets:
-            chats:
-                - id: <CHAT_ID>
-                  type: group
-
-    opmanga:
-        disabled: true
-        scopes:
-            - scope: chat
-              chat_id:
-                  - <CHAT_ID>
-        targets:
-            chats:
-                - id: <CHAT_ID>
-                  type: group
+ip:
+    targets:
+        users:
+            - id: User ID [Optional]
+        chats:
+            - id: Chat ID [Optional]
+              # Type of chat, can be either "private", "group", "supergroup" or "channel"
+              type: group
