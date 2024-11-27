@@ -39,7 +39,11 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 		return nil, fmt.Errorf("missing request")
 	}
 
-	var bodyData []byte
+	var (
+		bodyData []byte
+		method   string
+	)
+
 	if request.Body() != nil {
 		var err error
 		bodyData, err = json.Marshal(request.Body())
@@ -48,7 +52,6 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 		}
 	}
 
-	var method string
 	switch request.Command() {
 	case CommandGetMe, CommandGetUpdates:
 		method = "GET"
@@ -61,12 +64,16 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 	}
 
 	body := bytes.NewBuffer(bodyData)
-	req, err := http.NewRequest(method, this.URL(request.Command()), body)
+	r, err := http.NewRequest(method, this.URL(request.Command()), body)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	if request.Body() != nil {
+		r.Header.Add("Content-Type", "application/json")
+	}
+
+	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +81,7 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf(
 			"telegram request to \"%s\" returned status code %d (%s)",
-			req.URL, resp.StatusCode, resp.Status,
+			r.URL, resp.StatusCode, resp.Status,
 		)
 	}
 
