@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log/slog"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -13,7 +13,7 @@ import (
 
 	botcommands "github.com/knackwurstking/tgs/internal/bot-commands"
 	"github.com/knackwurstking/tgs/internal/config"
-	mybotcommands "github.com/knackwurstking/tgs/pkg/my-bot-commands"
+	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 func main() {
@@ -40,24 +40,15 @@ func main() {
 					return err
 				}
 
-				slog.SetDefault(
-					slog.New(
-						slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-							AddSource: true,
-							Level:     slog.LevelDebug,
-						}),
-					),
-				)
-
 				bot, err := tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
 				}
 
 				bot.Debug = true
-				slog.Info("Authorized bot", "username", bot.Self.UserName)
+				log.Printf("Authorized bot, username=%s", bot.Self.UserName)
 
-				myBotCommands := mybotcommands.New()
+				myBotCommands := tgs.NewMyBotCommands()
 
 				myBotCommands.Add(
 					config.BotCommandIP, "Get server ip",
@@ -79,49 +70,49 @@ func main() {
 					}
 
 					switch update.Message.Command() {
-					case config.BotCommandIP:
-						if isValidTarget(update.Message, cfg.IPCommandConfig.ValidationsConfig) {
+					case config.BotCommandIP[1:]:
+						if !isValidTarget(update.Message, cfg.IPCommandConfig.ValidationsConfig) {
 							continue
 						}
 
 						if err := botcommands.NewIP(bot).Run(
 							update.Message.Chat.ID, &update.Message.MessageID,
 						); err != nil {
-							slog.Error("Command failed", "command", config.BotCommandIP, "error", err)
+							log.Printf("Command \"%s\" failed with: %s", config.BotCommandIP, err)
 						}
 
 						break
 
-					case config.BotCommandJournalList:
+					case config.BotCommandJournalList[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandJournal:
+					case config.BotCommandJournal[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandPicowStatus:
+					case config.BotCommandPicowStatus[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandPicowON:
+					case config.BotCommandPicowON[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandPicowOFF:
+					case config.BotCommandPicowOFF[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandOPMangaList:
+					case config.BotCommandOPMangaList[1:]:
 						// TODO: ...
 						break
 
-					case config.BotCommandOPManga:
+					case config.BotCommandOPManga[1:]:
 						// TODO: ...
 						break
 
 					default:
-						slog.Warn("Command not found", "command", update.Message.Command())
+						log.Printf("Command \"%s\" not found!", update.Message.Command())
 					}
 				}
 
