@@ -39,11 +39,21 @@ func main() {
 					return err
 				}
 
+				slog.SetDefault(
+					slog.New(
+						slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+							AddSource: true,
+							Level:     slog.LevelDebug,
+						}),
+					),
+				)
+
 				bot, err := tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
 				}
 
+				bot.Debug = true
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
 				myBotCommands := mybotcommands.New()
@@ -57,10 +67,12 @@ func main() {
 					return err
 				}
 
-				update := tgbotapi.NewUpdate(0)
-				update.Timeout = 60 // 1min
+				updateConfig := tgbotapi.NewUpdate(0)
+				updateConfig.Timeout = 60 // 1min
 
-				for update := range bot.GetUpdatesChan(update) {
+				for update := range bot.GetUpdatesChan(updateConfig) {
+					updateConfig.Offset = update.UpdateID + 1
+
 					if !update.Message.IsCommand() {
 						continue
 					}
