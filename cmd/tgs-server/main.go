@@ -12,18 +12,8 @@ import (
 	"gopkg.in/yaml.v3"
 
 	botcommands "github.com/knackwurstking/tgs/internal/bot-commands"
+	"github.com/knackwurstking/tgs/internal/config"
 	mybotcommands "github.com/knackwurstking/tgs/pkg/my-bot-commands"
-)
-
-const (
-	BotCommandIP          string = "/ip"
-	BotCommandJournalList string = "/journallist"
-	BotCommandJournal     string = "/journal"
-	BotCommandPicowStatus string = "/picowstatus"
-	BotCommandPicowON     string = "/picowon"
-	BotCommandPicowOFF    string = "/picowoff"
-	BotCommandOPManga     string = "/opmanga"
-	BotCommandOPMangaList string = "/opmangalist"
 )
 
 func main() {
@@ -39,17 +29,17 @@ func main() {
 			)
 
 			return func(cmd *cli.Command) error {
-				config := NewConfig()
+				cfg := config.New()
 
-				if err := loadConfig(config, configPath); err != nil {
+				if err := loadConfig(cfg, configPath); err != nil {
 					return err
 				}
 
-				if err := checkConfig(config); err != nil {
+				if err := checkConfig(cfg); err != nil {
 					return err
 				}
 
-				bot, err := tgbotapi.NewBotAPI(config.Token)
+				bot, err := tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
 				}
@@ -59,8 +49,8 @@ func main() {
 				myBotCommands := mybotcommands.New()
 
 				myBotCommands.Add(
-					BotCommandIP, "Get server ip",
-					config.IPCommandConfig.Register,
+					config.BotCommandIP, "Get server ip",
+					cfg.IPCommandConfig.Register,
 				)
 
 				if err := myBotCommands.Register(bot); err != nil {
@@ -76,28 +66,28 @@ func main() {
 					}
 
 					switch update.Message.Command() {
-					case BotCommandIP:
-						if isValidTarget(update.Message, config.IPCommandConfig.ValidationsConfig) {
+					case config.BotCommandIP:
+						if isValidTarget(update.Message, cfg.IPCommandConfig.ValidationsConfig) {
 							continue
 						}
 
 						if err := botcommands.NewIP(bot).Run(
 							update.Message.Chat.ID, &update.Message.MessageID,
 						); err != nil {
-							slog.Error("Command failed", "command", BotCommandIP, "error", err)
+							slog.Error("Command failed", "command", config.BotCommandIP, "error", err)
 						}
 
 						break
 
-					case BotCommandJournalList:
-					case BotCommandJournal:
+					case config.BotCommandJournalList:
+					case config.BotCommandJournal:
 
-					case BotCommandPicowStatus:
-					case BotCommandPicowON:
-					case BotCommandPicowOFF:
+					case config.BotCommandPicowStatus:
+					case config.BotCommandPicowON:
+					case config.BotCommandPicowOFF:
 
-					case BotCommandOPMangaList:
-					case BotCommandOPManga:
+					case config.BotCommandOPMangaList:
+					case config.BotCommandOPManga:
 
 					default:
 						slog.Warn("Command not found", "command", update.Message.Command())
@@ -116,7 +106,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *ValidationsConfig) bool {
+func isValidTarget(message *tgbotapi.Message, targets *config.ValidationsConfig) bool {
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
@@ -136,15 +126,15 @@ func isValidTarget(message *tgbotapi.Message, targets *ValidationsConfig) bool {
 	return false
 }
 
-func checkConfig(config *Config) error {
-	if config.Token == "" {
+func checkConfig(cfg *config.Config) error {
+	if cfg.Token == "" {
 		return fmt.Errorf("missing token")
 	}
 
 	return nil
 }
 
-func loadConfig(config *Config, path string) error {
+func loadConfig(cfg *config.Config, path string) error {
 	extension := filepath.Ext(path)
 	if extension != ".yaml" && extension != ".json" {
 		return fmt.Errorf("unknown file type: %s", extension)
@@ -156,8 +146,8 @@ func loadConfig(config *Config, path string) error {
 	}
 
 	if extension == ".yaml" {
-		return yaml.Unmarshal(data, config)
+		return yaml.Unmarshal(data, cfg)
 	}
 
-	return json.Unmarshal(data, config)
+	return json.Unmarshal(data, cfg)
 }

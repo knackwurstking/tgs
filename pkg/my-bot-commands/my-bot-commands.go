@@ -9,9 +9,7 @@ import (
 )
 
 func New() *MyBotCommands {
-	return &MyBotCommands{
-		Commands: map[string][]tgbotapi.BotCommand{},
-	}
+	return NewMyBotCommands()
 }
 
 type MyBotCommands struct {
