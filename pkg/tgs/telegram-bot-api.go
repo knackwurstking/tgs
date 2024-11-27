@@ -39,9 +39,13 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 		return nil, fmt.Errorf("missing request")
 	}
 
-	data, err := json.Marshal(request)
-	if err != nil {
-		return nil, err
+	var bodyData []byte
+	if request.Body() != nil {
+		var err error
+		bodyData, err = json.Marshal(request.Body())
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var method string
@@ -56,7 +60,7 @@ func (this *TelegramBotAPI) SendRequest(request Request) ([]byte, error) {
 		return nil, fmt.Errorf(fmt.Sprintf("unknown command: %s", request.Command()))
 	}
 
-	body := bytes.NewBuffer(data)
+	body := bytes.NewBuffer(bodyData)
 	req, err := http.NewRequest(method, this.URL(request.Command()), body)
 	if err != nil {
 		return nil, err

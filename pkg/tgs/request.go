@@ -19,6 +19,10 @@ func (*RequestGetMe) Command() Command {
 	return CommandGetMe
 }
 
+func (*RequestGetMe) Body() any {
+	return nil
+}
+
 func (this *RequestGetMe) Send() (*ResponseGetMe, error) {
 	if this.API == nil {
 		return nil, MissingAPIError
@@ -46,6 +50,10 @@ func (*RequestGetUpdates) Command() Command {
 	return CommandGetUpdates
 }
 
+func (this *RequestGetUpdates) Body() any {
+	return this
+}
+
 func (this *RequestGetUpdates) Send() (*ResponseGetUpdates, error) {
 	if this.API == nil {
 		return nil, MissingAPIError
@@ -70,6 +78,10 @@ type RequestSetMyCommands struct {
 
 func (*RequestSetMyCommands) Command() Command {
 	return CommandSetMyCommands
+}
+
+func (this *RequestSetMyCommands) Body() any {
+	return this
 }
 
 func (this *RequestSetMyCommands) Send() (*ResponseSetMyCommands, error) {
@@ -111,6 +123,10 @@ type RequestSendMessage struct {
 
 func (*RequestSendMessage) Command() Command {
 	return CommandSendMessage
+}
+
+func (this *RequestSendMessage) Body() any {
+	return this
 }
 
 func (this *RequestSendMessage) Send() (*ResponseSendMessage, error) {

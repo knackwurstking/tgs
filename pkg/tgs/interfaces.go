@@ -2,6 +2,7 @@ package tgs
 
 type Request interface {
 	Command() Command
+	Body() any
 }
 
 type API interface {
