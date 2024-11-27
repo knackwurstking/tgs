@@ -45,7 +45,7 @@ func (this *IP) Run(chatID int) error {
 		return err
 	}
 	if !resp.OK {
-		return fmt.Errorf("send message returned %d: %s", resp.ErrorCode, resp.Description)
+		return fmt.Errorf("send message response: %d: %s", resp.ErrorCode, resp.Description)
 	}
 
 	return nil
