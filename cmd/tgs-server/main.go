@@ -25,6 +25,7 @@ func main() {
 
 			cli.StringVar(cmd, &configPath, "config",
 				cli.Usage("Path to server configuration (yaml)"),
+				cli.WithShort("c"),
 				cli.Required,
 			)
 
