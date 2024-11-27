@@ -23,13 +23,14 @@ func (*IP) URL() string {
 	return "ifconfig.io"
 }
 
-func (this *IP) Run(chatID int64) error {
+func (this *IP) Run(chatID int64, replyID *int) error {
 	address, err := this.FetchAddressFromURL()
 	if err != nil {
 		return err
 	}
 
 	msgConfig := tgbotapi.NewMessage(chatID, fmt.Sprintf("`%s`", address))
+	msgConfig.ReplyToMessageID = *replyID
 	msgConfig.ParseMode = "MarkdownV2"
 
 	_, err = this.BotAPI.Send(msgConfig)
