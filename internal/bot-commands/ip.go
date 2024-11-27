@@ -20,6 +20,7 @@ func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 }
 
 func (*IP) URL() string {
+	// FIXME: Command "/ip" failed with: Get "ifconfig.io": unsupported protocol scheme ""
 	return "ifconfig.io"
 }
 
