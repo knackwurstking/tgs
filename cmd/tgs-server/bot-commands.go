@@ -33,7 +33,7 @@ func (this *BotCommands) Add(command string, description string, scopes []tgbota
 	}
 }
 
-func (this *BotCommands) Register(bot *tgbotapi.BotAPI) {
+func (this *BotCommands) Register(bot *tgbotapi.BotAPI) error {
 	for scope, botCommands := range this.Commands {
 		scopeSplit := strings.SplitN(scope, ":", 3)
 
@@ -48,6 +48,11 @@ func (this *BotCommands) Register(bot *tgbotapi.BotAPI) {
 			UserID: int64(scopeUserID),
 		}
 
-		bot.Send(setMyCommandsConfig)
+		_, err := bot.Send(setMyCommandsConfig)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

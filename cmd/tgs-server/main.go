@@ -61,9 +61,9 @@ func main() {
 					{Type: "chat", ChatID: -1002493320266},
 				})
 
-				// TODO: Register commands
-
-				botCommands.Register(bot)
+				if err := botCommands.Register(bot); err != nil {
+					return err
+				}
 
 				update := tgbotapi.NewUpdate(0)
 				update.Timeout = 60 // 1min
