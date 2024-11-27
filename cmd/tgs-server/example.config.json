@@ -1,9 +1,15 @@
 {
-    "token": "<BOT_TOKEN>",
+    "token": "<token>",
     "ip": {
+        "register": [
+            {
+                "type": "chat",
+                "chat_id": "<chat-id>"
+            }
+        ],
         "targets": {
-            "users": [{ "id": "<USER_ID>" }],
-            "chats": [{ "id": "<CHAT_ID>", "type": "group" }]
+            "users": [{ "id": "<user-id>" }],
+            "chats": [{ "id": "<chat-id>", "type": "supergroup" }]
         }
     }
 }

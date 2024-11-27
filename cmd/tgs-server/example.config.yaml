@@ -5,12 +5,27 @@ define:
 token: <token>
 
 ip:
+    # `[]tgbotapi.BotCommandScope`
     register:
-        - id: *ChatID
-          type: chat
+        # Types:
+        #   - default
+        #   - all_private_chats
+        #   - all_group_chats
+        #   - all_chat_administrators
+        #   - chat
+        #   - chat_administrators
+        #   - chat_member
+        - type: chat
+          chat_id: *ChatID
 
     targets:
+        users:
+            - id: *UserID
         chats:
             - id: *ChatID
-              # Type of chat, can be either "private", "group", "supergroup" or "channel"
+              # Types:
+              #     - private
+              #     - group
+              #     - supergroup
+              #     - channel
               type: supergroup
