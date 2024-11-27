@@ -17,6 +17,7 @@ ip:
         #   - chat_member
         - type: chat
           chat_id: *ChatID
+          #user_id: *UserID
 
     targets:
         users:
