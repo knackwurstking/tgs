@@ -1,4 +1,4 @@
-package main
+package mybotcommands
 
 import (
 	"fmt"
@@ -8,17 +8,23 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type BotCommands struct {
-	Commands map[string][]tgbotapi.BotCommand
-}
-
-func NewBotCommands() *BotCommands {
-	return &BotCommands{
+func New() *MyBotCommands {
+	return &MyBotCommands{
 		Commands: map[string][]tgbotapi.BotCommand{},
 	}
 }
 
-func (this *BotCommands) Add(command string, description string, scopes []tgbotapi.BotCommandScope) {
+type MyBotCommands struct {
+	Commands map[string][]tgbotapi.BotCommand
+}
+
+func NewMyBotCommands() *MyBotCommands {
+	return &MyBotCommands{
+		Commands: map[string][]tgbotapi.BotCommand{},
+	}
+}
+
+func (this *MyBotCommands) Add(command string, description string, scopes []tgbotapi.BotCommandScope) {
 	for _, scope := range scopes {
 		scopeString := fmt.Sprintf("%s:%d:%d", scope.Type, scope.ChatID, scope.UserID)
 
@@ -33,7 +39,7 @@ func (this *BotCommands) Add(command string, description string, scopes []tgbota
 	}
 }
 
-func (this *BotCommands) Register(bot *tgbotapi.BotAPI) error {
+func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
 	for scope, botCommands := range this.Commands {
 		scopeSplit := strings.SplitN(scope, ":", 3)
 

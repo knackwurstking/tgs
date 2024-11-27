@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	botcommands "github.com/knackwurstking/tgs/internal/bot-commands"
+	mybotcommands "github.com/knackwurstking/tgs/pkg/my-bot-commands"
 )
 
 const (
@@ -55,13 +56,13 @@ func main() {
 
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
-				botCommands := NewBotCommands()
+				myBotCommands := mybotcommands.New()
 
-				botCommands.Add(BotCommandIP, "Get server ip", []tgbotapi.BotCommandScope{
+				myBotCommands.Add(BotCommandIP, "Get server ip", []tgbotapi.BotCommandScope{
 					{Type: "chat", ChatID: -1002493320266},
 				})
 
-				if err := botCommands.Register(bot); err != nil {
+				if err := myBotCommands.Register(bot); err != nil {
 					return err
 				}
 
