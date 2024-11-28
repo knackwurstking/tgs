@@ -13,4 +13,6 @@ require (
 	golang.org/x/sys v0.0.0-20200116001909-b77594299b42 // indirect
 )
 
-replace github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 => ../telegram-bot-api
+//replace github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 => ../telegram-bot-api
+
+replace github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 => github.com/knackwurstking/telegram-bot-api/v5 v5.6.0
