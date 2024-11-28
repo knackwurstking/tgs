@@ -19,7 +19,7 @@ func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 // TODO: Deliver user stats like user id (+username), chat id (+title), topic number (message_thread_id, +reply_to_message.forum_topic_created.name)
 
 func (this *Stats) Run(message *tgbotapi.Message) error {
-	// TODO: Continue here...
+	// TODO: Continue here... Create the message and reply (send) the message back
 
 	return nil
 }
