@@ -18,6 +18,7 @@ type UserValidation struct {
 }
 
 type ChatValidation struct {
-	ID   int64  `json:"id" yaml:"id"`
-	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+	ID              int64  `json:"id" yaml:"id"`
+	Type            string `json:"type,omitempty" yaml:"type,omitempty"`
+	MessageThreadID int    `json:"message_thread_id,omitempty" yaml:"message_thread_id,omitempty"`
 }
