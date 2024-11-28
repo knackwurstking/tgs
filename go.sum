@@ -2,6 +2,8 @@ github.com/SuperPaintman/nice v0.0.0-20211001214957-a29cd3367b17 h1:9EjaewjKeb8f
 github.com/SuperPaintman/nice v0.0.0-20211001214957-a29cd3367b17/go.mod h1:uc5MKp25kkPkWcI4gcCtGZWUSKjdZlKjrHAVZ7OXb6k=
 github.com/knackwurstking/telegram-bot-api/v5 v5.6.0 h1:nehV/ON8z6y0xXbcmnz5YY0dt70srpSYcIP7ICNFt2Y=
 github.com/knackwurstking/telegram-bot-api/v5 v5.6.0/go.mod h1:A2S0CWkNylc2phvKXWBBdD3K0iGnDBGbzRpISP2zBl8=
+github.com/lmittmann/tint v1.0.5 h1:NQclAutOfYsqs2F1Lenue6OoWCajs5wJcP3DfWVpePw=
+github.com/lmittmann/tint v1.0.5/go.mod h1:HIS3gSy7qNwGCj+5oRjAutErFBl4BzdQP6cJZ0NfMwE=
 github.com/mattn/go-isatty v0.0.13 h1:qdl+GuBjcsKKDco5BsxPJlId98mSWNKqYA+Co0SC1yA=
 github.com/mattn/go-isatty v0.0.13/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42 h1:vEOn+mP2zCOVzKckCZy6YsCtDblrpj/w7B9nxGNELpg=

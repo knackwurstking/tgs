@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/SuperPaintman/nice/cli"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/lmittmann/tint"
 	"gopkg.in/yaml.v3"
 
 	"github.com/knackwurstking/tgs/internal/bot-commands/ip"
@@ -40,13 +41,22 @@ func main() {
 					return err
 				}
 
+				slog.SetDefault(
+					slog.New(
+						tint.NewHandler(os.Stderr, &tint.Options{
+							AddSource: true,
+							Level:     slog.LevelDebug,
+						}),
+					),
+				)
+
 				bot, err := tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
 				}
 
 				bot.Debug = true
-				log.Printf("Authorized bot: %s", bot.Self.UserName)
+				slog.Info("Authorize bot", "username", bot.Self.UserName)
 
 				myBotCommands := tgs.NewMyBotCommands()
 
@@ -78,7 +88,9 @@ func main() {
 						logCommand(config.BotCommandIP, update.Message)
 
 						if err := ip.New(bot).Run(update.Message); err != nil {
-							log.Printf("Command %s failed: %s", config.BotCommandIP, err)
+							slog.Error("Command failed!",
+								"command", config.BotCommandIP, "error", err,
+							)
 						}
 
 						break
@@ -96,7 +108,7 @@ func main() {
 						break
 
 					default:
-						log.Printf("Command \"%s\" not found!", update.Message.Command())
+						slog.Warn("Command not found!", "command", update.Message.Command())
 					}
 				}
 
@@ -113,13 +125,14 @@ func main() {
 }
 
 func logCommand(command string, message *tgbotapi.Message) {
-	log.Printf("Running command %s from user %s (%d), [Chat ID: %d, Chat Title: %s, Chat Type: %s, Message Thread ID: %d]",
-		command,
-		message.From.UserName, message.From.ID,
-		message.Chat.ID,
-		message.Chat.Title,
-		message.Chat.Type,
-		message.MessageThreadID,
+	slog.Debug("Running command.",
+		"command", command,
+		"message.from.username", message.From.UserName,
+		"message.from.id", message.From.ID,
+		"message.chat.id", message.Chat.ID,
+		"message.chat.title", message.Chat.Title,
+		"message.chat.type", message.Chat.Type,
+		"message.message_thread_id", message.MessageThreadID,
 	)
 }
 
