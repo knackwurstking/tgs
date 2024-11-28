@@ -27,14 +27,14 @@ func (*IP) URL() string {
 	return "https://ifconfig.io"
 }
 
-func (this *IP) Run(chatID int64, replyID *int) error {
+func (this *IP) Run(message *tgbotapi.Message) error {
 	address, err := this.FetchAddressFromURL()
 	if err != nil {
 		return err
 	}
 
-	msgConfig := tgbotapi.NewMessage(chatID, fmt.Sprintf("`%s`", address))
-	msgConfig.ReplyToMessageID = *replyID
+	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
+	msgConfig.ReplyToMessageID = message.MessageID
 	msgConfig.ParseMode = "MarkdownV2"
 
 	_, err = this.BotAPI.Send(msgConfig)

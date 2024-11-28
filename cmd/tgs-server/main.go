@@ -79,9 +79,7 @@ func main() {
 							config.BotCommandIP, update.Message.From, update.Message.Chat,
 						)
 
-						if err := ip.New(bot).Run(
-							update.Message.Chat.ID, &update.Message.MessageID,
-						); err != nil {
+						if err := ip.New(bot).Run(update.Message); err != nil {
 							log.Printf("Command \"%s\" failed with: %s", config.BotCommandIP, err)
 						}
 
