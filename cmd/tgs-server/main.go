@@ -87,32 +87,9 @@ func main() {
 
 						break
 
-					case config.BotCommandJournalList[1:]:
-						// TODO: ...
-						break
+					case config.BotCommandStats[1:]:
+						// TODO: Continue here...
 
-					case config.BotCommandJournal[1:]:
-						// TODO: ...
-						break
-
-					case config.BotCommandPicowStatus[1:]:
-						// TODO: ...
-						break
-
-					case config.BotCommandPicowON[1:]:
-						// TODO: ...
-						break
-
-					case config.BotCommandPicowOFF[1:]:
-						// TODO: ...
-						break
-
-					case config.BotCommandOPMangaList[1:]:
-						// TODO: ...
-						break
-
-					case config.BotCommandOPManga[1:]:
-						// TODO: ...
 						break
 
 					default:
