@@ -11,7 +11,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	botcommands "github.com/knackwurstking/tgs/internal/bot-commands"
+	"github.com/knackwurstking/tgs/internal/bot-commands/ip"
 	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
@@ -75,7 +75,7 @@ func main() {
 							continue
 						}
 
-						if err := botcommands.NewIP(bot).Run(
+						if err := ip.New(bot).Run(
 							update.Message.Chat.ID, &update.Message.MessageID,
 						); err != nil {
 							log.Printf("Command \"%s\" failed with: %s", config.BotCommandIP, err)

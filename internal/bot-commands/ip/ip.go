@@ -1,4 +1,4 @@
-package botcommands
+package ip
 
 import (
 	"fmt"
@@ -8,6 +8,10 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
+
+func New(botAPI *tgbotapi.BotAPI) *IP {
+	return NewIP(botAPI)
+}
 
 type IP struct {
 	*tgbotapi.BotAPI
