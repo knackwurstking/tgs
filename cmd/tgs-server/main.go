@@ -75,6 +75,10 @@ func main() {
 							continue
 						}
 
+						log.Printf("Running command %s, from=%+v, chat=%+v",
+							config.BotCommandIP, update.Message.From, update.Message.Chat,
+						)
+
 						if err := ip.New(bot).Run(
 							update.Message.Chat.ID, &update.Message.MessageID,
 						); err != nil {
@@ -129,6 +133,10 @@ func main() {
 }
 
 func isValidTarget(message *tgbotapi.Message, targets *config.ValidationsConfig) bool {
+	if targets.All {
+		return true
+	}
+
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
