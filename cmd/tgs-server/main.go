@@ -123,8 +123,17 @@ func isValidTarget(message *tgbotapi.Message, targets *config.ValidationsConfig)
 	}
 
 	if targets.Chats != nil {
-		for _, chat := range targets.Chats {
-			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type && chat.Type != "") {
+		for _, targetChat := range targets.Chats {
+			if targetChat.ID == message.Chat.ID &&
+				(targetChat.Type == message.Chat.Type && targetChat.Type != "") {
+
+				if message.Chat.Type == "supergroup" &&
+					(message.MessageThreadID != targetChat.MessageThreadID &&
+						targetChat.MessageThreadID > -1) {
+
+					return false
+				}
+
 				return true
 			}
 		}
