@@ -45,14 +45,14 @@ func main() {
 					return err
 				}
 
-				bot.Debug = false
+				bot.Debug = true
 				log.Printf("Authorized bot: %s", bot.Self.UserName)
 
 				myBotCommands := tgs.NewMyBotCommands()
 
 				myBotCommands.Add(
 					config.BotCommandIP, "Get server ip",
-					cfg.IPCommandConfig.Register,
+					cfg.IP.Register,
 				)
 
 				if err := myBotCommands.Register(bot); err != nil {
@@ -71,18 +71,11 @@ func main() {
 
 					switch update.Message.Command() {
 					case config.BotCommandIP[1:]:
-						if !isValidTarget(update.Message, cfg.IPCommandConfig.ValidationsConfig) {
+						if !isValidTarget(update.Message, cfg.IP.ValidationsConfig) {
 							continue
 						}
 
-						log.Printf("Running command %s from user %s (%d), [Chat ID: %d, Chat Title: %s, Chat Type: %s, Message Thread ID: %d]",
-							config.BotCommandIP,
-							update.Message.From.UserName, update.Message.From.ID,
-							update.Message.Chat.ID,
-							update.Message.Chat.Title,
-							update.Message.Chat.Type,
-							update.Message.MessageThreadID,
-						)
+						logCommand(config.BotCommandIP, update.Message)
 
 						if err := ip.New(bot).Run(update.Message); err != nil {
 							log.Printf("Command %s failed: %s", config.BotCommandIP, err)
@@ -92,6 +85,13 @@ func main() {
 
 					case config.BotCommandStats[1:]:
 						// TODO: Continue here...
+						//if !isValidTarget(update.Message, cfg.Stats.ValidationsConfig) {
+						//	continue
+						//}
+
+						logCommand(config.BotCommandIP, update.Message)
+
+						// ...
 
 						break
 
@@ -112,7 +112,18 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *config.ValidationsConfig) bool {
+func logCommand(command string, message *tgbotapi.Message) {
+	log.Printf("Running command %s from user %s (%d), [Chat ID: %d, Chat Title: %s, Chat Type: %s, Message Thread ID: %d]",
+		command,
+		message.From.UserName, message.From.ID,
+		message.Chat.ID,
+		message.Chat.Title,
+		message.Chat.Type,
+		message.MessageThreadID,
+	)
+}
+
+func isValidTarget(message *tgbotapi.Message, targets *config.ValidationTargets) bool {
 	if targets.All {
 		return true
 	}

@@ -4,13 +4,13 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
-type IPCommandConfig struct {
+type CommandConfigIP struct {
 	Register          []tgs.BotCommandScope `json:"register" yaml:"register"`
-	ValidationsConfig *ValidationsConfig    `json:"targets" yaml:"targets"`
+	ValidationsConfig *ValidationTargets    `json:"targets" yaml:"targets"`
 }
 
-func NewIPCommandConfig() *IPCommandConfig {
-	return &IPCommandConfig{
+func NewCommandConfigIP() *CommandConfigIP {
+	return &CommandConfigIP{
 		Register:          make([]tgs.BotCommandScope, 0),
 		ValidationsConfig: NewValidationsConfig(),
 	}
