@@ -45,8 +45,8 @@ func main() {
 					return err
 				}
 
-				bot.Debug = true
-				log.Printf("Authorized bot, username=%s", bot.Self.UserName)
+				bot.Debug = false
+				log.Printf("Authorized bot: %s", bot.Self.UserName)
 
 				myBotCommands := tgs.NewMyBotCommands()
 
@@ -75,12 +75,17 @@ func main() {
 							continue
 						}
 
-						log.Printf("Running command %s, from=%+v, chat=%+v",
-							config.BotCommandIP, update.Message.From, update.Message.Chat,
+						log.Printf("Running command %s from user %s (%d), [Chat ID: %d, Chat Title: %s, Chat Type: %s, Message Thread ID: %d]",
+							config.BotCommandIP,
+							update.Message.From.UserName, update.Message.From.ID,
+							update.Message.Chat.ID,
+							update.Message.Chat.Title,
+							update.Message.Chat.Type,
+							update.Message.MessageThreadID,
 						)
 
 						if err := ip.New(bot).Run(update.Message); err != nil {
-							log.Printf("Command \"%s\" failed with: %s", config.BotCommandIP, err)
+							log.Printf("Command %s failed: %s", config.BotCommandIP, err)
 						}
 
 						break
