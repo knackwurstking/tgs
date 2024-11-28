@@ -20,6 +20,9 @@ ip:
           #user_id: *UserID
 
     targets:
+        # If set to true, all users in every chat are allowed to run this command
+        all: false
+
         users:
             - id: *UserID
         chats:
