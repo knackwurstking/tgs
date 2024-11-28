@@ -127,9 +127,9 @@ func isValidTarget(message *tgbotapi.Message, targets *config.ValidationsConfig)
 			if targetChat.ID == message.Chat.ID &&
 				(targetChat.Type == message.Chat.Type && targetChat.Type != "") {
 
-				if message.Chat.Type == "supergroup" &&
+				if message.Chat.IsForum &&
 					(message.MessageThreadID != targetChat.MessageThreadID &&
-						targetChat.MessageThreadID > -1) {
+						targetChat.MessageThreadID > 0) {
 
 					return false
 				}
