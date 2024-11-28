@@ -3,6 +3,7 @@ package config
 type ValidationsConfig struct {
 	Users []UserValidation `json:"users,omitempty" yaml:"users,omitempty"`
 	Chats []ChatValidation `json:"chats,omitempty" yaml:"chats,omitempty"`
+	All   bool             `json:"all,omitempty" json:"all,omitempty"`
 }
 
 func NewValidationsConfig() *ValidationsConfig {
