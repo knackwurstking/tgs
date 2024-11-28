@@ -33,3 +33,4 @@ ip:
               #     - supergroup
               #     - channel
               type: supergroup
+              message_thread_id: <number>
