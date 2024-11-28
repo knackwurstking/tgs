@@ -1,6 +1,11 @@
 package stats
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+import (
+	"encoding/json"
+	"fmt"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
 
 func New(botAPI *tgbotapi.BotAPI) *Stats {
 	return NewStats(botAPI)
@@ -16,10 +21,28 @@ func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 	}
 }
 
-// TODO: Deliver user stats like user id (+username), chat id (+title), topic number (message_thread_id, +reply_to_message.forum_topic_created.name)
-
 func (this *Stats) Run(message *tgbotapi.Message) error {
-	// TODO: Continue here... Create the message and reply (send) the message back
+	data := struct {
+		UserName        string `json:"username"`
+		ChatID          int64  `json:"chat_id"`
+		MessageThreadID int    `json:"message_thread_id"`
+	}{
+		UserName:        message.From.UserName,
+		ChatID:          message.Chat.ID,
+		MessageThreadID: message.MessageThreadID,
+	}
 
-	return nil
+	jsonData, err := json.MarshalIndent(data, "", "    ")
+
+	msgConfig := tgbotapi.NewMessage(message.Chat.ID,
+		fmt.Sprintf("```json\n")+
+			fmt.Sprintf("%s\n", string(jsonData))+
+			fmt.Sprintf("```"),
+	)
+
+	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
+
+	_, err = this.BotAPI.Send(msgConfig)
+	return err
 }
