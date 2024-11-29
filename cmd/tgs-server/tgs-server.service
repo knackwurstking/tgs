@@ -1,0 +1,9 @@
+[Unit]
+Description=Telegram bot server
+After=network.target
+
+[Service]
+ExecStart=tgs-server -c %h/.config/tgs-server/config.yaml
+
+[Install]
+WantedBy=default.target
