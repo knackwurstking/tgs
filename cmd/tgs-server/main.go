@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/SuperPaintman/nice/cli"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -73,8 +74,8 @@ func main() {
 					}
 
 					// TODO: Add commands here...
-					switch update.Message.Command() {
-					case config.BotCommandIP[1:]:
+					switch v := update.Message.Command(); {
+					case strings.HasSuffix(v, config.BotCommandIP[1:]):
 						runCommand(
 							update.Message,
 							config.BotCommandIP,
@@ -83,10 +84,10 @@ func main() {
 						)
 						break
 
-					case config.BotCommandStats[1:]:
+					case strings.HasSuffix(v, config.BotCommandStats[1:]):
 						runCommand(
 							update.Message,
-							config.BotCommandIP,
+							config.BotCommandStats,
 							botcommand.NewStats(bot),
 							cfg.Stats.ValidationTargets,
 						)
@@ -138,6 +139,8 @@ func registerCommands(bot *tgbotapi.BotAPI, cfg *config.Config) error {
 		config.BotCommandStats, "Get ID info",
 		cfg.Stats.Register,
 	)
+
+	// TODO: Register /journal command and the "sub" command /journallist
 
 	return myBotCommands.Register(bot)
 }
