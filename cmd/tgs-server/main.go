@@ -65,6 +65,11 @@ func main() {
 					cfg.IP.Register,
 				)
 
+				myBotCommands.Add(
+					config.BotCommandStats, "Get id info",
+					cfg.Stats.Register,
+				)
+
 				if err := myBotCommands.Register(bot); err != nil {
 					return err
 				}
