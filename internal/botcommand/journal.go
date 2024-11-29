@@ -19,15 +19,18 @@ func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
 }
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
-	// Check command for a sub command like "list" first
-	if strings.HasSuffix(message.Command(), config.BotCommandJournal+"list") {
-		// ...
+	if this.isListCommand(message.Command()) {
+		// TODO: Reply with a list with of available unit files
 
 		return fmt.Errorf("under construction")
 	}
 
 	// TODO: Find out how to do this `tgbotapi.ReplyKeyboardMarkup` thing
-	// 	- Number keyboard for entering the episode number
+	// 	- Number keyboard for entering the unit name
 
 	return fmt.Errorf("under construction")
+}
+
+func (this *Journal) isListCommand(command string) bool {
+	return strings.HasSuffix(command, config.BotCommandJournal+"list")
 }
