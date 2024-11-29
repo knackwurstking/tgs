@@ -6,7 +6,7 @@ type ValidationTargets struct {
 	All   bool                   `json:"all,omitempty" json:"all,omitempty"`
 }
 
-func NewValidationsConfig() *ValidationTargets {
+func NewValidationTargets() *ValidationTargets {
 	return &ValidationTargets{
 		Users: make([]UserValidationTarget, 0),
 		Chats: make([]ChatValidationTarget, 0),
