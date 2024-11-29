@@ -55,7 +55,7 @@ func main() {
 					return err
 				}
 
-				bot.Debug = true
+				bot.Debug = false
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
 				myBotCommands := tgs.NewMyBotCommands()
