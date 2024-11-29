@@ -58,19 +58,7 @@ func main() {
 				bot.Debug = false
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
-				myBotCommands := tgs.NewMyBotCommands()
-
-				myBotCommands.Add(
-					config.BotCommandIP, "Get server ip",
-					cfg.IP.Register,
-				)
-
-				myBotCommands.Add(
-					config.BotCommandStats, "Get id info",
-					cfg.Stats.Register,
-				)
-
-				if err := myBotCommands.Register(bot); err != nil {
+				if err := registerCommands(bot, cfg); err != nil {
 					return err
 				}
 
@@ -132,6 +120,22 @@ func main() {
 	}
 
 	app.HandleError(app.Run())
+}
+
+func registerCommands(bot *tgbotapi.BotAPI, cfg *config.Config) error {
+	myBotCommands := tgs.NewMyBotCommands()
+
+	myBotCommands.Add(
+		config.BotCommandIP, "Get server IP",
+		cfg.IP.Register,
+	)
+
+	myBotCommands.Add(
+		config.BotCommandStats, "Get ID info",
+		cfg.Stats.Register,
+	)
+
+	return myBotCommands.Register(bot)
 }
 
 func logCommand(command string, message *tgbotapi.Message) {
