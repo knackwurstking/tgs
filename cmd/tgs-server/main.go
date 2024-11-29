@@ -12,7 +12,7 @@ import (
 	"github.com/lmittmann/tint"
 	"gopkg.in/yaml.v3"
 
-	botcommand "github.com/knackwurstking/tgs/internal/bot-command"
+	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
