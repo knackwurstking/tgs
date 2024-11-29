@@ -1,6 +1,5 @@
 define:
-    - &UserID <number>
-    - &ChatID -<number>
+    - &ChatID <number>
 
 token: <token>
 
@@ -12,12 +11,11 @@ ip:
         #   - all_private_chats
         #   - all_group_chats
         #   - all_chat_administrators
-        #   - chat
-        #   - chat_administrators
-        #   - chat_member
+        #   - chat, needs: "chat_id"
+        #   - chat_administrators, needs: "chat_id"
+        #   - chat_member, needs: "chat_id" & "user_id"
         - type: chat
           chat_id: *ChatID
-          #user_id: *UserID
 
     targets:
         # If set to true, all users in every chat are allowed to run this command
@@ -33,4 +31,13 @@ ip:
               #     - supergroup
               #     - channel
               type: supergroup
-              message_thread_id: <number>
+              #message_thread_id: <number>
+
+stats:
+    register:
+        - type: default
+        - type: chat
+          chat_id: *ChatID
+
+    targets:
+        all: true
