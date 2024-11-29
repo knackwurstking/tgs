@@ -72,6 +72,7 @@ func main() {
 						continue
 					}
 
+					// TODO: Add commands here...
 					switch update.Message.Command() {
 					case config.BotCommandIP[1:]:
 						runCommand(
