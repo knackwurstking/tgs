@@ -12,7 +12,7 @@ import (
 	"github.com/lmittmann/tint"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/internal/bot-commands/ip"
+	botcommand "github.com/knackwurstking/tgs/internal/bot-command"
 	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
@@ -79,32 +79,37 @@ func main() {
 						continue
 					}
 
+					runCommand := func(
+						command string,
+						validationTargets *config.ValidationTargets,
+						handler botcommand.Handler,
+					) {
+						if !isValidTarget(update.Message, validationTargets) {
+							return
+						}
+
+						logCommand(command, update.Message)
+
+						if err := handler.Run(update.Message); err != nil {
+							slog.Error("Command failed!", "command", command, "error", err)
+						}
+					}
+
 					switch update.Message.Command() {
 					case config.BotCommandIP[1:]:
-						if !isValidTarget(update.Message, cfg.IP.ValidationsConfig) {
-							continue
-						}
-
-						logCommand(config.BotCommandIP, update.Message)
-
-						if err := ip.New(bot).Run(update.Message); err != nil {
-							slog.Error("Command failed!",
-								"command", config.BotCommandIP, "error", err,
-							)
-						}
-
+						runCommand(
+							config.BotCommandIP,
+							cfg.IP.ValidationTargets,
+							botcommand.NewIP(bot),
+						)
 						break
 
 					case config.BotCommandStats[1:]:
-						// TODO: Continue here...
-						//if !isValidTarget(update.Message, cfg.Stats.ValidationsConfig) {
-						//	continue
-						//}
-
-						logCommand(config.BotCommandIP, update.Message)
-
-						// ...
-
+						runCommand(
+							config.BotCommandIP,
+							cfg.Stats.ValidationTargets,
+							botcommand.NewStats(bot),
+						)
 						break
 
 					default:
