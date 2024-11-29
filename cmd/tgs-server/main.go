@@ -72,36 +72,22 @@ func main() {
 						continue
 					}
 
-					runCommand := func(
-						command string,
-						validationTargets *config.ValidationTargets,
-						handler botcommand.Handler,
-					) {
-						if !isValidTarget(update.Message, validationTargets) {
-							return
-						}
-
-						logCommand(command, update.Message)
-
-						if err := handler.Run(update.Message); err != nil {
-							slog.Error("Command failed!", "command", command, "error", err)
-						}
-					}
-
 					switch update.Message.Command() {
 					case config.BotCommandIP[1:]:
 						runCommand(
+							update.Message,
 							config.BotCommandIP,
-							cfg.IP.ValidationTargets,
 							botcommand.NewIP(bot),
+							cfg.IP.ValidationTargets,
 						)
 						break
 
 					case config.BotCommandStats[1:]:
 						runCommand(
+							update.Message,
 							config.BotCommandIP,
-							cfg.Stats.ValidationTargets,
 							botcommand.NewStats(bot),
+							cfg.Stats.ValidationTargets,
 						)
 						break
 
@@ -120,6 +106,23 @@ func main() {
 	}
 
 	app.HandleError(app.Run())
+}
+
+func runCommand(
+	message *tgbotapi.Message,
+	command string,
+	handler botcommand.Handler,
+	targets *config.ValidationTargets,
+) {
+	if !isValidTarget(message, targets) {
+		return
+	}
+
+	logCommand(command, message)
+
+	if err := handler.Run(message); err != nil {
+		slog.Error("Command failed!", "command", command, "error", err)
+	}
 }
 
 func registerCommands(bot *tgbotapi.BotAPI, cfg *config.Config) error {
