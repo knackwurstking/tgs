@@ -27,7 +27,7 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 	}
 
 	// TODO: Find out how to do this `tgbotapi.ReplyKeyboardMarkup` thing
-	// 	- Number keyboard to entering the episode number
+	// 	- Number keyboard for entering the episode number
 
 	return fmt.Errorf("under construction")
 }
