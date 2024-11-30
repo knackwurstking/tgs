@@ -13,6 +13,8 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		IP: NewCommandConfigIP(),
+		IP:      NewCommandConfigIP(),
+		Stats:   NewCommandConfigStats(),
+		Journal: NewCommandConfigJournal(),
 	}
 }
