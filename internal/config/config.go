@@ -5,9 +5,10 @@ func New() *Config {
 }
 
 type Config struct {
-	Token string              `json:"token" yaml:"token"`
-	IP    *CommandConfigIP    `json:"ip" yaml:"ip"`
-	Stats *CommandConfigStats `json:"stats" yaml:"stats"`
+	Token   string                `json:"token" yaml:"token"`
+	IP      *CommandConfigIP      `json:"ip,omitempty" yaml:"ip,omitempty"`
+	Stats   *CommandConfigStats   `json:"stats,omitempty" yaml:"stats,omitempty"`
+	Journal *CommandConfigJournal `json:"journal,omitempty" yaml:"journal,omitempty"`
 }
 
 func NewConfig() *Config {
