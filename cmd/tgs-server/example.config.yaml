@@ -1,5 +1,4 @@
 define:
-    - &UserID <number>
     - &ChatID <number>
 
 token: <token>
@@ -19,20 +18,11 @@ ip:
           chat_id: *ChatID
 
     targets:
-        # If set to true, all users in every chat are allowed to run this command
-        all: false
-
-        users:
-            - id: *UserID
         chats:
             - id: *ChatID
-              # Types:
-              #     - private
-              #     - group
-              #     - supergroup
-              #     - channel
+              # Type of chat, can be either "private", "group", "supergroup" or "channel"
               type: supergroup
-              #message_thread_id: <number>
+              message_thread_id: 5
 
 stats:
     register:
@@ -42,3 +32,26 @@ stats:
 
     targets:
         all: true
+
+journal:
+    register:
+        - type: chat
+          chat_id: *ChatID
+
+    targets:
+        chats:
+            - id: *ChatID
+              type: supergroup
+              message_thread_id: 3
+
+    units:
+        system:
+            - name: ssh
+              output: short
+        user:
+            - name: picow-led-server
+              output: cat
+            - name: op-anime-dl
+              output: cat
+            - name: op-manga-dl
+              output: cat
