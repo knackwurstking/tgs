@@ -5,8 +5,8 @@ import (
 )
 
 type CommandConfigStats struct {
-	Register          []tgs.BotCommandScope `json:"register" yaml:"register"`
-	ValidationTargets *ValidationTargets    `json:"targets" yaml:"targets"`
+	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 }
 
 func NewCommandConfigStats() *CommandConfigStats {
