@@ -1,6 +1,7 @@
 package botcommand
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,16 +14,55 @@ import (
 type IP struct {
 	*tgbotapi.BotAPI
 
-	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	register          []tgs.BotCommandScope
+	validationTargets *ValidationTargets
 }
 
 func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 	return &IP{
-		BotAPI:            botAPI,
-		Register:          []tgs.BotCommandScope{},
-		ValidationTargets: NewValidationTargets(),
+		BotAPI: botAPI,
+
+		register:          []tgs.BotCommandScope{},
+		validationTargets: NewValidationTargets(),
 	}
+}
+
+func (this *IP) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+	})
+}
+
+func (this *IP) UnmarshalJSON(data []byte) error {
+	d := struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+	}
+
+	err := json.Unmarshal(data, &d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.validationTargets = d.ValidationTargets
+
+	return nil
+}
+
+func (this *IP) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *IP) Targets() *ValidationTargets {
+	return this.validationTargets
 }
 
 func (*IP) URL() string {

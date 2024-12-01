@@ -1,6 +1,7 @@
 package botcommand
 
 import (
+	"encoding/json"
 	"fmt"
 	"os/exec"
 
@@ -11,18 +12,62 @@ import (
 type Journal struct {
 	*tgbotapi.BotAPI
 
-	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
-	Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	register          []tgs.BotCommandScope
+	validationTargets *ValidationTargets
+	units             *Units
 }
 
 func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
 	return &Journal{
-		BotAPI:            botAPI,
-		Register:          []tgs.BotCommandScope{},
-		ValidationTargets: NewValidationTargets(),
-		Units:             NewUnits(),
+		BotAPI: botAPI,
+
+		register:          []tgs.BotCommandScope{},
+		validationTargets: NewValidationTargets(),
+		units:             NewUnits(),
 	}
+}
+
+func (this *Journal) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+		Units:             this.units,
+	})
+}
+
+func (this *Journal) UnmarshalJSON(data []byte) error {
+	d := struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+		Units:             this.units,
+	}
+
+	err := json.Unmarshal(data, &d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.validationTargets = d.ValidationTargets
+	this.units = d.Units
+
+	return nil
+}
+
+func (this *Journal) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *Journal) Targets() *ValidationTargets {
+	return this.validationTargets
 }
 
 func (this *Journal) Run(message *tgbotapi.Message) error {

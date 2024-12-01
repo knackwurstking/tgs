@@ -11,16 +11,55 @@ import (
 type Stats struct {
 	*tgbotapi.BotAPI
 
-	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	register          []tgs.BotCommandScope
+	validationTargets *ValidationTargets
 }
 
 func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 	return &Stats{
-		BotAPI:            botAPI,
-		Register:          []tgs.BotCommandScope{},
-		ValidationTargets: NewValidationTargets(),
+		BotAPI: botAPI,
+
+		register:          []tgs.BotCommandScope{},
+		validationTargets: NewValidationTargets(),
 	}
+}
+
+func (this *Stats) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+	})
+}
+
+func (this *Stats) UnmarshalJSON(data []byte) error {
+	d := struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+	}
+
+	err := json.Unmarshal(data, &d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.validationTargets = d.ValidationTargets
+
+	return nil
+}
+
+func (this *Stats) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *Stats) Targets() *ValidationTargets {
+	return this.validationTargets
 }
 
 func (this *Stats) Run(message *tgbotapi.Message) error {

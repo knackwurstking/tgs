@@ -65,9 +65,9 @@ func main() {
 
 				// Register bot commands here
 				myBotCommands := tgs.NewMyBotCommands()
-				cfg.IP.AddCommands(myBotCommands, cfg.IP.Register...)
-				cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register...)
-				cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register...)
+				cfg.IP.AddCommands(myBotCommands, cfg.IP.Register()...)
+				cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register()...)
+				cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register()...)
 
 				if err = myBotCommands.Register(bot); err != nil {
 					return err
@@ -87,15 +87,15 @@ func main() {
 					// Run commands here
 					switch v := update.Message.Command(); {
 					case strings.HasSuffix(v, botcommand.BotCommandIP[1:]):
-						runCommand(cfg.IP, cfg.IP.ValidationTargets, update.Message)
+						runCommand(cfg.IP, update.Message)
 						break
 
 					case strings.HasSuffix(v, botcommand.BotCommandStats[1:]):
-						runCommand(cfg.Stats, cfg.Stats.ValidationTargets, update.Message)
+						runCommand(cfg.Stats, update.Message)
 						break
 
 					case strings.HasSuffix(v, botcommand.BotCommandJournal[1:]):
-						runCommand(cfg.Journal, cfg.Stats.ValidationTargets, update.Message)
+						runCommand(cfg.Journal, update.Message)
 						break
 
 					default:
@@ -115,12 +115,8 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func runCommand(
-	handler botcommand.Handler,
-	targets *botcommand.ValidationTargets,
-	message *tgbotapi.Message,
-) {
-	if !isValidTarget(message, targets) {
+func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
+	if !isValidTarget(message, handler.Targets()) {
 		return
 	}
 

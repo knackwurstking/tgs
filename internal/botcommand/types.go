@@ -6,6 +6,10 @@ import (
 )
 
 type Handler interface {
+	MarshalJSON() ([]byte, error)
+	UnmarshalJSON(data []byte) error
+	Register() []tgs.BotCommandScope
+	Targets() *ValidationTargets
 	Run(message *tgbotapi.Message) error
 	AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope)
 }
