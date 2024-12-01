@@ -109,24 +109,22 @@ func (this *Journal) Targets() *Targets {
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
 		// TODO: Maybe create a html file here? using some templating or whatever?
-		file := tgbotapi.FileBytes{
-			Name:  "journal-units-list.txt",
-			Bytes: []byte{},
-		}
-
-		file.Bytes = append(file.Bytes, []byte("System Level\n\n")...)
+		content := "System Level\n\n"
 
 		for _, unit := range this.units.System {
-			file.Bytes = append(file.Bytes, []byte(fmt.Sprintf("\t- %s\n", unit.Name))...)
+			content += fmt.Sprintf("\t- %s\n", unit.Name)
 		}
 
-		file.Bytes = append(file.Bytes, []byte("\nUser Level\n\n")...)
+		content += "\nUser Level\n\n"
 
 		for _, unit := range this.units.User {
-			file.Bytes = append(file.Bytes, []byte(fmt.Sprintf("\t- %s\n", unit.Name))...)
+			content += fmt.Sprintf("\t- %s\n", unit.Name)
 		}
 
-		documentConfig := tgbotapi.NewDocument(message.Chat.ID, file)
+		documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+			Name:  "journal-units-list.txt",
+			Bytes: []byte(content),
+		})
 		documentConfig.ReplyToMessageID = message.MessageID
 
 		_, err := this.BotAPI.Send(documentConfig)
