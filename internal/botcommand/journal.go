@@ -40,8 +40,8 @@ func (this *Journal) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (this *Journal) MarshalYAML() ([]byte, error) {
-	return yaml.Marshal(struct {
+func (this *Journal) MarshalYAML() (interface{}, error) {
+	return struct {
 		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 		Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
@@ -49,7 +49,7 @@ func (this *Journal) MarshalYAML() ([]byte, error) {
 		Register:          this.register,
 		ValidationTargets: this.validationTargets,
 		Units:             this.units,
-	})
+	}, nil
 }
 
 func (this *Journal) UnmarshalJSON(data []byte) error {
@@ -75,7 +75,7 @@ func (this *Journal) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (this *Journal) UnmarshalYAML(data []byte) error {
+func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
 		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
@@ -86,7 +86,7 @@ func (this *Journal) UnmarshalYAML(data []byte) error {
 		Units:             this.units,
 	}
 
-	err := yaml.Unmarshal(data, &d)
+	err := value.Encode(&d)
 	if err != nil {
 		return err
 	}

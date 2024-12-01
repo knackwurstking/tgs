@@ -35,14 +35,14 @@ func (this *Stats) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (this *Stats) MarshalYAML() ([]byte, error) {
-	return yaml.Marshal(struct {
+func (this *Stats) MarshalYAML() (interface{}, error) {
+	return struct {
 		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
 		Register:          this.register,
 		ValidationTargets: this.validationTargets,
-	})
+	}, nil
 }
 
 func (this *Stats) UnmarshalJSON(data []byte) error {
@@ -65,7 +65,7 @@ func (this *Stats) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (this *Stats) UnmarshalYAML(data []byte) error {
+func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
 		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
@@ -74,7 +74,7 @@ func (this *Stats) UnmarshalYAML(data []byte) error {
 		ValidationTargets: this.validationTargets,
 	}
 
-	err := yaml.Unmarshal(data, &d)
+	err := value.Encode(&d)
 	if err != nil {
 		return err
 	}
