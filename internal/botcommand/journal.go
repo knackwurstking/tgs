@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -33,10 +32,10 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 }
 
 func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(config.BotCommandJournal+"list", "List journalctl logs", scopes)
-	c.Add(config.BotCommandJournal, "Get a journalctl log", scopes)
+	c.Add(BotCommandJournal+"list", "List journalctl logs", scopes)
+	c.Add(BotCommandJournal, "Get a journalctl log", scopes)
 }
 
 func (this *Journal) isListCommand(command string) bool {
-	return command == config.BotCommandJournal+"list"
+	return command == BotCommandJournal+"list"
 }

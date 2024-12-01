@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -49,5 +48,5 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 }
 
 func (this *Stats) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(config.BotCommandStats, "Get ID info", scopes)
+	c.Add(BotCommandStats, "Get ID info", scopes)
 }

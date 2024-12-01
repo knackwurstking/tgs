@@ -32,13 +32,17 @@ func main() {
 			)
 
 			return func(cmd *cli.Command) error {
-				cfg := config.New()
+				var (
+					err error
+					bot *tgbotapi.BotAPI
+					cfg = config.New(bot)
+				)
 
-				if err := loadConfig(cfg, configPath); err != nil {
+				if err = loadConfig(cfg, configPath); err != nil {
 					return err
 				}
 
-				if err := checkConfig(cfg); err != nil {
+				if err = checkConfig(cfg); err != nil {
 					return err
 				}
 
@@ -51,7 +55,7 @@ func main() {
 					),
 				)
 
-				bot, err := tgbotapi.NewBotAPI(cfg.Token)
+				bot, err = tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
 				}
@@ -59,18 +63,13 @@ func main() {
 				bot.Debug = false
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
-				// Initialize bot commands here
-				ip := botcommand.NewIP(bot)
-				stats := botcommand.NewStats(bot)
-				journal := botcommand.NewJournal(bot)
-
 				// Register bot commands here
 				myBotCommands := tgs.NewMyBotCommands()
-				ip.AddCommands(myBotCommands, cfg.IP.Register...)
-				stats.AddCommands(myBotCommands, cfg.Stats.Register...)
-				journal.AddCommands(myBotCommands, cfg.Journal.Register...)
+				cfg.IP.AddCommands(myBotCommands, cfg.IP.Register...)
+				cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register...)
+				cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register...)
 
-				if err := myBotCommands.Register(bot); err != nil {
+				if err = myBotCommands.Register(bot); err != nil {
 					return err
 				}
 
@@ -87,16 +86,16 @@ func main() {
 
 					// Run commands here
 					switch v := update.Message.Command(); {
-					case strings.HasSuffix(v, config.BotCommandIP[1:]):
-						runCommand(ip, cfg.IP.ValidationTargets, update.Message)
+					case strings.HasSuffix(v, botcommand.BotCommandIP[1:]):
+						runCommand(cfg.IP, cfg.IP.ValidationTargets, update.Message)
 						break
 
-					case strings.HasSuffix(v, config.BotCommandStats[1:]):
-						runCommand(stats, cfg.Stats.ValidationTargets, update.Message)
+					case strings.HasSuffix(v, botcommand.BotCommandStats[1:]):
+						runCommand(cfg.Stats, cfg.Stats.ValidationTargets, update.Message)
 						break
 
-					case strings.HasSuffix(v, config.BotCommandJournal[1:]):
-						runCommand(journal, cfg.Stats.ValidationTargets, update.Message)
+					case strings.HasSuffix(v, botcommand.BotCommandJournal[1:]):
+						runCommand(cfg.Journal, cfg.Stats.ValidationTargets, update.Message)
 						break
 
 					default:

@@ -1,4 +1,4 @@
-package config
+package botcommand
 
 const (
 	BotCommandIP    string = "/ip"

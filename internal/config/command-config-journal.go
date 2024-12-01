@@ -4,17 +4,22 @@ import (
 	"fmt"
 	"os/exec"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 type CommandConfigJournal struct {
+	botcommand.Handler
+
 	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 	Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
 }
 
-func NewCommandConfigJournal() *CommandConfigJournal {
+func NewCommandConfigJournal(bot *tgbotapi.BotAPI) *CommandConfigJournal {
 	return &CommandConfigJournal{
+		Handler:           botcommand.NewJournal(bot),
 		Register:          make([]tgs.BotCommandScope, 0),
 		ValidationTargets: NewValidationTargets(),
 		Units:             NewUnits(),

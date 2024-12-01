@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -41,7 +40,7 @@ func (this *IP) Run(message *tgbotapi.Message) error {
 }
 
 func (this *IP) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(config.BotCommandIP, "Get server IP", scopes)
+	c.Add(BotCommandIP, "Get server IP", scopes)
 }
 
 func (this *IP) FetchAddressFromURL() (address string, err error) {

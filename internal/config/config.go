@@ -1,7 +1,9 @@
 package config
 
-func New() *Config {
-	return NewConfig()
+import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
+func New(bot *tgbotapi.BotAPI) *Config {
+	return NewConfig(bot)
 }
 
 type Config struct {
@@ -11,10 +13,10 @@ type Config struct {
 	Journal *CommandConfigJournal `json:"journal,omitempty" yaml:"journal,omitempty"`
 }
 
-func NewConfig() *Config {
+func NewConfig(bot *tgbotapi.BotAPI) *Config {
 	return &Config{
-		IP:      NewCommandConfigIP(),
-		Stats:   NewCommandConfigStats(),
-		Journal: NewCommandConfigJournal(),
+		IP:      NewCommandConfigIP(bot),
+		Stats:   NewCommandConfigStats(bot),
+		Journal: NewCommandConfigJournal(bot),
 	}
 }
