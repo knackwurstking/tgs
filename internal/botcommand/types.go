@@ -7,7 +7,8 @@ import (
 
 type Handler interface {
 	MarshalJSON() ([]byte, error)
-	UnmarshalJSON(data []byte) error
+	MarshalYAML() ([]byte, error)
+	UnmarshalYAML(data []byte) error
 	Register() []tgs.BotCommandScope
 	Targets() *ValidationTargets
 	Run(message *tgbotapi.Message) error

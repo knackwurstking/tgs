@@ -7,6 +7,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
+	"gopkg.in/yaml.v3"
 )
 
 type Journal struct {
@@ -39,6 +40,18 @@ func (this *Journal) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (this *Journal) MarshalYAML() ([]byte, error) {
+	return yaml.Marshal(struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+		Units:             this.units,
+	})
+}
+
 func (this *Journal) UnmarshalJSON(data []byte) error {
 	d := struct {
 		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
@@ -51,6 +64,29 @@ func (this *Journal) UnmarshalJSON(data []byte) error {
 	}
 
 	err := json.Unmarshal(data, &d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.validationTargets = d.ValidationTargets
+	this.units = d.Units
+
+	return nil
+}
+
+func (this *Journal) UnmarshalYAML(data []byte) error {
+	d := struct {
+		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Units             *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	}{
+		Register:          this.register,
+		ValidationTargets: this.validationTargets,
+		Units:             this.units,
+	}
+
+	err := yaml.Unmarshal(data, &d)
 	if err != nil {
 		return err
 	}
