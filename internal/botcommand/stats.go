@@ -8,9 +8,11 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
-// TODO: Combine this with the `config.CommandConfigStats` struct
 type Stats struct {
 	*tgbotapi.BotAPI
+
+	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 }
 
 func NewStats(botAPI *tgbotapi.BotAPI) *Stats {

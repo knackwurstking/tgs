@@ -1,4 +1,4 @@
-package config
+package botcommand
 
 type ValidationTargets struct {
 	Users []UserValidationTarget `json:"users,omitempty" yaml:"users,omitempty"`

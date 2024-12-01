@@ -117,7 +117,7 @@ func main() {
 
 func runCommand(
 	handler botcommand.Handler,
-	targets *config.ValidationTargets,
+	targets *botcommand.ValidationTargets,
 	message *tgbotapi.Message,
 ) {
 	if !isValidTarget(message, targets) {
@@ -140,7 +140,7 @@ func runCommand(
 	}
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *config.ValidationTargets) bool {
+func isValidTarget(message *tgbotapi.Message, targets *botcommand.ValidationTargets) bool {
 	if targets == nil {
 		return false
 	}

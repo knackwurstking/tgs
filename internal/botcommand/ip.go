@@ -10,9 +10,11 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
-// TODO: Combine this with the `config.CommandConfigIP` struct
 type IP struct {
 	*tgbotapi.BotAPI
+
+	Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+	ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
 }
 
 func NewIP(botAPI *tgbotapi.BotAPI) *IP {
