@@ -18,7 +18,10 @@ type Journal struct {
 
 func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
 	return &Journal{
-		BotAPI: botAPI,
+		BotAPI:            botAPI,
+		Register:          []tgs.BotCommandScope{},
+		ValidationTargets: NewValidationTargets(),
+		Units:             NewUnits(),
 	}
 }
 

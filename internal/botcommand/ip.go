@@ -19,7 +19,9 @@ type IP struct {
 
 func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 	return &IP{
-		BotAPI: botAPI,
+		BotAPI:            botAPI,
+		Register:          []tgs.BotCommandScope{},
+		ValidationTargets: NewValidationTargets(),
 	}
 }
 

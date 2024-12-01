@@ -17,7 +17,9 @@ type Stats struct {
 
 func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 	return &Stats{
-		BotAPI: botAPI,
+		BotAPI:            botAPI,
+		Register:          []tgs.BotCommandScope{},
+		ValidationTargets: NewValidationTargets(),
 	}
 }
 
