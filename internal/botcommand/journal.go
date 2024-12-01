@@ -108,6 +108,7 @@ func (this *Journal) Targets() *Targets {
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
+		// TODO: Maybe create a html file here? using some templating or whatever?
 		file := tgbotapi.FileBytes{
 			Name:  "journal-units-list.txt",
 			Bytes: []byte{},
