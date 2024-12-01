@@ -15,46 +15,46 @@ import (
 type IP struct {
 	*tgbotapi.BotAPI
 
-	register          []tgs.BotCommandScope
-	validationTargets *ValidationTargets
+	register []tgs.BotCommandScope
+	targets  *Targets
 }
 
 func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 	return &IP{
 		BotAPI: botAPI,
 
-		register:          []tgs.BotCommandScope{},
-		validationTargets: NewValidationTargets(),
+		register: []tgs.BotCommandScope{},
+		targets:  NewTargets(),
 	}
 }
 
 func (this *IP) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	})
 }
 
 func (this *IP) MarshalYAML() (interface{}, error) {
 	return struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}, nil
 }
 
 func (this *IP) UnmarshalJSON(data []byte) error {
 	d := struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}
 
 	err := json.Unmarshal(data, &d)
@@ -63,18 +63,18 @@ func (this *IP) UnmarshalJSON(data []byte) error {
 	}
 
 	this.register = d.Register
-	this.validationTargets = d.ValidationTargets
+	this.targets = d.Targets
 
 	return nil
 }
 
 func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}
 
 	err := value.Decode(&d)
@@ -83,7 +83,7 @@ func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	this.register = d.Register
-	this.validationTargets = d.ValidationTargets
+	this.targets = d.Targets
 
 	return nil
 }
@@ -92,8 +92,8 @@ func (this *IP) Register() []tgs.BotCommandScope {
 	return this.register
 }
 
-func (this *IP) Targets() *ValidationTargets {
-	return this.validationTargets
+func (this *IP) Targets() *Targets {
+	return this.targets
 }
 
 func (*IP) URL() string {

@@ -136,7 +136,7 @@ func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	}
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *botcommand.ValidationTargets) bool {
+func isValidTarget(message *tgbotapi.Message, targets *botcommand.Targets) bool {
 	if targets == nil {
 		return false
 	}

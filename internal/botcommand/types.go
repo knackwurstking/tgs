@@ -12,7 +12,7 @@ type Handler interface {
 	UnmarshalJSON(data []byte) error
 	UnmarshalYAML(value *yaml.Node) error
 	Register() []tgs.BotCommandScope
-	Targets() *ValidationTargets
+	Targets() *Targets
 	Run(message *tgbotapi.Message) error
 	AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope)
 }

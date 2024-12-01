@@ -12,46 +12,46 @@ import (
 type Stats struct {
 	*tgbotapi.BotAPI
 
-	register          []tgs.BotCommandScope
-	validationTargets *ValidationTargets
+	register []tgs.BotCommandScope
+	targets  *Targets
 }
 
 func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 	return &Stats{
 		BotAPI: botAPI,
 
-		register:          []tgs.BotCommandScope{},
-		validationTargets: NewValidationTargets(),
+		register: []tgs.BotCommandScope{},
+		targets:  NewTargets(),
 	}
 }
 
 func (this *Stats) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	})
 }
 
 func (this *Stats) MarshalYAML() (interface{}, error) {
 	return struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}, nil
 }
 
 func (this *Stats) UnmarshalJSON(data []byte) error {
 	d := struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}
 
 	err := json.Unmarshal(data, &d)
@@ -60,18 +60,18 @@ func (this *Stats) UnmarshalJSON(data []byte) error {
 	}
 
 	this.register = d.Register
-	this.validationTargets = d.ValidationTargets
+	this.targets = d.Targets
 
 	return nil
 }
 
 func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
-		Register          []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		ValidationTargets *ValidationTargets    `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
 	}{
-		Register:          this.register,
-		ValidationTargets: this.validationTargets,
+		Register: this.register,
+		Targets:  this.targets,
 	}
 
 	err := value.Encode(&d)
@@ -80,7 +80,7 @@ func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	this.register = d.Register
-	this.validationTargets = d.ValidationTargets
+	this.targets = d.Targets
 
 	return nil
 }
@@ -89,8 +89,8 @@ func (this *Stats) Register() []tgs.BotCommandScope {
 	return this.register
 }
 
-func (this *Stats) Targets() *ValidationTargets {
-	return this.validationTargets
+func (this *Stats) Targets() *Targets {
+	return this.targets
 }
 
 func (this *Stats) Run(message *tgbotapi.Message) error {
