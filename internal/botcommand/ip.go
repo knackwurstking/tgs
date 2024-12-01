@@ -11,6 +11,7 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+// TODO: Combine this with the `config.CommandConfigIP` struct
 type IP struct {
 	*tgbotapi.BotAPI
 }

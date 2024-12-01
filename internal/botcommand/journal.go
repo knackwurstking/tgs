@@ -8,6 +8,7 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+// TODO: Combine this with the `config.CommandConfigJournal` struct
 type Journal struct {
 	*tgbotapi.BotAPI
 }
@@ -20,7 +21,7 @@ func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
-		// TODO: Reply with a list with of available unit files
+		// TODO: Reply with a list of available unit files
 
 		return fmt.Errorf("under construction")
 	}

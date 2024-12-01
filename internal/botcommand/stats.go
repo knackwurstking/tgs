@@ -9,6 +9,7 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+// TODO: Combine this with the `config.CommandConfigStats` struct
 type Stats struct {
 	*tgbotapi.BotAPI
 }
