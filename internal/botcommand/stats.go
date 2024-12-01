@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/knackwurstking/tgs/internal/config"
+	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 type Stats struct {
@@ -43,4 +45,8 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 
 	_, err = this.BotAPI.Send(msgConfig)
 	return err
+}
+
+func (this *Stats) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
+	c.Add(config.BotCommandStats, "Get ID info", scopes)
 }

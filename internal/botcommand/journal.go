@@ -2,10 +2,10 @@ package botcommand
 
 import (
 	"fmt"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/internal/config"
+	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 type Journal struct {
@@ -31,6 +31,11 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 	return fmt.Errorf("under construction")
 }
 
+func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
+	c.Add(config.BotCommandJournal+"list", "List journalctl logs", scopes)
+	c.Add(config.BotCommandJournal, "Get a journalctl log", scopes)
+}
+
 func (this *Journal) isListCommand(command string) bool {
-	return strings.HasSuffix(command, config.BotCommandJournal+"list")
+	return command == config.BotCommandJournal+"list"
 }

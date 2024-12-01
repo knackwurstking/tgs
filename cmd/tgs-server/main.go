@@ -59,10 +59,22 @@ func main() {
 				bot.Debug = false
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
-				if err := registerCommands(bot, cfg); err != nil {
+				// Initialize bot commands here
+				ip := botcommand.NewIP(bot)
+				stats := botcommand.NewStats(bot)
+				journal := botcommand.NewJournal(bot)
+
+				// Register bot commands here
+				myBotCommands := tgs.NewMyBotCommands()
+				ip.AddCommands(myBotCommands, cfg.IP.Register...)
+				stats.AddCommands(myBotCommands, cfg.Stats.Register...)
+				journal.AddCommands(myBotCommands, cfg.Journal.Register...)
+
+				if err := myBotCommands.Register(bot); err != nil {
 					return err
 				}
 
+				// Enter the main loop
 				updateConfig := tgbotapi.NewUpdate(0)
 				updateConfig.Timeout = 60 // 1min
 
@@ -73,24 +85,18 @@ func main() {
 						continue
 					}
 
-					// TODO: Add commands here...
+					// Run commands here
 					switch v := update.Message.Command(); {
 					case strings.HasSuffix(v, config.BotCommandIP[1:]):
-						runCommand(
-							update.Message,
-							config.BotCommandIP,
-							botcommand.NewIP(bot),
-							cfg.IP.ValidationTargets,
-						)
+						runCommand(ip, cfg.IP.ValidationTargets, update.Message)
 						break
 
 					case strings.HasSuffix(v, config.BotCommandStats[1:]):
-						runCommand(
-							update.Message,
-							config.BotCommandStats,
-							botcommand.NewStats(bot),
-							cfg.Stats.ValidationTargets,
-						)
+						runCommand(stats, cfg.Stats.ValidationTargets, update.Message)
+						break
+
+					case strings.HasSuffix(v, config.BotCommandJournal[1:]):
+						runCommand(journal, cfg.Stats.ValidationTargets, update.Message)
 						break
 
 					default:
@@ -111,41 +117,15 @@ func main() {
 }
 
 func runCommand(
-	message *tgbotapi.Message,
-	command string,
 	handler botcommand.Handler,
 	targets *config.ValidationTargets,
+	message *tgbotapi.Message,
 ) {
 	if !isValidTarget(message, targets) {
 		return
 	}
 
-	logCommand(command, message)
-
-	if err := handler.Run(message); err != nil {
-		slog.Error("Command failed!", "command", command, "error", err)
-	}
-}
-
-func registerCommands(bot *tgbotapi.BotAPI, cfg *config.Config) error {
-	myBotCommands := tgs.NewMyBotCommands()
-
-	myBotCommands.Add(
-		config.BotCommandIP, "Get server IP",
-		cfg.IP.Register,
-	)
-
-	myBotCommands.Add(
-		config.BotCommandStats, "Get ID info",
-		cfg.Stats.Register,
-	)
-
-	// TODO: Register /journal command and the "sub" command /journallist
-
-	return myBotCommands.Register(bot)
-}
-
-func logCommand(command string, message *tgbotapi.Message) {
+	command := message.Command()
 	slog.Debug("Running command.",
 		"command", command,
 		"message.from.username", message.From.UserName,
@@ -155,13 +135,22 @@ func logCommand(command string, message *tgbotapi.Message) {
 		"message.chat.type", message.Chat.Type,
 		"message.message_thread_id", message.MessageThreadID,
 	)
+
+	if err := handler.Run(message); err != nil {
+		slog.Error("Command failed!", "command", command, "error", err)
+	}
 }
 
 func isValidTarget(message *tgbotapi.Message, targets *config.ValidationTargets) bool {
+	if targets == nil {
+		return false
+	}
+
 	if targets.All {
 		return true
 	}
 
+	// User ID check
 	if message.From.ID != 0 && targets.Users != nil {
 		for _, user := range targets.Users {
 			if user.ID == message.From.ID {
@@ -170,14 +159,13 @@ func isValidTarget(message *tgbotapi.Message, targets *config.ValidationTargets)
 		}
 	}
 
+	// Chat ID check & message thread ID if chat is forum
 	if targets.Chats != nil {
-		for _, targetChat := range targets.Chats {
-			if targetChat.ID == message.Chat.ID &&
-				(targetChat.Type == message.Chat.Type && targetChat.Type != "") {
-
+		for _, t := range targets.Chats {
+			if t.ID == message.Chat.ID && (t.Type == message.Chat.Type && t.Type != "") {
 				if message.Chat.IsForum &&
-					(message.MessageThreadID != targetChat.MessageThreadID &&
-						targetChat.MessageThreadID > 0) {
+					(message.MessageThreadID != t.MessageThreadID &&
+						t.MessageThreadID > 0) {
 
 					return false
 				}
