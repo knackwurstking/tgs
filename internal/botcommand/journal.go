@@ -108,9 +108,28 @@ func (this *Journal) Targets() *Targets {
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
-		// TODO: Reply with a list of available unit files
+		file := tgbotapi.FileBytes{
+			Name:  "journal-units-list.txt",
+			Bytes: []byte{},
+		}
 
-		return fmt.Errorf("under construction")
+		file.Bytes = append(file.Bytes, []byte("System Level\n\n")...)
+
+		for _, unit := range this.units.System {
+			file.Bytes = append(file.Bytes, []byte(fmt.Sprintf("\t- %s\n", unit.Name))...)
+		}
+
+		file.Bytes = append(file.Bytes, []byte("\nUser Level\n\n")...)
+
+		for _, unit := range this.units.User {
+			file.Bytes = append(file.Bytes, []byte(fmt.Sprintf("\t- %s\n", unit.Name))...)
+		}
+
+		documentConfig := tgbotapi.NewDocument(message.Chat.ID, file)
+		documentConfig.ReplyToMessageID = message.MessageID
+
+		_, err := this.BotAPI.Send(documentConfig)
+		return err
 	}
 
 	// TODO: Find out how to do this `tgbotapi.ReplyKeyboardMarkup` thing
