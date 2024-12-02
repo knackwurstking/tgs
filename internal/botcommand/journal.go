@@ -14,6 +14,90 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Unit struct {
+	// Name or the unit file to get
+	Name string `json:"name" yaml:"name"`
+	// Output will be used for the shell command `journalctl` as `--output ${output}`
+	//
+	// optional
+	Output string `json:"output,omitempty" yaml:"output,omitempty"`
+}
+
+type Units struct {
+	System []Unit `json:"system,omitempty" yaml:"system,omitempty"`
+	User   []Unit `json:"user,omitempty" yaml:"user,omitempty"`
+}
+
+func NewUnits() *Units {
+	return &Units{
+		System: make([]Unit, 0),
+		User:   make([]Unit, 0),
+	}
+}
+
+func (this *Units) GetSystemUnit(name string) (*Unit, error) {
+	for i, u := range this.System {
+		if u.Name == name {
+			return &this.System[i], nil
+		}
+	}
+
+	return nil, fmt.Errorf("user unit %s not found", name)
+}
+
+func (this *Units) GetUserUnit(name string) (*Unit, error) {
+	for i, u := range this.User {
+		if u.Name == name {
+			return &this.User[i], nil
+		}
+	}
+
+	return nil, fmt.Errorf("system unit %s not found", name)
+}
+
+func (this *Units) GetOutput(name string) (data []byte, err error) {
+	isUser := true
+
+	unit, err := this.GetUserUnit(name)
+	if err != nil {
+		isUser = false
+
+		unit, err = this.GetSystemUnit(name)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var output string
+	if unit.Output == "default" || unit.Output == "" {
+		output = "short"
+	} else {
+		output = unit.Output
+	}
+
+	var cmd *exec.Cmd
+	if isUser {
+		cmd = exec.Command("journalctl",
+			"--user",
+			"-u", unit.Name,
+			"--output", output,
+			"--no-pager",
+		)
+	} else {
+		cmd = exec.Command("journalctl",
+			"-u", unit.Name,
+			"--output", output,
+			"--no-pager",
+		)
+	}
+
+	if data, err = cmd.CombinedOutput(); err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
+}
+
 type Journal struct {
 	*tgbotapi.BotAPI
 
@@ -133,63 +217,7 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 	this.reply <- &Reply{
 		MessageID: msg.MessageID,
 		Timeout:   time.Minute * 5,
-		Callback: func(message *tgbotapi.Message) error {
-			slog.Debug("Handle reply callback",
-				"message.MessageID", message.MessageID,
-				"message.Text", message.Text,
-			)
-
-			textSplit := strings.Split(message.Text, " ")
-			for x := 0; x < len(textSplit); x++ {
-				textSplit[x] = strings.Trim(textSplit[x], " \r\n\t")
-			}
-
-			level := "user"
-			for _, t := range textSplit {
-				if t == "system" {
-					level = "system"
-				}
-			}
-
-			var (
-				fileName string
-				content  []byte
-				err      error
-			)
-
-			if level == "system" {
-				for _, unit := range this.units.System {
-					if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
-						content, err = this.units.GetOutput(unit.Name)
-						fileName = fmt.Sprintf("%s.log", unit.Name)
-						break
-					}
-				}
-			}
-
-			if level == "user" {
-				for _, unit := range this.units.User {
-					if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
-						content, err = this.units.GetOutput(unit.Name)
-						fileName = fmt.Sprintf("%s.log", unit.Name)
-						break
-					}
-				}
-			}
-
-			if err != nil {
-				return err
-			}
-
-			documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
-				Name:  fileName,
-				Bytes: content,
-			})
-			documentConfig.ReplyToMessageID = message.MessageID
-
-			_, err = this.BotAPI.Send(documentConfig)
-			return err
-		},
+		Callback:  this.replyCallback,
 	}
 
 	return nil
@@ -198,10 +226,6 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
 	c.Add(BotCommandJournal+"list", "List journalctl logs", scopes)
 	c.Add(BotCommandJournal, "Get a journalctl log", scopes)
-}
-
-func (this *Journal) isListCommand(command string) bool {
-	return command == BotCommandJournal[1:]+"list"
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
@@ -250,86 +274,64 @@ func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
 	return err
 }
 
-type Units struct {
-	System []Unit `json:"system,omitempty" yaml:"system,omitempty"`
-	User   []Unit `json:"user,omitempty" yaml:"user,omitempty"`
-}
+func (this *Journal) replyCallback(message *tgbotapi.Message) error {
+	slog.Debug("Handle reply callback",
+		"message.MessageID", message.MessageID,
+		"message.Text", message.Text,
+	)
 
-func NewUnits() *Units {
-	return &Units{
-		System: make([]Unit, 0),
-		User:   make([]Unit, 0),
+	textSplit := strings.Split(message.Text, " ")
+	for x := 0; x < len(textSplit); x++ {
+		textSplit[x] = strings.Trim(textSplit[x], " \r\n\t")
 	}
-}
 
-func (this *Units) GetSystemUnit(name string) (*Unit, error) {
-	for i, u := range this.System {
-		if u.Name == name {
-			return &this.System[i], nil
+	level := "user"
+	for _, t := range textSplit {
+		if t == "system" {
+			level = "system"
 		}
 	}
 
-	return nil, fmt.Errorf("user unit %s not found", name)
-}
+	var (
+		fileName string
+		content  []byte
+		err      error
+	)
 
-func (this *Units) GetUserUnit(name string) (*Unit, error) {
-	for i, u := range this.User {
-		if u.Name == name {
-			return &this.User[i], nil
+	if level == "system" {
+		for _, unit := range this.units.System {
+			if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+				content, err = this.units.GetOutput(unit.Name)
+				fileName = fmt.Sprintf("%s.log", unit.Name)
+				break
+			}
 		}
 	}
 
-	return nil, fmt.Errorf("system unit %s not found", name)
-}
+	if level == "user" {
+		for _, unit := range this.units.User {
+			if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+				content, err = this.units.GetOutput(unit.Name)
+				fileName = fmt.Sprintf("%s.log", unit.Name)
+				break
+			}
+		}
+	}
 
-func (this *Units) GetOutput(name string) (data []byte, err error) {
-	isUser := true
-
-	unit, err := this.GetUserUnit(name)
 	if err != nil {
-		isUser = false
-
-		unit, err = this.GetSystemUnit(name)
-		if err != nil {
-			return nil, err
-		}
+		return err
 	}
 
-	var output string
-	if unit.Output == "default" || unit.Output == "" {
-		output = "short"
-	} else {
-		output = unit.Output
-	}
+	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+		Name:  fileName,
+		Bytes: content,
+	})
+	documentConfig.ReplyToMessageID = message.MessageID
 
-	var cmd *exec.Cmd
-	if isUser {
-		cmd = exec.Command("journalctl",
-			"--user",
-			"-u", unit.Name,
-			"--output", output,
-			"--no-pager",
-		)
-	} else {
-		cmd = exec.Command("journalctl",
-			"-u", unit.Name,
-			"--output", output,
-			"--no-pager",
-		)
-	}
-
-	if data, err = cmd.CombinedOutput(); err != nil {
-		return nil, err
-	} else {
-		return data, nil
-	}
+	_, err = this.BotAPI.Send(documentConfig)
+	return err
 }
 
-type Unit struct {
-	// Name or the unit file to get
-	Name string `json:"name" yaml:"name"`
-	// Output will be used for the shell command `journalctl` as `--output ${output}`
-	//
-	// optional
-	Output string `json:"output,omitempty" yaml:"output,omitempty"`
+func (this *Journal) isListCommand(command string) bool {
+	return command == BotCommandJournal[1:]+"list"
 }
