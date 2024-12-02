@@ -97,7 +97,6 @@ func main() {
 							slog.Debug("Got a new update",
 								"replyID", replyID,
 								"update.Message.Text", update.Message.Text,
-								"update.CallbackData()", update.CallbackData(),
 							)
 							continue
 						}
@@ -123,11 +122,13 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						if r, ok := replyCallbacks[reply.Message.MessageID]; ok {
+						replyID := reply.Message.ReplyToMessage.MessageID
+
+						if r, ok := replyCallbacks[replyID]; ok {
 							r.Done() <- nil
 						}
 
-						replyCallbacks[reply.Message.MessageID] = reply
+						replyCallbacks[replyID] = reply
 						go reply.StartTimeout()
 
 						go func() {
@@ -136,21 +137,18 @@ func main() {
 							switch err := <-reply.Done(); {
 							case err == botcommand.TimeoutError:
 								slog.Warn("Reply callback timeout",
-									"reply.MessageID", reply.Message.MessageID,
-									"reply.Timeout", reply.Timeout,
+									"replyID", replyID, "reply.Timeout", reply.Timeout,
 								)
 								break
 
 							case err == nil:
 								slog.Debug("Reply callback finished",
-									"reply.MessageID", reply.Message.MessageID,
-									"reply.Timeout", reply.Timeout,
+									"replyID", replyID, "reply.Timeout", reply.Timeout,
 								)
 
 							default:
 								slog.Warn("Reply callback finished",
-									"reply.MessageID", reply.Message.MessageID,
-									"reply.Timeout", reply.Timeout,
+									"replyID", replyID, "reply.Timeout", reply.Timeout,
 									"error", err,
 								)
 
@@ -161,7 +159,7 @@ func main() {
 								break
 							}
 
-							delete(replyCallbacks, reply.Message.MessageID)
+							delete(replyCallbacks, replyID)
 						}()
 
 						break
