@@ -38,14 +38,6 @@ func main() {
 					cfg = config.New(bot)
 				)
 
-				if err = loadConfig(cfg, configPath); err != nil {
-					return err
-				}
-
-				if err = checkConfig(cfg); err != nil {
-					return err
-				}
-
 				slog.SetDefault(
 					slog.New(
 						tint.NewHandler(os.Stderr, &tint.Options{
@@ -54,6 +46,14 @@ func main() {
 						}),
 					),
 				)
+
+				if err = loadConfig(cfg, configPath); err != nil {
+					return err
+				}
+
+				if err = checkConfig(cfg); err != nil {
+					return err
+				}
 
 				bot, err = tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
