@@ -119,40 +119,11 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		return this.handleListCommand(message)
 	}
 
-	units := [][]tgbotapi.KeyboardButton{}
-
-	for _, unit := range this.units.System {
-		output := unit.Output
-		if output == "default" || output == "" {
-			output = "short"
-		}
-
-		units = append(units, []tgbotapi.KeyboardButton{{
-			Text: fmt.Sprintf("%s (level: system, output: %s)", unit.Name, output),
-		}})
-	}
-
-	for _, unit := range this.units.User {
-		output := unit.Output
-		if output == "default" || output == "" {
-			output = "short"
-		}
-
-		units = append(units, []tgbotapi.KeyboardButton{{
-			Text: fmt.Sprintf("%s (level: user, output: %s)", unit.Name, output),
-		}})
-	}
-
-	markup := tgbotapi.ReplyKeyboardMarkup{
-		Keyboard:        units,
-		OneTimeKeyboard: true,
-		Selective:       true,
-	}
-
-	// FIXME: Just as for user input and parse response
-	msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Enter the Chapter number")
+	msgConfig := tgbotapi.NewMessage(
+		message.Chat.ID,
+		"Give me the journal, You need to reply this me.",
+	)
 	msgConfig.ReplyToMessageID = message.MessageID
-	msgConfig.ReplyMarkup = markup
 
 	msg, err := this.Send(msgConfig)
 	if err != nil || this.reply == nil {
@@ -165,6 +136,7 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		Callback: func(message *tgbotapi.Message) error {
 			slog.Debug("Handle reply callback",
 				"message.MessageID", message.MessageID,
+				// TODO: Regex this for level (user or system, optional) and unit name
 				"message.Text", message.Text,
 			)
 
