@@ -218,18 +218,25 @@ func (this *Units) GetOutputForUnitPerName(name string) (data []byte, err error)
 		}
 	}
 
+	var output string
+	if unit.Output == "default" || unit.Output == "" {
+		output = "short"
+	} else {
+		output = unit.Output
+	}
+
 	var cmd *exec.Cmd
 	if isUser {
 		cmd = exec.Command("journalctl",
 			"--user",
 			"-u", unit.Name,
-			"--output", unit.GetOutput(),
+			"--output", output,
 			"--no-pager",
 		)
 	} else {
 		cmd = exec.Command("journalctl",
 			"-u", unit.Name,
-			"--output", unit.GetOutput(),
+			"--output", output,
 			"--no-pager",
 		)
 	}
@@ -248,15 +255,4 @@ type Unit struct {
 	//
 	// optional
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
-}
-
-// GetOutput will just return the `this.Output` field, but will do some parsing if the value
-// is empty or "default"
-func (this *Unit) GetOutput() string {
-	output := this.Output
-	if output == "" || output == "default" {
-		return "short"
-	}
-
-	return this.Output
 }
