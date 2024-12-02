@@ -2,10 +2,10 @@ package botcommand
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 
@@ -140,9 +140,56 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 				"message.Text", message.Text,
 			)
 
-			// TODO: Send document, journal log for requested unit file
+			textSplit := strings.Split(message.Text, " ")
+			for x := 0; x < len(textSplit); x++ {
+				textSplit[x] = strings.Trim(textSplit[x], " \r\n\t")
+			}
 
-			return errors.New("under construction")
+			level := "user"
+			for _, t := range textSplit {
+				if t == "system" {
+					level = "system"
+				}
+			}
+
+			var (
+				fileName string
+				content  []byte
+				err      error
+			)
+
+			if level == "system" {
+				for _, unit := range this.units.System {
+					if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+						content, err = this.units.GetOutput(unit.Name)
+						fileName = fmt.Sprintf("%s.log", unit.Name)
+						break
+					}
+				}
+			}
+
+			if level == "user" {
+				for _, unit := range this.units.User {
+					if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+						content, err = this.units.GetOutput(unit.Name)
+						fileName = fmt.Sprintf("%s.log", unit.Name)
+						break
+					}
+				}
+			}
+
+			if err != nil {
+				return err
+			}
+
+			documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+				Name:  fileName,
+				Bytes: content,
+			})
+			documentConfig.ReplyToMessageID = message.MessageID
+
+			_, err = this.BotAPI.Send(documentConfig)
+			return err
 		},
 	}
 
@@ -236,7 +283,7 @@ func (this *Units) GetUserUnit(name string) (*Unit, error) {
 	return nil, fmt.Errorf("system unit %s not found", name)
 }
 
-func (this *Units) GetOutputForUnitPerName(name string) (data []byte, err error) {
+func (this *Units) GetOutput(name string) (data []byte, err error) {
 	isUser := true
 
 	unit, err := this.GetUserUnit(name)
