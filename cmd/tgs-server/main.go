@@ -35,7 +35,7 @@ func main() {
 				var (
 					err error
 					bot *tgbotapi.BotAPI
-					cfg = config.New(bot)
+					cfg = config.New(bot, make(chan *botcommand.Reply))
 				)
 
 				slog.SetDefault(
@@ -80,33 +80,83 @@ func main() {
 				updateConfig := tgbotapi.NewUpdate(0)
 				updateConfig.Timeout = 60 // 1min
 
-				for update := range bot.GetUpdatesChan(updateConfig) {
-					updateConfig.Offset = update.UpdateID + 1
+				replyCallbacks := map[int]*botcommand.Reply{}
+				updateChan := bot.GetUpdatesChan(updateConfig)
+				for {
+					select {
+					case update := <-updateChan:
+						updateConfig.Offset = update.UpdateID + 1
 
-					if !update.Message.IsCommand() {
-						continue
-					}
+						if !update.Message.IsCommand() {
+							replyID := update.Message.ReplyToMessage.MessageID
+							if r, ok := replyCallbacks[replyID]; ok {
+								r.Run(update.Message)
+								continue
+							}
 
-					// Run commands here
-					switch v := update.Message.Command(); {
-					case strings.HasPrefix(v, botcommand.BotCommandIP[1:]):
-						runCommand(cfg.IP, update.Message)
+							slog.Debug("Got a new update",
+								"replyID", replyID,
+								"update.Message.Text", update.Message.Text,
+								"update.CallbackData()", update.CallbackData(),
+							)
+							continue
+						}
+
+						// Run commands here
+						switch v := update.Message.Command(); {
+						case strings.HasPrefix(v, botcommand.BotCommandIP[1:]):
+							runCommand(cfg.IP, update.Message)
+							break
+
+						case strings.HasPrefix(v, botcommand.BotCommandStats[1:]):
+							runCommand(cfg.Stats, update.Message)
+							break
+
+						case strings.HasPrefix(v, botcommand.BotCommandJournal[1:]):
+							runCommand(cfg.Journal, update.Message)
+							break
+
+						default:
+							slog.Warn("Command not found!", "command", v)
+						}
+
 						break
 
-					case strings.HasPrefix(v, botcommand.BotCommandStats[1:]):
-						runCommand(cfg.Stats, update.Message)
-						break
+					case reply := <-cfg.Reply:
+						if r, ok := replyCallbacks[reply.MessageID]; ok {
+							r.Done() <- nil
+						}
 
-					case strings.HasPrefix(v, botcommand.BotCommandJournal[1:]):
-						runCommand(cfg.Journal, update.Message)
-						break
+						replyCallbacks[reply.MessageID] = reply
+						go reply.StartTimeout()
 
-					default:
-						slog.Warn("Command not found!", "command", v)
+						go func() {
+							defer reply.Close()
+
+							switch <-reply.Done() {
+							case botcommand.TimeoutError:
+								slog.Warn("Reply callback timeout",
+									"reply.MessageID", reply.MessageID,
+									"reply.Timeout", reply.Timeout,
+								)
+								break
+
+							case nil:
+								slog.Debug("Reply callback finished",
+									"reply.MessageID", reply.MessageID,
+									"reply.Timeout", reply.Timeout,
+								)
+
+							default:
+								break
+							}
+
+							delete(replyCallbacks, reply.MessageID)
+						}()
+
+						break
 					}
 				}
-
-				return nil
 			}
 		}),
 		CommandFlags: []cli.CommandFlag{

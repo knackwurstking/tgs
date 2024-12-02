@@ -2,9 +2,12 @@ package botcommand
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log/slog"
 	"os/exec"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -17,15 +20,19 @@ type Journal struct {
 	register []tgs.BotCommandScope
 	targets  *Targets
 	units    *Units
+
+	reply chan *Reply
 }
 
-func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
+func NewJournal(botAPI *tgbotapi.BotAPI, reply chan *Reply) *Journal {
 	return &Journal{
 		BotAPI: botAPI,
 
 		register: []tgs.BotCommandScope{},
 		targets:  NewTargets(),
 		units:    NewUnits(),
+
+		reply: reply,
 	}
 }
 
@@ -112,10 +119,36 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		return this.handleListCommand(message)
 	}
 
-	// TODO: Find out how to do this `tgbotapi.ReplyKeyboardMarkup` thing
-	// 	- Number keyboard for entering the unit name
+	markup := tgbotapi.ReplyKeyboardMarkup{
+		Keyboard: [][]tgbotapi.KeyboardButton{
+			{{Text: "1"}, {Text: "2"}, {Text: "3"}},
+			{{Text: "4"}, {Text: "5"}, {Text: "6"}},
+			{{Text: "7"}, {Text: "8"}, {Text: "9"}},
+			{{Text: "0"}},
+		},
+		OneTimeKeyboard: true,
+		Selective:       true,
+	}
 
-	return fmt.Errorf("under construction")
+	msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Enter the Chapter number")
+	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ReplyMarkup = markup
+
+	msg, err := this.Send(msgConfig)
+	if err != nil || this.reply == nil {
+		return err
+	}
+
+	this.reply <- &Reply{
+		MessageID: msg.MessageID,
+		Timeout:   time.Minute * 5,
+		Callback: func(message *tgbotapi.Message) error {
+			slog.Debug("Handle reply callback", "message.MessageID", message.MessageID)
+			return errors.New("under construction")
+		},
+	}
+
+	return nil
 }
 
 func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {

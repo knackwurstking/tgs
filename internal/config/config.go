@@ -5,8 +5,8 @@ import (
 	"github.com/knackwurstking/tgs/internal/botcommand"
 )
 
-func New(bot *tgbotapi.BotAPI) *Config {
-	return NewConfig(bot)
+func New(bot *tgbotapi.BotAPI, reply chan *botcommand.Reply) *Config {
+	return NewConfig(bot, reply)
 }
 
 type Config struct {
@@ -14,12 +14,15 @@ type Config struct {
 	IP      *botcommand.IP      `json:"ip,omitempty" yaml:"ip,omitempty"`
 	Stats   *botcommand.Stats   `json:"stats,omitempty" yaml:"stats,omitempty"`
 	Journal *botcommand.Journal `json:"journal,omitempty" yaml:"journal,omitempty"`
+
+	Reply chan *botcommand.Reply `json:"-" yaml:"-"`
 }
 
-func NewConfig(bot *tgbotapi.BotAPI) *Config {
+func NewConfig(bot *tgbotapi.BotAPI, reply chan *botcommand.Reply) *Config {
 	return &Config{
 		IP:      botcommand.NewIP(bot),
 		Stats:   botcommand.NewStats(bot),
-		Journal: botcommand.NewJournal(bot),
+		Journal: botcommand.NewJournal(bot, reply),
+		Reply:   reply,
 	}
 }
