@@ -206,17 +206,17 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 
 	msgConfig := tgbotapi.NewMessage(
 		message.Chat.ID,
-		"Give me the journal, You need to reply this me.",
+		"Give me the journal, You need to reply to this message for this to work.",
 	)
 	msgConfig.ReplyToMessageID = message.MessageID
 
-	_, err := this.Send(msgConfig)
+	msg, err := this.Send(msgConfig)
 	if err != nil || this.reply == nil {
 		return err
 	}
 
 	this.reply <- &Reply{
-		Message:  message,
+		Message:  &msg,
 		Timeout:  time.Minute * 5,
 		Callback: this.replyCallback,
 	}

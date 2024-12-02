@@ -88,6 +88,7 @@ func main() {
 						updateConfig.Offset = update.UpdateID + 1
 
 						if !update.Message.IsCommand() {
+							// FIXME: Fix this reply id map key shit
 							replyID := update.Message.ReplyToMessage.MessageID
 							if r, ok := replyCallbacks[replyID]; ok {
 								r.Run(update.Message)
@@ -122,13 +123,15 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						replyID := reply.Message.ReplyToMessage.MessageID
+						// FIXME: Fix this reply id map key shit
+						messageID := reply.Message.MessageID
+						slog.Debug("Set a reply callback function", "messageID", messageID)
 
-						if r, ok := replyCallbacks[replyID]; ok {
+						if r, ok := replyCallbacks[messageID]; ok {
 							r.Done() <- nil
 						}
 
-						replyCallbacks[replyID] = reply
+						replyCallbacks[messageID] = reply
 						go reply.StartTimeout()
 
 						go func() {
@@ -137,29 +140,34 @@ func main() {
 							switch err := <-reply.Done(); {
 							case err == botcommand.TimeoutError:
 								slog.Warn("Reply callback timeout",
-									"replyID", replyID, "reply.Timeout", reply.Timeout,
+									"messageID", messageID, "reply.Timeout", reply.Timeout,
 								)
 								break
 
 							case err == nil:
 								slog.Debug("Reply callback finished",
-									"replyID", replyID, "reply.Timeout", reply.Timeout,
+									"messageID", messageID, "reply.Timeout", reply.Timeout,
 								)
 
 							default:
 								slog.Warn("Reply callback finished",
-									"replyID", replyID, "reply.Timeout", reply.Timeout,
+									"messageID", messageID, "reply.Timeout", reply.Timeout,
 									"error", err,
 								)
 
-								msgConfig := tgbotapi.NewMessage(reply.Message.Chat.ID, err.Error())
-								msgConfig.ReplyToMessageID = reply.Message.MessageID
+								msgConfig := tgbotapi.NewMessage(
+									reply.Message.Chat.ID,
+									fmt.Sprintf("`%s`", err.Error()),
+								)
+								msgConfig.ReplyToMessageID = messageID
+								msgConfig.ParseMode = "MarkdownV2"
+
 								_, _ = bot.Send(msgConfig) // NOTE: Ignore any error
 
 								break
 							}
 
-							delete(replyCallbacks, replyID)
+							delete(replyCallbacks, messageID)
 						}()
 
 						break
@@ -184,6 +192,7 @@ func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	command := message.Command()
 	slog.Debug("Running command.",
 		"command", command,
+		"message.message_id", message.MessageID,
 		"message.from.username", message.From.UserName,
 		"message.from.id", message.From.ID,
 		"message.chat.id", message.Chat.ID,
