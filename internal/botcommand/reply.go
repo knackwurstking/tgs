@@ -26,9 +26,6 @@ func (this *Reply) Run(message *tgbotapi.Message) {
 	}
 
 	if err := this.Callback(message); err != nil {
-		msgConfig := tgbotapi.NewMessage(message.Chat.ID, err.Error())
-		msgConfig.ReplyToMessageID = message.MessageID
-
 		this.Done() <- err
 	} else {
 		this.Done() <- nil
