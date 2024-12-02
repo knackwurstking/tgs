@@ -109,50 +109,7 @@ func (this *Journal) Targets() *Targets {
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
-		var (
-			system []string
-			user   []string
-		)
-
-		for _, unit := range this.units.System {
-			system = append(system, fmt.Sprintf("<li>%s</li>", unit.Name))
-		}
-
-		for _, unit := range this.units.User {
-			user = append(user, fmt.Sprintf("<li>%s</li>", unit.Name))
-		}
-
-		content := fmt.Sprintf(`<!doctype html>
-<html>
-	<head>
-		<title>Journal Units</title>
-	</head>
-
-	<body>
-		<h2>System Level</h2>
-		<ul>
-			%s
-		</ul>
-
-		<h2>User Level</h2>
-		<ul>
-			%s
-		</ul>
-	</body>
-</html>
-		`,
-			strings.Join(system, "\n"),
-			strings.Join(user, "\n"),
-		)
-
-		documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
-			Name:  "journal-units.html",
-			Bytes: []byte(content),
-		})
-		documentConfig.ReplyToMessageID = message.MessageID
-
-		_, err := this.BotAPI.Send(documentConfig)
-		return err
+		return this.handleListCommand(message)
 	}
 
 	// TODO: Find out how to do this `tgbotapi.ReplyKeyboardMarkup` thing
@@ -168,6 +125,52 @@ func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandS
 
 func (this *Journal) isListCommand(command string) bool {
 	return command == BotCommandJournal[1:]+"list"
+}
+
+func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
+	var (
+		system []string
+		user   []string
+	)
+
+	for _, unit := range this.units.System {
+		system = append(system, fmt.Sprintf("<li>%s</li>", unit.Name))
+	}
+
+	for _, unit := range this.units.User {
+		user = append(user, fmt.Sprintf("<li>%s</li>", unit.Name))
+	}
+
+	content := fmt.Sprintf(
+		`<!doctype html><html>
+			<head>
+				<title>Journal Units</title>
+			</head>
+
+			<body>
+				<h2>System Level</h2>
+				<ul>
+					%s
+				</ul>
+
+				<h2>User Level</h2>
+				<ul>
+					%s
+				</ul>
+			</body>
+		</html>`,
+		strings.Join(system, "\n"),
+		strings.Join(user, "\n"),
+	)
+
+	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+		Name:  "journal-units.html",
+		Bytes: []byte(content),
+	})
+	documentConfig.ReplyToMessageID = message.MessageID
+
+	_, err := this.BotAPI.Send(documentConfig)
+	return err
 }
 
 type Units struct {
