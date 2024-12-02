@@ -61,6 +61,9 @@ func main() {
 				}
 
 				bot.Debug = false
+				cfg.IP.BotAPI = bot
+				cfg.Stats.BotAPI = bot
+				cfg.Journal.BotAPI = bot
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
 				// Register bot commands here
@@ -86,20 +89,20 @@ func main() {
 
 					// Run commands here
 					switch v := update.Message.Command(); {
-					case strings.HasSuffix(v, botcommand.BotCommandIP[1:]):
+					case strings.HasPrefix(v, botcommand.BotCommandIP[1:]):
 						runCommand(cfg.IP, update.Message)
 						break
 
-					case strings.HasSuffix(v, botcommand.BotCommandStats[1:]):
+					case strings.HasPrefix(v, botcommand.BotCommandStats[1:]):
 						runCommand(cfg.Stats, update.Message)
 						break
 
-					case strings.HasSuffix(v, botcommand.BotCommandJournal[1:]):
+					case strings.HasPrefix(v, botcommand.BotCommandJournal[1:]):
 						runCommand(cfg.Journal, update.Message)
 						break
 
 					default:
-						slog.Warn("Command not found!", "command", update.Message.Command())
+						slog.Warn("Command not found!", "command", v)
 					}
 				}
 
