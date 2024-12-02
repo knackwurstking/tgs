@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -108,21 +109,44 @@ func (this *Journal) Targets() *Targets {
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
 	if this.isListCommand(message.Command()) {
-		// TODO: Maybe create a html file here? using some templating or whatever?
-		content := "System Level\n\n"
+		var (
+			system []string
+			user   []string
+		)
 
 		for _, unit := range this.units.System {
-			content += fmt.Sprintf("\t- %s\n", unit.Name)
+			system = append(system, fmt.Sprintf("<li>%s</li>", unit.Name))
 		}
-
-		content += "\nUser Level\n\n"
 
 		for _, unit := range this.units.User {
-			content += fmt.Sprintf("\t- %s\n", unit.Name)
+			user = append(user, fmt.Sprintf("<li>%s</li>", unit.Name))
 		}
 
+		content := fmt.Sprintf(`<!doctype html>
+<html>
+	<head>
+		<title>Journal Units</title>
+	</head>
+
+	<body>
+		<h2>System Level</h2>
+		<ul>
+			%s
+		</ul>
+
+		<h2>User Level</h2>
+		<ul>
+			%s
+		</ul>
+	</body>
+</html>
+		`,
+			strings.Join(system, "\n"),
+			strings.Join(user, "\n"),
+		)
+
 		documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
-			Name:  "journal-units-list.txt",
+			Name:  "journal-units.html",
 			Bytes: []byte(content),
 		})
 		documentConfig.ReplyToMessageID = message.MessageID
