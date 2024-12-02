@@ -136,7 +136,6 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		Callback: func(message *tgbotapi.Message) error {
 			slog.Debug("Handle reply callback",
 				"message.MessageID", message.MessageID,
-				// TODO: Regex this for level (user or system, optional) and unit name
 				"message.Text", message.Text,
 			)
 
