@@ -1,7 +1,7 @@
 define:
-    - &ChatID <number>
+    - &AliceChatID -1002493320266
 
-token: <token>
+token: <bot-token>
 
 ip:
     # `[]tgbotapi.BotCommandScope`
@@ -15,11 +15,11 @@ ip:
         #   - chat_administrators, needs: "chat_id"
         #   - chat_member, needs: "chat_id" & "user_id"
         - type: chat
-          chat_id: *ChatID
+          chat_id: *AliceChatID
 
     targets:
         chats:
-            - id: *ChatID
+            - id: *AliceChatID
               # Type of chat, can be either "private", "group", "supergroup" or "channel"
               type: supergroup
               message_thread_id: 5
@@ -28,7 +28,7 @@ stats:
     register:
         - type: default
         - type: chat
-          chat_id: *ChatID
+          chat_id: *AliceChatID
 
     targets:
         all: true
@@ -36,11 +36,11 @@ stats:
 journal:
     register:
         - type: chat
-          chat_id: *ChatID
+          chat_id: *AliceChatID
 
     targets:
         chats:
-            - id: *ChatID
+            - id: *AliceChatID
               type: supergroup
               message_thread_id: 3
 
