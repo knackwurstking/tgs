@@ -184,9 +184,11 @@ func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 		"message.message_thread_id", message.MessageThreadID,
 	)
 
-	if err := handler.Run(message); err != nil {
-		slog.Error("Command failed!", "command", command, "error", err)
-	}
+	go func() {
+		if err := handler.Run(message); err != nil {
+			slog.Error("Command failed!", "command", command, "error", err)
+		}
+	}()
 }
 
 func isValidTarget(message *tgbotapi.Message, targets *botcommand.Targets) bool {
