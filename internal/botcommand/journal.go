@@ -91,6 +91,7 @@ func (this *Units) GetOutput(name string) (data []byte, err error) {
 		)
 	}
 
+	slog.Debug("Run journalctl command", "args", cmd.Args)
 	if data, err = cmd.CombinedOutput(); err != nil {
 		return nil, err
 	} else {
@@ -209,15 +210,15 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 	)
 	msgConfig.ReplyToMessageID = message.MessageID
 
-	msg, err := this.Send(msgConfig)
+	_, err := this.Send(msgConfig)
 	if err != nil || this.reply == nil {
 		return err
 	}
 
 	this.reply <- &Reply{
-		MessageID: msg.MessageID,
-		Timeout:   time.Minute * 5,
-		Callback:  this.replyCallback,
+		Message:  message,
+		Timeout:  time.Minute * 5,
+		Callback: this.replyCallback,
 	}
 
 	return nil
@@ -281,8 +282,12 @@ func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 	)
 
 	textSplit := strings.Split(message.Text, " ")
+
+	// Trim and convert to lower case
 	for x := 0; x < len(textSplit); x++ {
-		textSplit[x] = strings.Trim(textSplit[x], " \r\n\t")
+		textSplit[x] = strings.ToLower(
+			strings.Trim(textSplit[x], " \r\n\t"),
+		)
 	}
 
 	level := "user"

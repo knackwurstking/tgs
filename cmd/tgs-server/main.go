@@ -123,35 +123,45 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						if r, ok := replyCallbacks[reply.MessageID]; ok {
+						if r, ok := replyCallbacks[reply.Message.MessageID]; ok {
 							r.Done() <- nil
 						}
 
-						replyCallbacks[reply.MessageID] = reply
+						replyCallbacks[reply.Message.MessageID] = reply
 						go reply.StartTimeout()
 
 						go func() {
 							defer reply.Close()
 
-							switch <-reply.Done() {
-							case botcommand.TimeoutError:
+							switch err := <-reply.Done(); {
+							case err == botcommand.TimeoutError:
 								slog.Warn("Reply callback timeout",
-									"reply.MessageID", reply.MessageID,
+									"reply.MessageID", reply.Message.MessageID,
 									"reply.Timeout", reply.Timeout,
 								)
 								break
 
-							case nil:
+							case err == nil:
 								slog.Debug("Reply callback finished",
-									"reply.MessageID", reply.MessageID,
+									"reply.MessageID", reply.Message.MessageID,
 									"reply.Timeout", reply.Timeout,
 								)
 
 							default:
+								slog.Warn("Reply callback finished",
+									"reply.MessageID", reply.Message.MessageID,
+									"reply.Timeout", reply.Timeout,
+									"error", err,
+								)
+
+								msgConfig := tgbotapi.NewMessage(reply.Message.Chat.ID, err.Error())
+								msgConfig.ReplyToMessageID = reply.Message.MessageID
+								_, _ = bot.Send(msgConfig) // NOTE: Ignore any error
+
 								break
 							}
 
-							delete(replyCallbacks, reply.MessageID)
+							delete(replyCallbacks, reply.Message.MessageID)
 						}()
 
 						break

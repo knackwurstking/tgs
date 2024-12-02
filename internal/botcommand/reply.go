@@ -13,9 +13,9 @@ var (
 )
 
 type Reply struct {
-	MessageID int
-	Timeout   time.Duration
-	Callback  func(message *tgbotapi.Message) error
+	Message  *tgbotapi.Message
+	Timeout  time.Duration
+	Callback func(message *tgbotapi.Message) error
 
 	done chan error
 }
@@ -26,6 +26,9 @@ func (this *Reply) Run(message *tgbotapi.Message) {
 	}
 
 	if err := this.Callback(message); err != nil {
+		msgConfig := tgbotapi.NewMessage(message.Chat.ID, err.Error())
+		msgConfig.ReplyToMessageID = message.MessageID
+
 		this.Done() <- err
 	} else {
 		this.Done() <- nil
