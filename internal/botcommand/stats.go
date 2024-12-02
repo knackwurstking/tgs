@@ -27,8 +27,8 @@ func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 
 func (this *Stats) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -37,8 +37,8 @@ func (this *Stats) MarshalJSON() ([]byte, error) {
 
 func (this *Stats) MarshalYAML() (interface{}, error) {
 	return struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -47,8 +47,8 @@ func (this *Stats) MarshalYAML() (interface{}, error) {
 
 func (this *Stats) UnmarshalJSON(data []byte) error {
 	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -67,14 +67,14 @@ func (this *Stats) UnmarshalJSON(data []byte) error {
 
 func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
 	}
 
-	err := value.Encode(&d)
+	err := value.Decode(&d)
 	if err != nil {
 		return err
 	}

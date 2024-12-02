@@ -30,9 +30,9 @@ func NewJournal(botAPI *tgbotapi.BotAPI) *Journal {
 
 func (this *Journal) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
+		Units    *Units                `json:"units,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -42,9 +42,9 @@ func (this *Journal) MarshalJSON() ([]byte, error) {
 
 func (this *Journal) MarshalYAML() (interface{}, error) {
 	return struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
+		Units    *Units                `yaml:"units,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -54,9 +54,9 @@ func (this *Journal) MarshalYAML() (interface{}, error) {
 
 func (this *Journal) UnmarshalJSON(data []byte) error {
 	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
+		Units    *Units                `json:"units,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
@@ -77,16 +77,16 @@ func (this *Journal) UnmarshalJSON(data []byte) error {
 
 func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
+		Units    *Units                `yaml:"units,omitempty"`
 	}{
 		Register: this.register,
 		Targets:  this.targets,
 		Units:    this.units,
 	}
 
-	err := value.Encode(&d)
+	err := value.Decode(&d)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandS
 }
 
 func (this *Journal) isListCommand(command string) bool {
-	return command == BotCommandJournal+"list"
+	return command == BotCommandJournal[1:]+"list"
 }
 
 type Units struct {
