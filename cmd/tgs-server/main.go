@@ -88,7 +88,6 @@ func main() {
 						updateConfig.Offset = update.UpdateID + 1
 
 						if !update.Message.IsCommand() {
-							// FIXME: Fix this reply id map key shit
 							replyID := update.Message.ReplyToMessage.MessageID
 							if r, ok := replyCallbacks[replyID]; ok {
 								r.Run(update.Message)
@@ -123,7 +122,6 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						// FIXME: Fix this reply id map key shit
 						messageID := reply.Message.MessageID
 						slog.Debug("Set a reply callback function", "messageID", messageID)
 
