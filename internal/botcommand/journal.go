@@ -119,17 +119,37 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		return this.handleListCommand(message)
 	}
 
+	units := [][]tgbotapi.KeyboardButton{}
+
+	for _, unit := range this.units.System {
+		output := unit.Output
+		if output == "default" || output == "" {
+			output = "short"
+		}
+
+		units = append(units, []tgbotapi.KeyboardButton{{
+			Text: fmt.Sprintf("%s (level: system, output: %s)", unit.Name, output),
+		}})
+	}
+
+	for _, unit := range this.units.User {
+		output := unit.Output
+		if output == "default" || output == "" {
+			output = "short"
+		}
+
+		units = append(units, []tgbotapi.KeyboardButton{{
+			Text: fmt.Sprintf("%s (level: user, output: %s)", unit.Name, output),
+		}})
+	}
+
 	markup := tgbotapi.ReplyKeyboardMarkup{
-		Keyboard: [][]tgbotapi.KeyboardButton{
-			{{Text: "1"}, {Text: "2"}, {Text: "3"}},
-			{{Text: "4"}, {Text: "5"}, {Text: "6"}},
-			{{Text: "7"}, {Text: "8"}, {Text: "9"}},
-			{{Text: "0"}},
-		},
+		Keyboard:        units,
 		OneTimeKeyboard: true,
 		Selective:       true,
 	}
 
+	// FIXME: Just as for user input and parse response
 	msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Enter the Chapter number")
 	msgConfig.ReplyToMessageID = message.MessageID
 	msgConfig.ReplyMarkup = markup
@@ -143,7 +163,13 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 		MessageID: msg.MessageID,
 		Timeout:   time.Minute * 5,
 		Callback: func(message *tgbotapi.Message) error {
-			slog.Debug("Handle reply callback", "message.MessageID", message.MessageID)
+			slog.Debug("Handle reply callback",
+				"message.MessageID", message.MessageID,
+				"message.Text", message.Text,
+			)
+
+			// TODO: Send document, journal log for requested unit file
+
 			return errors.New("under construction")
 		},
 	}
