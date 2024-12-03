@@ -72,9 +72,9 @@ func main() {
 
 				{ // Register bot commands here
 					myBotCommands := tgs.NewMyBotCommands()
-					cfg.IP.AddCommands(myBotCommands, cfg.IP.Register()...)
-					cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register()...)
-					cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register()...)
+					cfg.IP.AddCommands(myBotCommands)
+					cfg.Stats.AddCommands(myBotCommands)
+					cfg.Journal.AddCommands(myBotCommands)
 
 					if err = myBotCommands.Register(bot); err != nil {
 						return err

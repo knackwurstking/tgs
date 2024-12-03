@@ -21,10 +21,20 @@ type OPManga struct {
 	targets  *Targets
 }
 
-func (this *OPManga) Register() []tgs.BotCommandScope
-func (this *OPManga) Targets() *Targets
+func (this *OPManga) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *OPManga) Targets() *Targets {
+	return this.targets
+}
+
 func (this *OPManga) Run(message *tgbotapi.Message) error
-func (this *OPManga) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope)
+
+func (this *OPManga) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandOPManga+"list", "List all available chapters", this.Register())
+	c.Add(BotCommandOPManga, "Request a chapter", this.Register())
+}
 
 func (this *OPManga) MarshalJSON() ([]byte, error) {
 	return json.Marshal(OPMangaConfig{Register: this.register, Targets: this.targets})

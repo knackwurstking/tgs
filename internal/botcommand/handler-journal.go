@@ -164,9 +164,9 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(BotCommandJournal+"list", "List journalctl logs", scopes)
-	c.Add(BotCommandJournal, "Get a journalctl log", scopes)
+func (this *Journal) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandJournal+"list", "List journalctl logs", this.Register())
+	c.Add(BotCommandJournal, "Get a journalctl log", this.Register())
 }
 
 func (this *Journal) MarshalJSON() ([]byte, error) {

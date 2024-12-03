@@ -67,8 +67,8 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 	return err
 }
 
-func (this *Stats) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(BotCommandStats, "Get ID info", scopes)
+func (this *Stats) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandStats, "Get ID info", this.Register())
 }
 
 func (this *Stats) MarshalJSON() ([]byte, error) {

@@ -60,8 +60,8 @@ func (this *IP) Run(message *tgbotapi.Message) error {
 	return err
 }
 
-func (this *IP) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(BotCommandIP, "Get server IP", scopes)
+func (this *IP) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandIP, "Get server IP", this.Register())
 }
 
 func (this *IP) MarshalJSON() ([]byte, error) {

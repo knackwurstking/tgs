@@ -24,7 +24,7 @@ type Handler interface {
 	Register() []tgs.BotCommandScope
 	Targets() *Targets
 	Run(message *tgbotapi.Message) error
-	AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope)
+	AddCommands(c *tgs.MyBotCommands)
 
 	MarshalJSON() ([]byte, error)
 	UnmarshalJSON(data []byte) error
