@@ -16,6 +16,11 @@ const (
 	IPURL = "https://ifconfig.io"
 )
 
+type IPConfig struct {
+	Register []tgs.BotCommandScope `json:"register,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty"`
+}
+
 type IP struct {
 	*tgbotapi.BotAPI
 
@@ -59,26 +64,13 @@ func (this *IP) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope)
 }
 
 func (this *IP) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	})
+	return json.Marshal(IPConfig{Register: this.register, Targets: this.targets})
 }
 
 func (this *IP) UnmarshalJSON(data []byte) error {
-	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
+	d := IPConfig{Register: this.register, Targets: this.targets}
 
-	err := json.Unmarshal(data, &d)
-	if err != nil {
+	if err := json.Unmarshal(data, &d); err != nil {
 		return err
 	}
 
@@ -89,26 +81,13 @@ func (this *IP) UnmarshalJSON(data []byte) error {
 }
 
 func (this *IP) MarshalYAML() (interface{}, error) {
-	return struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}, nil
+	return IPConfig{Register: this.register, Targets: this.targets}, nil
 }
 
 func (this *IP) UnmarshalYAML(value *yaml.Node) error {
-	d := struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
+	d := IPConfig{Register: this.register, Targets: this.targets}
 
-	err := value.Decode(&d)
-	if err != nil {
+	if err := value.Decode(&d); err != nil {
 		return err
 	}
 

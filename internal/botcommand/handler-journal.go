@@ -102,6 +102,12 @@ func (this *Units) GetOutput(name string) (data []byte, err error) {
 	}
 }
 
+type JournalConfig struct {
+	Register []tgs.BotCommandScope `json:"register,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty"`
+	Units    *Units                `json:"units,omitempty"`
+}
+
 type Journal struct {
 	*tgbotapi.BotAPI
 
@@ -163,11 +169,7 @@ func (this *Journal) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandS
 }
 
 func (this *Journal) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty"`
-	}{
+	return json.Marshal(JournalConfig{
 		Register: this.register,
 		Targets:  this.targets,
 		Units:    this.units,
@@ -175,18 +177,13 @@ func (this *Journal) MarshalJSON() ([]byte, error) {
 }
 
 func (this *Journal) UnmarshalJSON(data []byte) error {
-	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-		Units    *Units                `json:"units,omitempty"`
-	}{
+	d := JournalConfig{
 		Register: this.register,
 		Targets:  this.targets,
 		Units:    this.units,
 	}
 
-	err := json.Unmarshal(data, &d)
-	if err != nil {
+	if err := json.Unmarshal(data, &d); err != nil {
 		return err
 	}
 
@@ -198,11 +195,7 @@ func (this *Journal) UnmarshalJSON(data []byte) error {
 }
 
 func (this *Journal) MarshalYAML() (interface{}, error) {
-	return struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-		Units    *Units                `yaml:"units,omitempty"`
-	}{
+	return JournalConfig{
 		Register: this.register,
 		Targets:  this.targets,
 		Units:    this.units,
@@ -210,18 +203,13 @@ func (this *Journal) MarshalYAML() (interface{}, error) {
 }
 
 func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
-	d := struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-		Units    *Units                `yaml:"units,omitempty"`
-	}{
+	d := JournalConfig{
 		Register: this.register,
 		Targets:  this.targets,
 		Units:    this.units,
 	}
 
-	err := value.Decode(&d)
-	if err != nil {
+	if err := value.Decode(&d); err != nil {
 		return err
 	}
 

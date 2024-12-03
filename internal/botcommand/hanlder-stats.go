@@ -9,6 +9,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type StatsConfig struct {
+	Register []tgs.BotCommandScope `json:"register,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty"`
+}
+
 type Stats struct {
 	*tgbotapi.BotAPI
 
@@ -66,26 +71,13 @@ func (this *Stats) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandSco
 }
 
 func (this *Stats) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	})
+	return json.Marshal(StatsConfig{Register: this.register, Targets: this.targets})
 }
 
 func (this *Stats) UnmarshalJSON(data []byte) error {
-	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
+	d := StatsConfig{Register: this.register, Targets: this.targets}
 
-	err := json.Unmarshal(data, &d)
-	if err != nil {
+	if err := json.Unmarshal(data, &d); err != nil {
 		return err
 	}
 
@@ -96,26 +88,13 @@ func (this *Stats) UnmarshalJSON(data []byte) error {
 }
 
 func (this *Stats) MarshalYAML() (interface{}, error) {
-	return struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}, nil
+	return StatsConfig{Register: this.register, Targets: this.targets}, nil
 }
 
 func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
-	d := struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
+	d := StatsConfig{Register: this.register, Targets: this.targets}
 
-	err := value.Decode(&d)
-	if err != nil {
+	if err := value.Decode(&d); err != nil {
 		return err
 	}
 
