@@ -18,6 +18,10 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+var (
+	replyCallbacks = map[int]*botcommand.Reply{}
+)
+
 func main() {
 	app := cli.App{
 		Name:  "tgs-server",
@@ -66,21 +70,21 @@ func main() {
 				cfg.Journal.BotAPI = bot
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
-				// Register bot commands here
-				myBotCommands := tgs.NewMyBotCommands()
-				cfg.IP.AddCommands(myBotCommands, cfg.IP.Register()...)
-				cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register()...)
-				cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register()...)
+				{ // Register bot commands here
+					myBotCommands := tgs.NewMyBotCommands()
+					cfg.IP.AddCommands(myBotCommands, cfg.IP.Register()...)
+					cfg.Stats.AddCommands(myBotCommands, cfg.Stats.Register()...)
+					cfg.Journal.AddCommands(myBotCommands, cfg.Journal.Register()...)
 
-				if err = myBotCommands.Register(bot); err != nil {
-					return err
+					if err = myBotCommands.Register(bot); err != nil {
+						return err
+					}
 				}
 
 				// Enter the main loop
 				updateConfig := tgbotapi.NewUpdate(0)
 				updateConfig.Timeout = 60 // 1min
 
-				replyCallbacks := map[int]*botcommand.Reply{}
 				updateChan := bot.GetUpdatesChan(updateConfig)
 				for {
 					select {
@@ -122,51 +126,7 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						messageID := reply.Message.MessageID
-						slog.Debug("Set a reply callback function", "messageID", messageID)
-
-						if r, ok := replyCallbacks[messageID]; ok {
-							r.Done() <- nil
-						}
-
-						replyCallbacks[messageID] = reply
-						go reply.StartTimeout()
-
-						go func() {
-							defer reply.Close()
-
-							switch err := <-reply.Done(); {
-							case err == botcommand.ReplyTimeoutError:
-								slog.Warn("Reply callback timeout",
-									"messageID", messageID, "reply.Timeout", reply.Timeout,
-								)
-								break
-
-							case err == nil:
-								slog.Debug("Reply callback finished",
-									"messageID", messageID, "reply.Timeout", reply.Timeout,
-								)
-
-							default:
-								slog.Warn("Reply callback finished",
-									"messageID", messageID, "reply.Timeout", reply.Timeout,
-									"error", err,
-								)
-
-								msgConfig := tgbotapi.NewMessage(
-									reply.Message.Chat.ID,
-									fmt.Sprintf("`%s`", err.Error()),
-								)
-								msgConfig.ReplyToMessageID = messageID
-								msgConfig.ParseMode = "MarkdownV2"
-
-								_, _ = bot.Send(msgConfig) // NOTE: Ignore any error
-
-								break
-							}
-
-							delete(replyCallbacks, messageID)
-						}()
+						handleReplies(reply, bot)
 
 						break
 					}
@@ -206,6 +166,52 @@ func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	}()
 }
 
+func handleReplies(r *botcommand.Reply, bot *tgbotapi.BotAPI) {
+	messageID := r.Message.MessageID
+	slog.Debug("Set a reply callback function", "messageID", messageID)
+
+	if r, ok := replyCallbacks[messageID]; ok {
+		r.Done() <- nil
+	}
+
+	replyCallbacks[messageID] = r
+	go r.StartTimeout()
+
+	defer r.Close()
+
+	switch err := <-r.Done(); {
+	case err == botcommand.ReplyTimeoutError:
+		slog.Warn("Reply callback timeout",
+			"messageID", messageID, "reply.Timeout", r.Timeout,
+		)
+		break
+
+	case err == nil:
+		slog.Debug("Reply callback finished",
+			"messageID", messageID, "reply.Timeout", r.Timeout,
+		)
+
+	default:
+		slog.Warn("Reply callback finished",
+			"messageID", messageID, "reply.Timeout", r.Timeout,
+			"error", err,
+		)
+
+		msgConfig := tgbotapi.NewMessage(
+			r.Message.Chat.ID,
+			fmt.Sprintf("`%s`", err.Error()),
+		)
+		msgConfig.ReplyToMessageID = messageID
+		msgConfig.ParseMode = "MarkdownV2"
+
+		_, _ = bot.Send(msgConfig) // NOTE: Ignore any error
+
+		break
+	}
+
+	delete(replyCallbacks, messageID)
+}
+
 func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 	if handler.Targets() == nil {
 		return false
@@ -243,14 +249,6 @@ func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 	return false
 }
 
-func checkConfig(cfg *config.Config) error {
-	if cfg.Token == "" {
-		return fmt.Errorf("missing token")
-	}
-
-	return nil
-}
-
 func loadConfig(cfg *config.Config, path string) error {
 	extension := filepath.Ext(path)
 	if extension != ".yaml" && extension != ".json" {
@@ -267,4 +265,12 @@ func loadConfig(cfg *config.Config, path string) error {
 	}
 
 	return json.Unmarshal(data, cfg)
+}
+
+func checkConfig(cfg *config.Config) error {
+	if cfg.Token == "" {
+		return fmt.Errorf("missing token")
+	}
+
+	return nil
 }
