@@ -12,6 +12,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	IPURL = "https://ifconfig.io"
+)
+
 type IP struct {
 	*tgbotapi.BotAPI
 
@@ -28,6 +32,32 @@ func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 	}
 }
 
+func (this *IP) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *IP) Targets() *Targets {
+	return this.targets
+}
+
+func (this *IP) Run(message *tgbotapi.Message) error {
+	address, err := this.fetchAddressFromURL()
+	if err != nil {
+		return err
+	}
+
+	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
+	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
+
+	_, err = this.BotAPI.Send(msgConfig)
+	return err
+}
+
+func (this *IP) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
+	c.Add(BotCommandIP, "Get server IP", scopes)
+}
+
 func (this *IP) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Register []tgs.BotCommandScope `json:"register,omitempty"`
@@ -36,16 +66,6 @@ func (this *IP) MarshalJSON() ([]byte, error) {
 		Register: this.register,
 		Targets:  this.targets,
 	})
-}
-
-func (this *IP) MarshalYAML() (interface{}, error) {
-	return struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}, nil
 }
 
 func (this *IP) UnmarshalJSON(data []byte) error {
@@ -68,6 +88,16 @@ func (this *IP) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (this *IP) MarshalYAML() (interface{}, error) {
+	return struct {
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
+	}{
+		Register: this.register,
+		Targets:  this.targets,
+	}, nil
+}
+
 func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	d := struct {
 		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
@@ -88,44 +118,14 @@ func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-func (this *IP) Register() []tgs.BotCommandScope {
-	return this.register
-}
-
-func (this *IP) Targets() *Targets {
-	return this.targets
-}
-
-func (*IP) URL() string {
-	return "https://ifconfig.io"
-}
-
-func (this *IP) Run(message *tgbotapi.Message) error {
-	address, err := this.FetchAddressFromURL()
-	if err != nil {
-		return err
-	}
-
-	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
-	msgConfig.ReplyToMessageID = message.MessageID
-	msgConfig.ParseMode = "MarkdownV2"
-
-	_, err = this.BotAPI.Send(msgConfig)
-	return err
-}
-
-func (this *IP) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
-	c.Add(BotCommandIP, "Get server IP", scopes)
-}
-
-func (this *IP) FetchAddressFromURL() (address string, err error) {
-	resp, err := http.Get(this.URL())
+func (this *IP) fetchAddressFromURL() (address string, err error) {
+	resp, err := http.Get(IPURL)
 	if err != nil {
 		return address, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		return address, fmt.Errorf("request to %s: %d (%s)",
-			this.URL(), resp.StatusCode, resp.Status,
+			IPURL, resp.StatusCode, resp.Status,
 		)
 	}
 

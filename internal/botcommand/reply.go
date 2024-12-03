@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	TimeoutError = errors.New("TimeoutError")
+	ReplyTimeoutError = errors.New("TimeoutError")
 )
 
 type Reply struct {
@@ -44,7 +44,7 @@ func (this *Reply) StartTimeout() {
 	}
 
 	time.Sleep(this.Timeout)
-	this.done <- TimeoutError
+	this.done <- ReplyTimeoutError
 }
 
 func (this *Reply) Done() chan error {

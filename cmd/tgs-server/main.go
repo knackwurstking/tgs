@@ -136,7 +136,7 @@ func main() {
 							defer reply.Close()
 
 							switch err := <-reply.Done(); {
-							case err == botcommand.TimeoutError:
+							case err == botcommand.ReplyTimeoutError:
 								slog.Warn("Reply callback timeout",
 									"messageID", messageID, "reply.Timeout", reply.Timeout,
 								)
@@ -183,7 +183,7 @@ func main() {
 }
 
 func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
-	if !isValidTarget(message, handler.Targets()) {
+	if !isValidTarget(message, handler) {
 		return
 	}
 
@@ -206,18 +206,18 @@ func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	}()
 }
 
-func isValidTarget(message *tgbotapi.Message, targets *botcommand.Targets) bool {
-	if targets == nil {
+func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
+	if handler.Targets() == nil {
 		return false
 	}
 
-	if targets.All {
+	if handler.Targets().All {
 		return true
 	}
 
 	// User ID check
-	if message.From.ID != 0 && targets.Users != nil {
-		for _, user := range targets.Users {
+	if message.From.ID != 0 && handler.Targets().Users != nil {
+		for _, user := range handler.Targets().Users {
 			if user.ID == message.From.ID {
 				return true
 			}
@@ -225,8 +225,8 @@ func isValidTarget(message *tgbotapi.Message, targets *botcommand.Targets) bool 
 	}
 
 	// Chat ID check & message thread ID if chat is forum
-	if targets.Chats != nil {
-		for _, t := range targets.Chats {
+	if handler.Targets().Chats != nil {
+		for _, t := range handler.Targets().Chats {
 			if t.ID == message.Chat.ID && (t.Type == message.Chat.Type && t.Type != "") {
 				if message.Chat.IsForum &&
 					(message.MessageThreadID != t.MessageThreadID &&

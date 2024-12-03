@@ -25,66 +25,6 @@ func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
 	}
 }
 
-func (this *Stats) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	})
-}
-
-func (this *Stats) MarshalYAML() (interface{}, error) {
-	return struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}, nil
-}
-
-func (this *Stats) UnmarshalJSON(data []byte) error {
-	d := struct {
-		Register []tgs.BotCommandScope `json:"register,omitempty"`
-		Targets  *Targets              `json:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
-
-	err := json.Unmarshal(data, &d)
-	if err != nil {
-		return err
-	}
-
-	this.register = d.Register
-	this.targets = d.Targets
-
-	return nil
-}
-
-func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
-	d := struct {
-		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-		Targets  *Targets              `yaml:"targets,omitempty"`
-	}{
-		Register: this.register,
-		Targets:  this.targets,
-	}
-
-	err := value.Decode(&d)
-	if err != nil {
-		return err
-	}
-
-	this.register = d.Register
-	this.targets = d.Targets
-
-	return nil
-}
-
 func (this *Stats) Register() []tgs.BotCommandScope {
 	return this.register
 }
@@ -123,4 +63,64 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 
 func (this *Stats) AddCommands(c *tgs.MyBotCommands, scopes ...tgs.BotCommandScope) {
 	c.Add(BotCommandStats, "Get ID info", scopes)
+}
+
+func (this *Stats) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
+	}{
+		Register: this.register,
+		Targets:  this.targets,
+	})
+}
+
+func (this *Stats) UnmarshalJSON(data []byte) error {
+	d := struct {
+		Register []tgs.BotCommandScope `json:"register,omitempty"`
+		Targets  *Targets              `json:"targets,omitempty"`
+	}{
+		Register: this.register,
+		Targets:  this.targets,
+	}
+
+	err := json.Unmarshal(data, &d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.targets = d.Targets
+
+	return nil
+}
+
+func (this *Stats) MarshalYAML() (interface{}, error) {
+	return struct {
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
+	}{
+		Register: this.register,
+		Targets:  this.targets,
+	}, nil
+}
+
+func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
+	d := struct {
+		Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+		Targets  *Targets              `yaml:"targets,omitempty"`
+	}{
+		Register: this.register,
+		Targets:  this.targets,
+	}
+
+	err := value.Decode(&d)
+	if err != nil {
+		return err
+	}
+
+	this.register = d.Register
+	this.targets = d.Targets
+
+	return nil
 }
