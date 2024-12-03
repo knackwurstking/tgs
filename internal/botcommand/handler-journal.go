@@ -1,8 +1,11 @@
 package botcommand
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"io"
 	"log/slog"
 	"os/exec"
 	"slices"
@@ -234,49 +237,39 @@ func (this *Journal) isListCommand(command string) bool {
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
-	var (
-		system []string
-		user   []string
-	)
+	buf := bytes.NewBuffer([]byte{})
 
-	for _, unit := range this.units.System {
-		system = append(system, fmt.Sprintf("<li>%s</li>", unit.Name))
+	if t, err := template.ParseFS(Templates,
+		"templates/index.html",
+		"templates/journallist.html",
+	); err != nil {
+		return err
+	} else {
+		if err := t.Execute(buf, struct {
+			PageTitle   string
+			SystemUnits []Unit
+			UserUnits   []Unit
+		}{
+			PageTitle:   "Journal Units",
+			SystemUnits: this.units.System,
+			UserUnits:   this.units.User,
+		}); err != nil {
+			return err
+		}
 	}
 
-	for _, unit := range this.units.User {
-		user = append(user, fmt.Sprintf("<li>%s</li>", unit.Name))
+	if content, err := io.ReadAll(buf); err != nil {
+		return err
+	} else {
+		documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+			Name:  "journal-units.html",
+			Bytes: content,
+		})
+		documentConfig.ReplyToMessageID = message.MessageID
+
+		_, err = this.BotAPI.Send(documentConfig)
+		return err
 	}
-
-	content := fmt.Sprintf(
-		`<!doctype html><html>
-			<head>
-				<title>Journal Units</title>
-			</head>
-
-			<body>
-				<h2>System Level</h2>
-				<ul>
-					%s
-				</ul>
-
-				<h2>User Level</h2>
-				<ul>
-					%s
-				</ul>
-			</body>
-		</html>`,
-		strings.Join(system, "\n"),
-		strings.Join(user, "\n"),
-	)
-
-	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
-		Name:  "journal-units.html",
-		Bytes: []byte(content),
-	})
-	documentConfig.ReplyToMessageID = message.MessageID
-
-	_, err := this.BotAPI.Send(documentConfig)
-	return err
 }
 
 func (this *Journal) replyCallback(message *tgbotapi.Message) error {
