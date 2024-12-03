@@ -21,6 +21,7 @@ type IPConfig struct {
 	Targets  *Targets              `json:"targets,omitempty"`
 }
 
+// IP implements the Handler interface
 type IP struct {
 	*tgbotapi.BotAPI
 

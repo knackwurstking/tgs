@@ -108,6 +108,7 @@ type JournalConfig struct {
 	Units    *Units                `json:"units,omitempty"`
 }
 
+// Journal implements the Handler interface
 type Journal struct {
 	*tgbotapi.BotAPI
 

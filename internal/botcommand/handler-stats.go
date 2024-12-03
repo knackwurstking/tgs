@@ -14,6 +14,7 @@ type StatsConfig struct {
 	Targets  *Targets              `json:"targets,omitempty"`
 }
 
+// Stats implements the Handler interface
 type Stats struct {
 	*tgbotapi.BotAPI
 

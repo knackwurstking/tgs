@@ -13,6 +13,7 @@ type OPMangaConfig struct {
 	Targets  *Targets              `json:"targets,omitempty"`
 }
 
+// OPManga implements the Handler interface
 type OPManga struct {
 	tgbotapi.BotAPI
 
