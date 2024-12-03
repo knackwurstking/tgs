@@ -11,7 +11,7 @@ import (
 
 type OPMangaTemplateData struct {
 	PageTitle string
-	// TODO: Arcs, Chapters, ...
+	Chapters  OPMangaChapters
 }
 
 type OPMangaChapters struct {
@@ -121,7 +121,7 @@ func (this *OPManga) isListCommand(c string) bool {
 }
 
 func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
-	content, err := getTemplateData(OPMangaTemplateData{
+	content, err := GetTemplateData(OPMangaTemplateData{
 		PageTitle: "One Piece Manga | Chapters",
 	})
 	if err != nil {

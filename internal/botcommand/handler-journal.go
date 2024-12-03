@@ -229,7 +229,7 @@ func (this *Journal) isListCommand(command string) bool {
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
-	content, err := getTemplateData(JournalTemplateData{
+	content, err := GetTemplateData(JournalTemplateData{
 		PageTitle:   "Journal Units",
 		SystemUnits: this.units.System,
 		UserUnits:   this.units.User,
