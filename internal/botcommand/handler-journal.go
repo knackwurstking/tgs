@@ -229,6 +229,10 @@ func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *Journal) isListCommand(command string) bool {
+	return command == BotCommandJournal[1:]+"list"
+}
+
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
 	var (
 		system []string
@@ -335,8 +339,4 @@ func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 
 	_, err = this.BotAPI.Send(documentConfig)
 	return err
-}
-
-func (this *Journal) isListCommand(command string) bool {
-	return command == BotCommandJournal[1:]+"list"
 }
