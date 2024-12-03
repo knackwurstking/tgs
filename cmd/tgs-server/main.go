@@ -75,6 +75,7 @@ func main() {
 					cfg.IP.AddCommands(myBotCommands)
 					cfg.Stats.AddCommands(myBotCommands)
 					cfg.Journal.AddCommands(myBotCommands)
+					cfg.OPManga.AddCommands(myBotCommands)
 
 					if err = myBotCommands.Register(bot); err != nil {
 						return err

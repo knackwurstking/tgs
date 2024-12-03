@@ -14,6 +14,7 @@ type Config struct {
 	IP      *botcommand.IP      `json:"ip,omitempty" yaml:"ip,omitempty"`
 	Stats   *botcommand.Stats   `json:"stats,omitempty" yaml:"stats,omitempty"`
 	Journal *botcommand.Journal `json:"journal,omitempty" yaml:"journal,omitempty"`
+	OPManga *botcommand.OPManga `json:"opmanga,omitempty" yaml:"opmanga,omitempty" `
 
 	Reply chan *botcommand.Reply `json:"-" yaml:"-"`
 }
