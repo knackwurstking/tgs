@@ -1,11 +1,8 @@
 package botcommand
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"io"
 	"log/slog"
 	"os/exec"
 	"slices"
@@ -100,6 +97,12 @@ func (this *Units) GetOutput(name string) (data []byte, err error) {
 	} else {
 		return data, nil
 	}
+}
+
+type JournalTemplateData struct {
+	PageTitle   string
+	SystemUnits []Unit
+	UserUnits   []Unit
 }
 
 type JournalConfig struct {
@@ -226,39 +229,23 @@ func (this *Journal) isListCommand(command string) bool {
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
-	buf := bytes.NewBuffer([]byte{})
-
-	if t, err := template.ParseFS(Templates,
-		"templates/index.html",
-		"templates/journallist.html",
-	); err != nil {
-		return err
-	} else {
-		if err := t.Execute(buf, struct {
-			PageTitle   string
-			SystemUnits []Unit
-			UserUnits   []Unit
-		}{
-			PageTitle:   "Journal Units",
-			SystemUnits: this.units.System,
-			UserUnits:   this.units.User,
-		}); err != nil {
-			return err
-		}
-	}
-
-	if content, err := io.ReadAll(buf); err != nil {
-		return err
-	} else {
-		documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
-			Name:  "journal-units.html",
-			Bytes: content,
-		})
-		documentConfig.ReplyToMessageID = message.MessageID
-
-		_, err = this.BotAPI.Send(documentConfig)
+	content, err := getTemplateData(JournalTemplateData{
+		PageTitle:   "Journal Units",
+		SystemUnits: this.units.System,
+		UserUnits:   this.units.User,
+	})
+	if err != nil {
 		return err
 	}
+
+	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
+		Name:  "journal-units.html",
+		Bytes: content,
+	})
+	documentConfig.ReplyToMessageID = message.MessageID
+
+	_, err = this.BotAPI.Send(documentConfig)
+	return err
 }
 
 func (this *Journal) replyCallback(message *tgbotapi.Message) error {

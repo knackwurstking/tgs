@@ -1,7 +1,10 @@
 package botcommand
 
 import (
+	"bytes"
 	"embed"
+	"html/template"
+	"io"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -31,4 +34,21 @@ type Handler interface {
 
 	MarshalYAML() (interface{}, error)
 	UnmarshalYAML(value *yaml.Node) error
+}
+
+func GetTemplateData(templateData any) ([]byte, error) {
+	buf := bytes.NewBuffer([]byte{})
+
+	if t, err := template.ParseFS(Templates,
+		"templates/index.html",
+		"templates/opmangalist.html",
+	); err != nil {
+		return nil, err
+	} else {
+		if err := t.Execute(buf, templateData); err != nil {
+			return nil, err
+		}
+	}
+
+	return io.ReadAll(buf)
 }
