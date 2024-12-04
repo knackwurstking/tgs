@@ -14,6 +14,12 @@ type OPMangaChapter struct {
 	Path string
 }
 
+func (this *OPMangaChapter) PDF() ([]byte, error) {
+	// TODO: Read pdf data from path and return
+
+	return nil, fmt.Errorf("under construction")
+}
+
 type OPMangaArc struct {
 	Name     string
 	Chapters []OPMangaChapter
@@ -22,12 +28,6 @@ type OPMangaArc struct {
 type OPMangaTemplateData struct {
 	PageTitle string
 	Arcs      []OPMangaArc
-}
-
-func (this *OPMangaChapter) PDF() ([]byte, error) {
-	// TODO: Read pdf data from path and return
-
-	return nil, fmt.Errorf("under construction")
 }
 
 type OPMangaConfig struct {
