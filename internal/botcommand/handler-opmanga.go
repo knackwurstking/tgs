@@ -9,23 +9,25 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type OPMangaChapter struct {
+	Name string
+	Path string
+}
+
+type OPMangaArc struct {
+	Name     string
+	Chapters []OPMangaChapter
+}
+
 type OPMangaTemplateData struct {
 	PageTitle string
-	Chapters  OPMangaChapters
+	Arcs      []OPMangaArc
 }
 
-type OPMangaChapters struct {
-	// ...
-}
+func (this *OPMangaChapter) PDF() ([]byte, error) {
+	// TODO: Read pdf data from path and return
 
-func NewOPMangaChapters() *OPMangaChapters {
-	return &OPMangaChapters{}
-}
-
-func (this *OPMangaChapters) Grep(path string) error {
-	// TODO: ...
-
-	return fmt.Errorf("under construction")
+	return nil, fmt.Errorf("under construction")
 }
 
 type OPMangaConfig struct {
@@ -121,8 +123,14 @@ func (this *OPManga) isListCommand(c string) bool {
 }
 
 func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
+	arcs, err := this.listArcs()
+	if err != nil {
+		return err
+	}
+
 	content, err := GetTemplateData(OPMangaTemplateData{
 		PageTitle: "One Piece Manga | Chapters",
+		Arcs:      arcs,
 	})
 	if err != nil {
 		return err
@@ -138,12 +146,8 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	return err
 }
 
-func (this *OPManga) getChapters() (*OPMangaChapters, error) {
-	chapters := NewOPMangaChapters()
-
-	if err := chapters.Grep(this.path); err != nil {
-		return nil, err
-	}
+func (this *OPManga) listArcs() ([]OPMangaArc, error) {
+	// TODO: Grep and build data from path
 
 	return nil, fmt.Errorf("under construction")
 }

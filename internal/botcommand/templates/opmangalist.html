@@ -1,3 +1,12 @@
-{{define "content"}}
-<!-- TODO: ... -->
-{{end}}
+{{define "content"}} {{range $arc := .Arcs}}
+<section>
+    <details>
+        <summary>{{$arc.Name}}</summary>
+        <ul>
+            {{range $chapter := $arc.Chapters}}
+            <li>{{$unit.Name}}</li>
+            {{end}}
+        </ul>
+    </details>
+</section>
+{{end}} {{end}}
