@@ -123,7 +123,7 @@ func (this *OPManga) isListCommand(c string) bool {
 }
 
 func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
-	arcs, err := this.listArcs()
+	arcs, err := this.buildOPMangaArcs()
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,11 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	return err
 }
 
-func (this *OPManga) listArcs() ([]OPMangaArc, error) {
+func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
+	if this.path == "" {
+		return nil, fmt.Errorf("missing path")
+	}
+
 	// TODO: Grep and build data from path
 
 	return nil, fmt.Errorf("under construction")
