@@ -110,6 +110,7 @@ func (this *OPManga) UnmarshalJSON(data []byte) error {
 
 	this.register = d.Register
 	this.targets = d.Targets
+	this.path = d.Path
 
 	return nil
 }
@@ -135,6 +136,7 @@ func (this *OPManga) UnmarshalYAML(value *yaml.Node) error {
 
 	this.register = d.Register
 	this.targets = d.Targets
+	this.path = d.Path
 
 	return nil
 }
@@ -201,7 +203,7 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 			Chapters: []OPMangaChapter{},
 		}
 
-		if sp := strings.SplitN(e1.Name(), " ", 1); len(sp) < 2 {
+		if sp := strings.SplitN(e1.Name(), " ", 2); len(sp) < 2 {
 			arc.Name = e1.Name()
 		} else {
 			arc.Name = sp[1] // Ignore the prefixed number (ex.: "016 Thousand Sunny Arc")
@@ -222,7 +224,7 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 
 			// Parse file: "0441 Duell auf Banaro Island.pdf", remove ".pdf", Get prefixed
 			// number and chapter name
-			fileSplit := strings.SplitN(strings.TrimSuffix(e2.Name(), ".pdf"), " ", 1)
+			fileSplit := strings.SplitN(strings.TrimSuffix(e2.Name(), ".pdf"), " ", 2)
 
 			if n, err := strconv.Atoi(fileSplit[0]); err != nil {
 				return nil, err
