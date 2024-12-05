@@ -6,7 +6,7 @@
 -   Added “/opmanga” and “/opmangalist” commands. [work-in-progress]
 -   Fixed the “/journal” bot command. It was broken due to a missing goroutine
 
-## v0.1.0 [unreleased]
+## v0.1.0 [2024-12-02]
 
 -   Commands added:
     -   ip
