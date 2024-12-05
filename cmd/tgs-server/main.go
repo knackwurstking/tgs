@@ -62,14 +62,12 @@ func main() {
 				bot, err = tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
+				} else {
 				}
 
-				bot.Debug = false
-				cfg.IP.BotAPI = bot
-				cfg.Stats.BotAPI = bot
-				cfg.Journal.BotAPI = bot
-				cfg.OPManga.BotAPI = bot
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
+				bot.Debug = false
+				cfg.SetBot(bot)
 
 				{ // Register bot commands here
 					myBotCommands := tgs.NewMyBotCommands()

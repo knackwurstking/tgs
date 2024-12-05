@@ -28,3 +28,10 @@ func NewConfig(bot *tgbotapi.BotAPI, reply chan *botcommand.Reply) *Config {
 		Reply:   reply,
 	}
 }
+
+func (this *Config) SetBot(bot *tgbotapi.BotAPI) {
+	this.IP.BotAPI = bot
+	this.Stats.BotAPI = bot
+	this.Journal.BotAPI = bot
+	this.OPManga.BotAPI = bot
+}
