@@ -4,16 +4,16 @@
 
 ### Notes
 
-- Server
-    - Commands via config (yaml)
-    - Create example configuration and build server around this configuration
-    - Server runs "getUpdates" command, grep user command, check config and handle system command from configuration
+-   Server
+    -   Commands via config (yaml)
+    -   Create example configuration and build server around this configuration
+    -   Server runs "getUpdates" command, grep user command, check config and handle system command from configuration
 
 ### TODOs
 
-- [ ] Get IP command (no deps.)
-- [ ] Get server logs (journalctl) command (no deps.)
-- [ ] Control picow led server - Toggle all lights on/off
+-   [ ] Get IP command (no deps.)
+-   [ ] Get server logs (journalctl) command (no deps.)
+-   [ ] Control picow led server - Toggle all lights on/off
 
 ### Telegram API:
 
