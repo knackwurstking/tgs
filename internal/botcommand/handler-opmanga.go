@@ -38,11 +38,20 @@ type OPMangaConfig struct {
 
 // OPManga implements the Handler interface
 type OPManga struct {
-	tgbotapi.BotAPI
+	*tgbotapi.BotAPI
 
 	register []tgs.BotCommandScope
 	targets  *Targets
 	path     string
+}
+
+func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
+	return &OPManga{
+		BotAPI: bot,
+
+		register: []tgs.BotCommandScope{},
+		targets:  NewTargets(),
+	}
 }
 
 func (this *OPManga) Register() []tgs.BotCommandScope {
