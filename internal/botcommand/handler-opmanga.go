@@ -3,6 +3,7 @@ package botcommand
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -160,11 +161,12 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	}
 
 	documentConfig := tgbotapi.NewDocument(m.Chat.ID, tgbotapi.FileBytes{
-		Name:  "journal-units.html",
+		Name:  "opmanga-chapters.html",
 		Bytes: content,
 	})
 	documentConfig.ReplyToMessageID = m.MessageID
 
+	slog.Debug("Send template with data", "data", arcs)
 	_, err = this.BotAPI.Send(documentConfig)
 	return err
 }
@@ -187,7 +189,7 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 		return nil, err
 	}
 
-	arcs := []OPMangaArc{}
+	arcs := make([]OPMangaArc, 0)
 
 	for _, e1 := range root {
 		if !e1.IsDir() {
