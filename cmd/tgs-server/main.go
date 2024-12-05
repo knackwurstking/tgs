@@ -120,6 +120,10 @@ func main() {
 							runCommand(cfg.Journal, update.Message)
 							break
 
+						case strings.HasPrefix(v, botcommand.BotCommandOPManga[1:]):
+							runCommand(cfg.OPManga, update.Message)
+							break
+
 						default:
 							slog.Warn("Command not found!", "command", v)
 						}
@@ -145,6 +149,11 @@ func main() {
 
 func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	if !isValidTarget(message, handler) {
+		slog.Debug("Invalid target",
+			"command", message.Command(),
+			"message.Chat.ID", message.Chat.ID,
+			"handler.Targets", handler.Targets(),
+		)
 		return
 	}
 
@@ -235,14 +244,18 @@ func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 	if handler.Targets().Chats != nil {
 		for _, t := range handler.Targets().Chats {
 			if t.ID == message.Chat.ID && (t.Type == message.Chat.Type && t.Type != "") {
-				if message.Chat.IsForum &&
-					(message.MessageThreadID != t.MessageThreadID &&
-						t.MessageThreadID > 0) {
+				if message.Chat.IsForum {
+					if t.MessageThreadID <= 0 {
+						return true
+					}
 
-					return false
+					if t.MessageThreadID == message.MessageThreadID {
+
+						return true
+					}
+				} else {
+					return true
 				}
-
-				return true
 			}
 		}
 	}
