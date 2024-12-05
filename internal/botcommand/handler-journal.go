@@ -81,12 +81,14 @@ func (this *Units) GetOutput(name string) (data []byte, err error) {
 			"--user",
 			"-u", unit.Name,
 			"--output", output,
+			"--reverse",
 			"--no-pager",
 		)
 	} else {
 		cmd = exec.Command("journalctl",
 			"-u", unit.Name,
 			"--output", output,
+			"--reverse",
 			"--no-pager",
 		)
 	}
