@@ -166,7 +166,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	})
 	documentConfig.ReplyToMessageID = m.MessageID
 
-	slog.Debug("Send template with data", "data", arcs)
+	slog.Debug("Send template with data", "content", string(content), "documentConfig", documentConfig, "bot", this.BotAPI)
 	_, err = this.BotAPI.Send(documentConfig)
 	return err
 }
