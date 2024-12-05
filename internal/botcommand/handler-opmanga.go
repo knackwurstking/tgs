@@ -30,6 +30,13 @@ type OPMangaTemplateData struct {
 	Arcs      []OPMangaArc
 }
 
+func (this *OPMangaTemplateData) Patterns() []string {
+	return []string{
+		"templates/index.html",
+		"templates/opmangalist.html",
+	}
+}
+
 type OPMangaConfig struct {
 	Register []tgs.BotCommandScope `json:"register,omitempty"`
 	Targets  *Targets              `json:"targets,omitempty"`
@@ -137,7 +144,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 		return err
 	}
 
-	content, err := GetTemplateData(OPMangaTemplateData{
+	content, err := GetTemplateData(&OPMangaTemplateData{
 		PageTitle: "One Piece Manga | Chapters",
 		Arcs:      arcs,
 	})

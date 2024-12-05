@@ -107,6 +107,13 @@ type JournalTemplateData struct {
 	UserUnits   []Unit
 }
 
+func (this *JournalTemplateData) Patterns() []string {
+	return []string{
+		"templates/index.html",
+		"templates/journallist.html",
+	}
+}
+
 type JournalConfig struct {
 	Register []tgs.BotCommandScope `json:"register,omitempty"`
 	Targets  *Targets              `json:"targets,omitempty"`
@@ -231,7 +238,7 @@ func (this *Journal) isListCommand(command string) bool {
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
-	content, err := GetTemplateData(JournalTemplateData{
+	content, err := GetTemplateData(&JournalTemplateData{
 		PageTitle:   "Journal Units",
 		SystemUnits: this.units.System,
 		UserUnits:   this.units.User,

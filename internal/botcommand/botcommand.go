@@ -36,13 +36,14 @@ type Handler interface {
 	UnmarshalYAML(value *yaml.Node) error
 }
 
-func GetTemplateData(templateData any) ([]byte, error) {
+type TemplateData interface {
+	Patterns() []string
+}
+
+func GetTemplateData(templateData TemplateData) ([]byte, error) {
 	buf := bytes.NewBuffer([]byte{})
 
-	if t, err := template.ParseFS(Templates,
-		"templates/index.html",
-		"templates/opmangalist.html",
-	); err != nil {
+	if t, err := template.ParseFS(Templates, templateData.Patterns()...); err != nil {
 		return nil, err
 	} else {
 		if err := t.Execute(buf, templateData); err != nil {
