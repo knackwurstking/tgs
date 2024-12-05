@@ -1,7 +1,8 @@
 define:
-    - &AliceChatID -1002493320266
+    - &AliceChatID <number>
+    - &OPChatID <number>
 
-token: <bot-token>
+token: <token>
 
 ip:
     # `[]tgbotapi.BotCommandScope`
@@ -55,3 +56,21 @@ journal:
               output: cat
             - name: op-manga-dl
               output: cat
+            - name: tgs-server
+              output: cat
+
+opmanga:
+    register:
+        - type: chat
+          chat_id: *OPChatID
+
+    targets:
+        chats:
+            - id: *OPChatID
+              type: supergroup
+              message_thread_id: 2
+            - id: *OPChatID
+              type: supergroup
+              message_thread_id: 3
+
+    path: "/Volumes/media/Data/One Piece/Manga"
