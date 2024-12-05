@@ -77,12 +77,11 @@ func (this *Units) GetOutput(name string) (data []byte, err error) {
 
 	var cmd *exec.Cmd
 	if isUser {
-		cmd = exec.Command("journalctl",
-			"--user",
-			"-u", unit.Name,
-			"--output", output,
-			"--reverse",
-			"--no-pager",
+		cmd = exec.Command("bash", "-c",
+			fmt.Sprintf(
+				"journalctl --user -u %s --output %s --reverse --no-pager | sed 's/\x1b\\[[0-9;]*m//g'",
+				unit.Name, output,
+			),
 		)
 	} else {
 		cmd = exec.Command("journalctl",
