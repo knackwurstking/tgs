@@ -127,7 +127,7 @@ func main() {
 						break
 
 					case reply := <-cfg.Reply:
-						handleReplies(reply, bot)
+						go handleReplies(reply, bot)
 
 						break
 					}
