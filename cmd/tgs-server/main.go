@@ -68,6 +68,7 @@ func main() {
 				cfg.IP.BotAPI = bot
 				cfg.Stats.BotAPI = bot
 				cfg.Journal.BotAPI = bot
+				cfg.OPManga.BotAPI = bot
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 
 				{ // Register bot commands here
