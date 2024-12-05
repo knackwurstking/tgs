@@ -4,7 +4,7 @@
         <summary>{{$arc.Name}}</summary>
         <ul>
             {{range $chapter := $arc.Chapters}}
-            <li>{{$unit.Name}}</li>
+            <li><b>{{$chapter.Number}}</b> {{$chapter.Name}}</li>
             {{end}}
         </ul>
     </details>

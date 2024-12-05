@@ -3,6 +3,10 @@ package botcommand
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -10,8 +14,9 @@ import (
 )
 
 type OPMangaChapter struct {
-	Name string
-	Path string
+	Number int
+	Name   string
+	Path   string
 }
 
 func (this *OPMangaChapter) PDF() ([]byte, error) {
@@ -145,7 +150,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	}
 
 	content, err := GetTemplateData(&OPMangaTemplateData{
-		PageTitle: "One Piece Manga | Chapters",
+		PageTitle: "One Piece Manga",
 		Arcs:      arcs,
 	})
 	if err != nil {
@@ -167,7 +172,71 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 		return nil, fmt.Errorf("missing path")
 	}
 
-	// TODO: Grep and build data from path
+	info, err := os.Stat(this.path)
+	if err != nil {
+		return nil, err
+	}
+	if !info.IsDir() {
+		return nil, fmt.Errorf("nope, need an directory here")
+	}
 
-	return nil, fmt.Errorf("under construction")
+	root, err := os.ReadDir(this.path)
+	if err != nil {
+		return nil, err
+	}
+
+	arcs := []OPMangaArc{}
+
+	for _, e1 := range root {
+		if !e1.IsDir() {
+			continue // Just ignore all non directories
+		}
+
+		sub, err := os.ReadDir(filepath.Join(this.path, e1.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		arc := OPMangaArc{
+			Chapters: []OPMangaChapter{},
+		}
+
+		if sp := strings.SplitN(e1.Name(), " ", 1); len(sp) < 2 {
+			arc.Name = e1.Name()
+		} else {
+			arc.Name = sp[1] // Ignore the prefixed number (ex.: "016 Thousand Sunny Arc")
+		}
+
+		for _, e2 := range sub {
+			if e2.IsDir() {
+				continue // Skip all directories
+			}
+
+			if filepath.Ext(e2.Name()) != ".pdf" {
+				continue // Allow only pdf
+			}
+
+			chapter := OPMangaChapter{
+				Path: filepath.Join(this.path, e1.Name(), e2.Name()),
+			}
+
+			// Parse file: "0441 Duell auf Banaro Island.pdf", remove ".pdf", Get prefixed
+			// number and chapter name
+			fileSplit := strings.SplitN(strings.TrimSuffix(e2.Name(), ".pdf"), " ", 1)
+
+			if n, err := strconv.Atoi(fileSplit[0]); err != nil {
+				return nil, err
+			} else {
+				chapter.Number = n
+			}
+
+			chapter.Name = fileSplit[1]
+
+			arc.Chapters = append(arc.Chapters, chapter)
+		}
+
+		arcs = append(arcs, arc)
+	}
+
+	return arcs, nil
 }
