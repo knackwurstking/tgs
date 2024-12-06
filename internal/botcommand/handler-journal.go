@@ -143,44 +143,6 @@ func NewJournal(botAPI *tgbotapi.BotAPI, reply chan *Reply) *Journal {
 	}
 }
 
-func (this *Journal) Register() []tgs.BotCommandScope {
-	return this.register
-}
-
-func (this *Journal) Targets() *Targets {
-	return this.targets
-}
-
-func (this *Journal) Run(message *tgbotapi.Message) error {
-	if this.isListCommand(message.Command()) {
-		return this.handleListCommand(message)
-	}
-
-	msgConfig := tgbotapi.NewMessage(
-		message.Chat.ID,
-		"Hi there! Could you please send me the name of the journal? You’ll need to reply to this message to get it. I’ll give you a little time, about 5 minutes, to answer!",
-	)
-	msgConfig.ReplyToMessageID = message.MessageID
-
-	msg, err := this.Send(msgConfig)
-	if err != nil || this.reply == nil {
-		return err
-	}
-
-	this.reply <- &Reply{
-		Message:  &msg,
-		Timeout:  time.Minute * 5,
-		Callback: this.replyCallback,
-	}
-
-	return nil
-}
-
-func (this *Journal) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandJournal+"list", "List journalctl logs", this.Register())
-	c.Add(BotCommandJournal, "Get a journalctl log", this.Register())
-}
-
 func (this *Journal) MarshalJSON() ([]byte, error) {
 	return json.Marshal(JournalConfig{
 		Register: this.register,
@@ -233,6 +195,44 @@ func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *Journal) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *Journal) Targets() *Targets {
+	return this.targets
+}
+
+func (this *Journal) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandJournal+"list", "List journalctl logs", this.Register())
+	c.Add(BotCommandJournal, "Get a journalctl log", this.Register())
+}
+
+func (this *Journal) Run(message *tgbotapi.Message) error {
+	if this.isListCommand(message.Command()) {
+		return this.handleListCommand(message)
+	}
+
+	msgConfig := tgbotapi.NewMessage(
+		message.Chat.ID,
+		"Hi there! Could you please send me the name of the journal? You’ll need to reply to this message to get it. I’ll give you a little time, about 5 minutes, to answer!",
+	)
+	msgConfig.ReplyToMessageID = message.MessageID
+
+	msg, err := this.Send(msgConfig)
+	if err != nil || this.reply == nil {
+		return err
+	}
+
+	this.reply <- &Reply{
+		Message:  &msg,
+		Timeout:  time.Minute * 5,
+		Callback: this.replyCallback,
+	}
+
+	return nil
+}
+
 func (this *Journal) isListCommand(command string) bool {
 	return command == BotCommandJournal[1:]+"list"
 }
@@ -259,21 +259,20 @@ func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
 
 func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
+		"command", BotCommandJournal,
 		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
 	)
 
-	textSplit := strings.Split(message.Text, " ")
-
-	// Trim and convert to lower case
-	for x := 0; x < len(textSplit); x++ {
-		textSplit[x] = strings.ToLower(
-			strings.Trim(textSplit[x], " \r\n\t"),
+	messageSplit := strings.Split(message.Text, " ")
+	for x := 0; x < len(messageSplit); x++ {
+		messageSplit[x] = strings.ToLower(
+			strings.Trim(messageSplit[x], " \r\n\t"),
 		)
 	}
 
 	level := "user"
-	for _, t := range textSplit {
+	for _, t := range messageSplit {
 		if t == "system" {
 			level = "system"
 		}
@@ -287,7 +286,7 @@ func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 
 	if level == "system" {
 		for _, unit := range this.units.System {
-			if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
 				content, err = this.units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
 				break
@@ -297,7 +296,7 @@ func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 
 	if level == "user" {
 		for _, unit := range this.units.User {
-			if slices.Contains(textSplit, strings.ToLower(unit.Name)) {
+			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
 				content, err = this.units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
 				break

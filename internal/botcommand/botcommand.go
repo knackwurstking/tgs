@@ -24,16 +24,16 @@ var (
 )
 
 type Handler interface {
-	Register() []tgs.BotCommandScope
-	Targets() *Targets
-	Run(message *tgbotapi.Message) error
-	AddCommands(c *tgs.MyBotCommands)
-
 	MarshalJSON() ([]byte, error)
 	UnmarshalJSON(data []byte) error
 
 	MarshalYAML() (interface{}, error)
 	UnmarshalYAML(value *yaml.Node) error
+
+	Register() []tgs.BotCommandScope
+	Targets() *Targets
+	AddCommands(c *tgs.MyBotCommands)
+	Run(message *tgbotapi.Message) error
 }
 
 type TemplateData interface {

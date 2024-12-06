@@ -3,10 +3,12 @@ package botcommand
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -56,6 +58,8 @@ type OPManga struct {
 	register []tgs.BotCommandScope
 	targets  *Targets
 	path     string
+
+	reply chan *Reply
 }
 
 func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
@@ -65,29 +69,6 @@ func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
 		register: []tgs.BotCommandScope{},
 		targets:  NewTargets(),
 	}
-}
-
-func (this *OPManga) Register() []tgs.BotCommandScope {
-	return this.register
-}
-
-func (this *OPManga) Targets() *Targets {
-	return this.targets
-}
-
-func (this *OPManga) Run(message *tgbotapi.Message) error {
-	if this.isListCommand(message.Command()) {
-		return this.handleListCommand(message)
-	}
-
-	// TODO: ...
-
-	return fmt.Errorf("under construction")
-}
-
-func (this *OPManga) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandOPManga+"list", "List all available chapters", this.Register())
-	c.Add(BotCommandOPManga, "Request a chapter", this.Register())
 }
 
 func (this *OPManga) MarshalJSON() ([]byte, error) {
@@ -142,35 +123,46 @@ func (this *OPManga) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-func (this *OPManga) isListCommand(c string) bool {
-	return c == BotCommandOPManga[1:]+"list"
+func (this *OPManga) Register() []tgs.BotCommandScope {
+	return this.register
 }
 
-func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
-	arcs, err := this.buildOPMangaArcs()
-	if err != nil {
+func (this *OPManga) Targets() *Targets {
+	return this.targets
+}
+
+func (this *OPManga) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandOPManga+"list", "List all available chapters", this.Register())
+	c.Add(BotCommandOPManga, "Request a chapter", this.Register())
+}
+
+func (this *OPManga) Run(m *tgbotapi.Message) error {
+	if this.isListCommand(m.Command()) {
+		return this.handleListCommand(m)
+	}
+
+	msgConfig := tgbotapi.NewMessage(
+		m.Chat.ID,
+		// TODO: Add a nice message here, just like the journallist command
+		"",
+	)
+	msgConfig.ReplyToMessageID = m.MessageID
+
+	msg, err := this.Send(msgConfig)
+	if err != nil || this.reply == nil {
 		return err
 	}
 
-	content, err := GetTemplateData(&OPMangaTemplateData{
-		PageTitle: "One Piece Manga",
-		Arcs:      arcs,
-	})
-	if err != nil {
-		return err
+	this.reply <- &Reply{
+		Message:  &msg,
+		Timeout:  time.Minute * 5,
+		Callback: this.replyCallback,
 	}
 
-	documentConfig := tgbotapi.NewDocument(m.Chat.ID, tgbotapi.FileBytes{
-		Name:  "opmanga-chapters.html",
-		Bytes: content,
-	})
-	documentConfig.ReplyToMessageID = m.MessageID
-
-	_, err = this.BotAPI.Send(documentConfig)
-	return err
+	return nil
 }
 
-func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
+func (this *OPManga) arcs() ([]OPMangaArc, error) {
 	if this.path == "" {
 		return nil, fmt.Errorf("missing path")
 	}
@@ -242,4 +234,46 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 	}
 
 	return arcs, nil
+}
+
+func (this *OPManga) isListCommand(c string) bool {
+	return c == BotCommandOPManga[1:]+"list"
+}
+
+func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
+	arcs, err := this.arcs()
+	if err != nil {
+		return err
+	}
+
+	content, err := GetTemplateData(&OPMangaTemplateData{
+		PageTitle: "One Piece Manga",
+		Arcs:      arcs,
+	})
+	if err != nil {
+		return err
+	}
+
+	documentConfig := tgbotapi.NewDocument(m.Chat.ID, tgbotapi.FileBytes{
+		Name:  "opmanga-chapters.html",
+		Bytes: content,
+	})
+	documentConfig.ReplyToMessageID = m.MessageID
+
+	_, err = this.BotAPI.Send(documentConfig)
+	return err
+}
+
+func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
+	slog.Debug("Handle reply callback",
+		"command", BotCommandOPManga,
+		"message.MessageID", message.MessageID,
+		"message.Text", message.Text,
+	)
+
+	// TODO: Parse message and get episode string
+	// TODO: Search arcs data for chapter
+	// TODO: Read chapter pdf data and send the document to the client
+
+	return fmt.Errorf("under construction")
 }

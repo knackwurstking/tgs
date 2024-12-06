@@ -38,32 +38,6 @@ func NewIP(botAPI *tgbotapi.BotAPI) *IP {
 	}
 }
 
-func (this *IP) Register() []tgs.BotCommandScope {
-	return this.register
-}
-
-func (this *IP) Targets() *Targets {
-	return this.targets
-}
-
-func (this *IP) Run(message *tgbotapi.Message) error {
-	address, err := this.fetchAddressFromURL()
-	if err != nil {
-		return err
-	}
-
-	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
-	msgConfig.ReplyToMessageID = message.MessageID
-	msgConfig.ParseMode = "MarkdownV2"
-
-	_, err = this.BotAPI.Send(msgConfig)
-	return err
-}
-
-func (this *IP) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandIP, "Get server IP", this.Register())
-}
-
 func (this *IP) MarshalJSON() ([]byte, error) {
 	return json.Marshal(IPConfig{Register: this.register, Targets: this.targets})
 }
@@ -96,6 +70,32 @@ func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	this.targets = d.Targets
 
 	return nil
+}
+
+func (this *IP) Register() []tgs.BotCommandScope {
+	return this.register
+}
+
+func (this *IP) Targets() *Targets {
+	return this.targets
+}
+
+func (this *IP) AddCommands(c *tgs.MyBotCommands) {
+	c.Add(BotCommandIP, "Get server IP", this.Register())
+}
+
+func (this *IP) Run(message *tgbotapi.Message) error {
+	address, err := this.fetchAddressFromURL()
+	if err != nil {
+		return err
+	}
+
+	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
+	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
+
+	_, err = this.BotAPI.Send(msgConfig)
+	return err
 }
 
 func (this *IP) fetchAddressFromURL() (address string, err error) {
