@@ -109,6 +109,7 @@ type JournalTemplateData struct {
 func (this *JournalTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
+		"templates/pico.min.css",
 		"templates/journallist.html",
 	}
 }

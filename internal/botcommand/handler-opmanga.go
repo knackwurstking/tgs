@@ -38,6 +38,7 @@ type OPMangaTemplateData struct {
 func (this *OPMangaTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
+		"templates/pico.min.css",
 		"templates/opmangalist.html",
 	}
 }
@@ -196,7 +197,7 @@ func (this *OPManga) buildOPMangaArcs() ([]OPMangaArc, error) {
 
 		sub, err := os.ReadDir(filepath.Join(this.path, e1.Name()))
 		if err != nil {
-			return nil, err
+			continue // Ignore for now
 		}
 
 		arc := OPMangaArc{

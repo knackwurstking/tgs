@@ -1,7 +1,7 @@
 {{define "content"}} {{range $arc := .Arcs}}
 <section>
     <details>
-        <summary>{{$arc.Name}}</summary>
+        <summary>[{{len $arc.Chapters}}] {{$arc.Name}}</summary>
         <ul>
             {{range $chapter := $arc.Chapters}}
             <li><b>{{$chapter.Number}}</b> {{$chapter.Name}}</li>
