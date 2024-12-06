@@ -96,7 +96,7 @@ func main() {
 						}
 
 						if !update.Message.IsCommand() {
-							if update.Message.ReplyToMessage != nil {
+							if update.Message.ReplyToMessage == nil {
 								slog.Debug("Got a new update",
 									"update.Message.Text", update.Message.Text,
 								)
