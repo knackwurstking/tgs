@@ -143,8 +143,7 @@ func (this *OPManga) Run(m *tgbotapi.Message) error {
 
 	msgConfig := tgbotapi.NewMessage(
 		m.Chat.ID,
-		// TODO: Add a nice message here, just like the journallist command
-		"",
+		"Hi there! Reply to this message to get the episode you want. I’ll give you about 5 minutes to answer.",
 	)
 	msgConfig.ReplyToMessageID = m.MessageID
 
