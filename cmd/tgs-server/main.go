@@ -91,6 +91,10 @@ func main() {
 					case update := <-updateChan:
 						updateConfig.Offset = update.UpdateID + 1
 
+						if update.Message == nil {
+							continue
+						}
+
 						if !update.Message.IsCommand() {
 							replyID := update.Message.ReplyToMessage.MessageID
 							if r, ok := replyCallbacks[replyID]; ok {
