@@ -96,6 +96,13 @@ func main() {
 						}
 
 						if !update.Message.IsCommand() {
+							if update.Message.ReplyToMessage != nil {
+								slog.Debug("Got a new update",
+									"update.Message.Text", update.Message.Text,
+								)
+								continue
+							}
+
 							replyID := update.Message.ReplyToMessage.MessageID
 							if r, ok := replyCallbacks[replyID]; ok {
 								r.Run(update.Message)
