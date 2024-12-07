@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.1.0 [unreleased]
+## v1.0.0 [unreleased]
 
 -   Commands added:
     -   ip
