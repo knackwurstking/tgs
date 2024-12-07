@@ -3,10 +3,15 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <title>{{.PageTitle}}</title>
+
         <style>
-            {{block "css" .}}
-            {{end}}
+            {{block "css" .}} {{end}}
+        </style>
+
+        <style>
+            {{block "theme" .}} {{end}}
         </style>
     </head>
 

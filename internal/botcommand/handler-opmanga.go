@@ -42,6 +42,7 @@ func (this *OPMangaTemplateData) Patterns() []string {
 		"templates/index.html",
 		"templates/opmangalist.html",
 		"templates/style.css",
+		"templates/original.css",
 	}
 }
 
