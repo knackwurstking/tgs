@@ -40,8 +40,8 @@ type OPMangaTemplateData struct {
 func (this *OPMangaTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
-		"templates/pico.min.css",
 		"templates/opmangalist.html",
+		"templates/style.css",
 	}
 }
 
