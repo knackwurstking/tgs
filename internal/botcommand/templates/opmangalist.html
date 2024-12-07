@@ -1,12 +1,14 @@
 {{define "content"}} {{range $arc := .Arcs}}
-<section>
-    <details>
-        <summary>[{{len $arc.Chapters}}] {{$arc.Name}}</summary>
-        <ul>
-            {{range $chapter := $arc.Chapters}}
-            <li><b>{{$chapter.Number}}</b> {{$chapter.Name}}</li>
-            {{end}}
-        </ul>
-    </details>
-</section>
+<main class="is-container">
+    <section>
+        <details {{if eq (len $arc.Chapters) 0}}disabled{{end}}>
+            <summary>[{{len $arc.Chapters}}] {{$arc.Name}}</summary>
+            <ul>
+                {{range $chapter := $arc.Chapters}}
+                <li><b>{{$chapter.Number}}</b> {{$chapter.Name}}</li>
+                {{end}}
+            </ul>
+        </details>
+    </section>
+</main>
 {{end}} {{end}}

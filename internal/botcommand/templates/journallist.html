@@ -1,23 +1,25 @@
 {{define "content"}}
-<section>
-    <details>
-        <summary>System Level</summary>
-        <ul>
-            {{range $unit := .SystemUnits}}
-            <li>{{$unit.Name}}</li>
-            {{end}}
-        </ul>
-    </details>
-</section>
+<main class="is-container">
+    <section>
+        <details>
+            <summary>System Level</summary>
+            <ul>
+                {{range $unit := .SystemUnits}}
+                <li>{{$unit.Name}}</li>
+                {{end}}
+            </ul>
+        </details>
+    </section>
 
-<section>
-    <details>
-        <summary>User Level</summary>
-        <ul>
-            {{range $unit := .UserUnits}}
-            <li>{{$unit.Name}}</li>
-            {{end}}
-        </ul>
-    </details>
-</section>
+    <section>
+        <details>
+            <summary>User Level</summary>
+            <ul>
+                {{range $unit := .UserUnits}}
+                <li>{{$unit.Name}}</li>
+                {{end}}
+            </ul>
+        </details>
+    </section>
+</main>
 {{end}}
