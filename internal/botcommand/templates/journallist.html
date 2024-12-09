@@ -1,7 +1,7 @@
 {{define "content"}}
 <main class="is-container">
     <section>
-        <details>
+        <details {{if eq (len .SystemUnits) 0}}disabled{{end}}>
             <summary>System Level</summary>
             <ul>
                 {{range $unit := .SystemUnits}}
@@ -12,7 +12,7 @@
     </section>
 
     <section>
-        <details>
+        <details {{if eq (len .UserUnits) 0}}disabled{{end}}>
             <summary>User Level</summary>
             <ul>
                 {{range $unit := .UserUnits}}
