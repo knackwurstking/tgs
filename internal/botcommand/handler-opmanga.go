@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -269,13 +270,20 @@ func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 		"message.Text", message.Text,
 	)
 
-	_, err := this.arcs()
+	arcs, err := this.arcs()
 	if err != nil {
 		return err
 	}
 
-	// TODO: Parse message and get episode string
+	// Parse message and get episode string
+	r := regexp.MustCompile(`[0-9]+`)
+	m := r.FindString(message.Text)
+	if m == "" {
+		return fmt.Errorf("nothing found, need a number here: %s", message.Text)
+	}
+
 	// TODO: Search arcs data for chapter
+
 	// TODO: Read chapter pdf data and send the document to the client
 
 	return fmt.Errorf("under construction")
