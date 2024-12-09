@@ -110,8 +110,10 @@ func (this *JournalTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
 		"templates/journallist.html",
-		"templates/pico.min.css",
+		//"templates/pico.min.css",
 		"templates/styles.css",
+		"templates/ui.min.css",
+		"templates/ui.min.umd.cjs",
 	}
 }
 

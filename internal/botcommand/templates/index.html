@@ -7,12 +7,16 @@
         <title>{{.PageTitle}}</title>
 
         <style>
-            {{block "css" .}} {{end}}
+            {{block "style" .}} {{end}}
         </style>
 
         <style>
-            {{block "styles" .}} {{end}}
+            {{block "custom-style" .}} {{end}}
         </style>
+
+        <script>
+            {{block "script" .}} {{end}}
+        </script>
     </head>
 
     <body>
