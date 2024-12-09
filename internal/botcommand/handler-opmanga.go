@@ -270,7 +270,7 @@ func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 		"message.Text", message.Text,
 	)
 
-	arcs, err := this.arcs()
+	_, err := this.arcs()
 	if err != nil {
 		return err
 	}
