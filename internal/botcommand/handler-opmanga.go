@@ -270,6 +270,11 @@ func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 		"message.Text", message.Text,
 	)
 
+	arcs, err := this.arcs()
+	if err != nil {
+		return err
+	}
+
 	// TODO: Parse message and get episode string
 	// TODO: Search arcs data for chapter
 	// TODO: Read chapter pdf data and send the document to the client

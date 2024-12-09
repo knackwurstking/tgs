@@ -5,7 +5,7 @@ html,
 body,
 .tooltip,
 .popover {
-    font-family: "Recursive", sans-serif;
+    font-family: "Recursive";
     font-variation-settings:
         "MONO" 0,
         "wght" 400;
@@ -16,7 +16,7 @@ kbd,
 pre,
 samp,
 .text-monospace {
-    font-family: "Recursive", monospace;
+    font-family: "Recursive";
     font-variation-settings:
         "MONO" 1,
         "wght" 350;
