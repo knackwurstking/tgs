@@ -114,7 +114,7 @@ func (this *JournalTemplateData) Patterns() []string {
 		"templates/styles.css",
 		"templates/original.css",
 		"templates/ui.min.css",
-		"templates/ui.min.umd.cjs",
+		//"templates/ui.min.umd.cjs",
 	}
 }
 

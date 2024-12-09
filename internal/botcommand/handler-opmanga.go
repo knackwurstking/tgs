@@ -46,7 +46,7 @@ func (this *OPMangaTemplateData) Patterns() []string {
 		"templates/styles.css",
 		"templates/original.css",
 		"templates/ui.min.css",
-		"templates/ui.min.umd.cjs",
+		//"templates/ui.min.umd.cjs",
 	}
 }
 
