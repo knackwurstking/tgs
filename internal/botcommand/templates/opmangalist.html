@@ -3,7 +3,9 @@
     {{range $arc := .Arcs}}
     <section>
         <details {{if eq (len $arc.Chapters) 0}}disabled{{end}}>
-            <summary>[{{len $arc.Chapters}}] {{$arc.Name}}</summary>
+            <summary onclick="this.parentElement.scrollIntoView(true)">
+                [{{len $arc.Chapters}}] {{$arc.Name}}
+            </summary>
             <ul>
                 {{range $chapter := $arc.Chapters}}
                 <li>
