@@ -92,9 +92,7 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 	jsonData, err := json.MarshalIndent(data, "", "    ")
 
 	msgConfig := tgbotapi.NewMessage(message.Chat.ID,
-		"```json\n"+
-			fmt.Sprintf("%s\n", string(jsonData))+
-			"```",
+		"```json\n"+fmt.Sprintf("%s\n", string(jsonData))+"```",
 	)
 
 	msgConfig.ReplyToMessageID = message.MessageID
