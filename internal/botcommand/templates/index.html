@@ -11,6 +11,10 @@
         </style>
 
         <style>
+            {{block "theme" .}} {{end}}
+        </style>
+
+        <style>
             {{block "custom-style" .}} {{end}}
         </style>
 
@@ -19,7 +23,7 @@
         </script>
     </head>
 
-    <body>
+    <body data-theme="dark">
         {{block "content" .}} {{end}}
     </body>
 </html>

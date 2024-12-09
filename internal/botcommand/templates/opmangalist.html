@@ -1,5 +1,5 @@
 {{define "content"}}
-<main class="container">
+<main class="ui-container">
     {{range $arc := .Arcs}}
     <section>
         <details {{if eq (len $arc.Chapters) 0}}disabled{{end}}>

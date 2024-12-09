@@ -112,6 +112,7 @@ func (this *JournalTemplateData) Patterns() []string {
 		"templates/journallist.html",
 		//"templates/pico.min.css",
 		"templates/styles.css",
+		"templates/theme.css",
 		"templates/ui.min.css",
 		"templates/ui.min.umd.cjs",
 	}
