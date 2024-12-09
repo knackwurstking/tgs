@@ -111,7 +111,6 @@ func (this *JournalTemplateData) Patterns() []string {
 		"templates/index.html",
 		"templates/journallist.html",
 		"templates/pico.min.css",
-		"templates/recursive.css",
 		"templates/styles.css",
 	}
 }
