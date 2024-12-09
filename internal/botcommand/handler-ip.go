@@ -17,16 +17,15 @@ const (
 )
 
 type IPConfig struct {
-	Register []tgs.BotCommandScope `json:"register,omitempty"`
-	Targets  *Targets              `json:"targets,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+	Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 }
 
 // IP implements the Handler interface
 type IP struct {
 	*tgbotapi.BotAPI
-
-	register []tgs.BotCommandScope
 	targets  *Targets
+	register []tgs.BotCommandScope
 }
 
 func NewIP(botAPI *tgbotapi.BotAPI) *IP {
@@ -94,7 +93,7 @@ func (this *IP) Run(message *tgbotapi.Message) error {
 	msgConfig.ReplyToMessageID = message.MessageID
 	msgConfig.ParseMode = "MarkdownV2"
 
-	_, err = this.BotAPI.Send(msgConfig)
+	_, err = this.Send(msgConfig)
 	return err
 }
 

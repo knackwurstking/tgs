@@ -16,9 +16,9 @@ import (
 )
 
 type OPMangaChapter struct {
-	Number int
 	Name   string
 	Path   string
+	Number int
 }
 
 func (this *OPMangaChapter) PDF() ([]byte, error) {
@@ -41,26 +41,24 @@ func (this *OPMangaTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
 		"templates/opmangalist.html",
-		"templates/style.css",
-		"templates/original.css",
+		"templates/pico.min.css",
+		"templates/recursive.css",
 	}
 }
 
 type OPMangaConfig struct {
-	Register []tgs.BotCommandScope `json:"register,omitempty"`
-	Targets  *Targets              `json:"targets,omitempty"`
-	Path     string                `json:"path" json:"path"`
+	Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+	Path     string                `json:"path" yaml:"path"`
+	Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 }
 
 // OPManga implements the Handler interface
 type OPManga struct {
 	*tgbotapi.BotAPI
-
-	register []tgs.BotCommandScope
 	targets  *Targets
+	reply    chan *Reply
 	path     string
-
-	reply chan *Reply
+	register []tgs.BotCommandScope
 }
 
 func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
@@ -260,7 +258,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	})
 	documentConfig.ReplyToMessageID = m.MessageID
 
-	_, err = this.BotAPI.Send(documentConfig)
+	_, err = this.Send(documentConfig)
 	return err
 }
 

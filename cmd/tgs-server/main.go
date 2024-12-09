@@ -18,9 +18,7 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
-var (
-	replyCallbacks = map[int]*botcommand.Reply{}
-)
+var replyCallbacks = map[int]*botcommand.Reply{}
 
 func main() {
 	app := cli.App{
@@ -120,30 +118,22 @@ func main() {
 						switch v := update.Message.Command(); {
 						case strings.HasPrefix(v, botcommand.BotCommandIP[1:]):
 							runCommand(cfg.IP, update.Message)
-							break
 
 						case strings.HasPrefix(v, botcommand.BotCommandStats[1:]):
 							runCommand(cfg.Stats, update.Message)
-							break
 
 						case strings.HasPrefix(v, botcommand.BotCommandJournal[1:]):
 							runCommand(cfg.Journal, update.Message)
-							break
 
 						case strings.HasPrefix(v, botcommand.BotCommandOPManga[1:]):
 							runCommand(cfg.OPManga, update.Message)
-							break
 
 						default:
 							slog.Warn("Command not found!", "command", v)
 						}
 
-						break
-
 					case reply := <-cfg.Reply:
 						go handleReplies(reply, bot)
-
-						break
 					}
 				}
 			}
@@ -199,14 +189,14 @@ func handleReplies(r *botcommand.Reply, bot *tgbotapi.BotAPI) {
 
 	defer r.Close()
 
-	switch err := <-r.Done(); {
-	case err == botcommand.ReplyTimeoutError:
+	err := <-r.Done()
+	switch err {
+	case botcommand.ErrorTimeout:
 		slog.Warn("Reply callback timeout",
 			"messageID", messageID, "reply.Timeout", r.Timeout,
 		)
-		break
 
-	case err == nil:
+	case nil:
 		slog.Debug("Reply callback finished",
 			"messageID", messageID, "reply.Timeout", r.Timeout,
 		)
@@ -225,8 +215,6 @@ func handleReplies(r *botcommand.Reply, bot *tgbotapi.BotAPI) {
 		msgConfig.ParseMode = "MarkdownV2"
 
 		_, _ = bot.Send(msgConfig) // NOTE: Ignore any error
-
-		break
 	}
 
 	delete(replyCallbacks, messageID)
@@ -260,7 +248,6 @@ func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 					}
 
 					if t.MessageThreadID == message.MessageThreadID {
-
 						return true
 					}
 				} else {

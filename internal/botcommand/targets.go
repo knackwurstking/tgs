@@ -3,7 +3,7 @@ package botcommand
 type Targets struct {
 	Users []UserTarget `json:"users,omitempty" yaml:"users,omitempty"`
 	Chats []ChatTarget `json:"chats,omitempty" yaml:"chats,omitempty"`
-	All   bool         `json:"all,omitempty" json:"all,omitempty"`
+	All   bool         `json:"all,omitempty" yaml:"all,omitempty"`
 }
 
 func NewTargets() *Targets {
@@ -18,7 +18,7 @@ type UserTarget struct {
 }
 
 type ChatTarget struct {
-	ID              int64  `json:"id" yaml:"id"`
 	Type            string `json:"type,omitempty" yaml:"type,omitempty"`
+	ID              int64  `json:"id" yaml:"id"`
 	MessageThreadID int    `json:"message_thread_id,omitempty" yaml:"message_thread_id,omitempty"`
 }

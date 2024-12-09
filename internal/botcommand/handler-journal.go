@@ -110,26 +110,24 @@ func (this *JournalTemplateData) Patterns() []string {
 	return []string{
 		"templates/index.html",
 		"templates/journallist.html",
-		"templates/style.css",
-		"templates/original.css",
+		"templates/pico.min.css",
+		"templates/recursive.css",
 	}
 }
 
 type JournalConfig struct {
-	Register []tgs.BotCommandScope `json:"register,omitempty"`
-	Targets  *Targets              `json:"targets,omitempty"`
-	Units    *Units                `json:"units,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+	Units    *Units                `json:"units,omitempty" yaml:"units,omitempty"`
+	Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 }
 
 // Journal implements the Handler interface
 type Journal struct {
 	*tgbotapi.BotAPI
-
-	register []tgs.BotCommandScope
 	targets  *Targets
 	units    *Units
-
-	reply chan *Reply
+	reply    chan *Reply
+	register []tgs.BotCommandScope
 }
 
 func NewJournal(botAPI *tgbotapi.BotAPI, reply chan *Reply) *Journal {
@@ -254,7 +252,7 @@ func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
 	})
 	documentConfig.ReplyToMessageID = message.MessageID
 
-	_, err = this.BotAPI.Send(documentConfig)
+	_, err = this.Send(documentConfig)
 	return err
 }
 
@@ -315,6 +313,6 @@ func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 	})
 	documentConfig.ReplyToMessageID = message.MessageID
 
-	_, err = this.BotAPI.Send(documentConfig)
+	_, err = this.Send(documentConfig)
 	return err
 }

@@ -10,16 +10,15 @@ import (
 )
 
 type StatsConfig struct {
-	Register []tgs.BotCommandScope `json:"register,omitempty"`
-	Targets  *Targets              `json:"targets,omitempty"`
+	Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
+	Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
 }
 
 // Stats implements the Handler interface
 type Stats struct {
 	*tgbotapi.BotAPI
-
-	register []tgs.BotCommandScope
 	targets  *Targets
+	register []tgs.BotCommandScope
 }
 
 func NewStats(botAPI *tgbotapi.BotAPI) *Stats {
@@ -93,14 +92,14 @@ func (this *Stats) Run(message *tgbotapi.Message) error {
 	jsonData, err := json.MarshalIndent(data, "", "    ")
 
 	msgConfig := tgbotapi.NewMessage(message.Chat.ID,
-		fmt.Sprintf("```json\n")+
+		"```json\n"+
 			fmt.Sprintf("%s\n", string(jsonData))+
-			fmt.Sprintf("```"),
+			"```",
 	)
 
 	msgConfig.ReplyToMessageID = message.MessageID
 	msgConfig.ParseMode = "MarkdownV2"
 
-	_, err = this.BotAPI.Send(msgConfig)
+	_, err = this.Send(msgConfig)
 	return err
 }

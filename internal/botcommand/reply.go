@@ -8,16 +8,13 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-var (
-	ReplyTimeoutError = errors.New("TimeoutError")
-)
+var ErrorTimeout = errors.New("TimeoutError")
 
 type Reply struct {
 	Message  *tgbotapi.Message
-	Timeout  time.Duration
 	Callback func(message *tgbotapi.Message) error
-
-	done chan error
+	done     chan error
+	Timeout  time.Duration
 }
 
 func (this *Reply) Run(message *tgbotapi.Message) {
@@ -44,7 +41,7 @@ func (this *Reply) StartTimeout() {
 	}
 
 	time.Sleep(this.Timeout)
-	this.done <- ReplyTimeoutError
+	this.done <- ErrorTimeout
 }
 
 func (this *Reply) Done() chan error {
