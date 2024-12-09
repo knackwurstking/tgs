@@ -4,7 +4,7 @@
     <section>
         <details {{if eq (len $arc.Chapters) 0}}disabled{{end}}>
             <summary
-                onclick="setTimeout( function() { this.parentElement.scrollIntoView(true); } )"
+                onclick="const el = this.parendElement; setTimeout( function() { el.scrollIntoView(true); } )"
             >
                 [{{len $arc.Chapters}}] {{$arc.Name}}
             </summary>
