@@ -1,0 +1,13 @@
+{{define "styles"}}
+[disabled] {
+    touch-action: none;
+    pointer-events: none;
+
+    opacity: 0.75;
+
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+{{end}}
