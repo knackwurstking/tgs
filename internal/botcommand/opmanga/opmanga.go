@@ -36,78 +36,78 @@ func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
 	}
 }
 
-func (this *OPManga) MarshalJSON() ([]byte, error) {
+func (opm *OPManga) MarshalJSON() ([]byte, error) {
 	return json.Marshal(Config{
-		Register: this.register,
-		Targets:  this.targets,
-		Path:     this.path,
+		Register: opm.register,
+		Targets:  opm.targets,
+		Path:     opm.path,
 	})
 }
 
-func (this *OPManga) UnmarshalJSON(data []byte) error {
+func (opm *OPManga) UnmarshalJSON(data []byte) error {
 	d := Config{
-		Register: this.register,
-		Targets:  this.targets,
-		Path:     this.path,
+		Register: opm.register,
+		Targets:  opm.targets,
+		Path:     opm.path,
 	}
 
 	if err := json.Unmarshal(data, &d); err != nil {
 		return err
 	}
 
-	this.register = d.Register
-	this.targets = d.Targets
-	this.path = d.Path
+	opm.register = d.Register
+	opm.targets = d.Targets
+	opm.path = d.Path
 
 	return nil
 }
 
-func (this *OPManga) MarshalYAML() (interface{}, error) {
+func (opm *OPManga) MarshalYAML() (interface{}, error) {
 	return Config{
-		Register: this.register,
-		Targets:  this.targets,
-		Path:     this.path,
+		Register: opm.register,
+		Targets:  opm.targets,
+		Path:     opm.path,
 	}, nil
 }
 
-func (this *OPManga) UnmarshalYAML(value *yaml.Node) error {
+func (opm *OPManga) UnmarshalYAML(value *yaml.Node) error {
 	d := Config{
-		Register: this.register,
-		Targets:  this.targets,
-		Path:     this.path,
+		Register: opm.register,
+		Targets:  opm.targets,
+		Path:     opm.path,
 	}
 
 	if err := value.Decode(&d); err != nil {
 		return err
 	}
 
-	this.register = d.Register
-	this.targets = d.Targets
-	this.path = d.Path
+	opm.register = d.Register
+	opm.targets = d.Targets
+	opm.path = d.Path
 
 	return nil
 }
 
-func (this *OPManga) BotCommand() string {
+func (opm *OPManga) BotCommand() string {
 	return "opmanga"
 }
 
-func (this *OPManga) Register() []tgs.BotCommandScope {
-	return this.register
+func (opm *OPManga) Register() []tgs.BotCommandScope {
+	return opm.register
 }
 
-func (this *OPManga) Targets() *botcommand.Targets {
-	return this.targets
+func (opm *OPManga) Targets() *botcommand.Targets {
+	return opm.targets
 }
 
-func (this *OPManga) AddCommands(c *tgs.MyBotCommands) {
-	c.Add("/"+this.BotCommand()+"list", "List all available chapters", this.Register())
-	c.Add("/"+this.BotCommand(), "Request a chapter", this.Register())
+func (opm *OPManga) AddCommands(c *tgs.MyBotCommands) {
+	c.Add("/"+opm.BotCommand()+"list", "List all available chapters", opm.Register())
+	c.Add("/"+opm.BotCommand(), "Request a chapter", opm.Register())
 }
 
-func (this *OPManga) Run(m *tgbotapi.Message) error {
-	if this.isListCommand(m.Command()) {
-		return this.handleListCommand(m)
+func (opm *OPManga) Run(m *tgbotapi.Message) error {
+	if opm.isListCommand(m.Command()) {
+		return opm.handleListCommand(m)
 	}
 
 	msgConfig := tgbotapi.NewMessage(
@@ -116,26 +116,26 @@ func (this *OPManga) Run(m *tgbotapi.Message) error {
 	)
 	msgConfig.ReplyToMessageID = m.MessageID
 
-	msg, err := this.Send(msgConfig)
-	if err != nil || this.reply == nil {
+	msg, err := opm.Send(msgConfig)
+	if err != nil || opm.reply == nil {
 		return err
 	}
 
-	this.reply <- &botcommand.Reply{
+	opm.reply <- &botcommand.Reply{
 		Message:  &msg,
 		Timeout:  time.Minute * 5,
-		Callback: this.replyCallback,
+		Callback: opm.replyCallback,
 	}
 
 	return nil
 }
 
-func (this *OPManga) arcs() ([]Arc, error) {
-	if this.path == "" {
+func (opm *OPManga) arcs() ([]Arc, error) {
+	if opm.path == "" {
 		return nil, fmt.Errorf("missing path")
 	}
 
-	info, err := os.Stat(this.path)
+	info, err := os.Stat(opm.path)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (this *OPManga) arcs() ([]Arc, error) {
 		return nil, fmt.Errorf("nope, need an directory here")
 	}
 
-	dirEntries, err := os.ReadDir(this.path)
+	dirEntries, err := os.ReadDir(opm.path)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (this *OPManga) arcs() ([]Arc, error) {
 			continue // Just ignore all non directories
 		}
 
-		sub, err := os.ReadDir(filepath.Join(this.path, dirEntry.Name()))
+		sub, err := os.ReadDir(filepath.Join(opm.path, dirEntry.Name()))
 		if err != nil {
 			continue // Ignore for now
 		}
@@ -180,7 +180,7 @@ func (this *OPManga) arcs() ([]Arc, error) {
 			}
 
 			chapter, err := NewChapter(
-				filepath.Join(this.path, dirEntry.Name(), subEntry.Name()),
+				filepath.Join(opm.path, dirEntry.Name(), subEntry.Name()),
 			)
 			if err != nil {
 				return nil, err
@@ -195,12 +195,12 @@ func (this *OPManga) arcs() ([]Arc, error) {
 	return arcs, nil
 }
 
-func (this *OPManga) isListCommand(c string) bool {
-	return c == this.BotCommand()+"list"
+func (opm *OPManga) isListCommand(c string) bool {
+	return c == opm.BotCommand()+"list"
 }
 
-func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
-	arcs, err := this.arcs()
+func (opm *OPManga) handleListCommand(m *tgbotapi.Message) error {
+	arcs, err := opm.arcs()
 	if err != nil {
 		return err
 	}
@@ -219,18 +219,18 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 	})
 	documentConfig.ReplyToMessageID = m.MessageID
 
-	_, err = this.Send(documentConfig)
+	_, err = opm.Send(documentConfig)
 	return err
 }
 
-func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
+func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
-		"command", this.BotCommand(),
+		"command", opm.BotCommand(),
 		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
 	)
 
-	arcs, err := this.arcs()
+	arcs, err := opm.arcs()
 	if err != nil {
 		return err
 	}
@@ -265,7 +265,7 @@ outer_loop:
 					msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
 					msgConfig.ReplyMarkup = documentConfig
 
-					_, err = this.Send(msgConfig)
+					_, err = opm.Send(msgConfig)
 					if err != nil {
 						return err
 					}

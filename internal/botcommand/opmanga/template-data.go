@@ -5,7 +5,7 @@ type TemplateData struct {
 	Arcs      []Arc
 }
 
-func (this *TemplateData) Patterns() []string {
+func (td *TemplateData) Patterns() []string {
 	return []string{
 		"data/index.go.html",
 		"data/opmangalist.go.html", // block: content
