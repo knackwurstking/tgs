@@ -1,5 +1,7 @@
 package botcommand
 
+// TODO: Move to ip package, just like opmanga
+
 import (
 	"encoding/json"
 	"fmt"

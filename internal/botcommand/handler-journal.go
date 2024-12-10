@@ -1,5 +1,7 @@
 package botcommand
 
+// TODO: Move to journal package, just like opmanga
+
 import (
 	"encoding/json"
 	"fmt"
