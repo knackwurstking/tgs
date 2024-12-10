@@ -18,10 +18,8 @@ const (
 	BotCommandOPManga string = "/opmanga"
 )
 
-var (
-	//go:embed templates
-	Templates embed.FS
-)
+//go:embed templates
+var Templates embed.FS
 
 type Handler interface {
 	MarshalJSON() ([]byte, error)
@@ -38,6 +36,11 @@ type Handler interface {
 
 type TemplateData interface {
 	Patterns() []string
+}
+
+type File interface {
+	Name() string
+	Data() []byte
 }
 
 func GetTemplateData(templateData TemplateData) ([]byte, error) {
