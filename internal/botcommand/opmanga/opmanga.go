@@ -268,6 +268,7 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 
 					_, err = opm.Send(msgConfig)
 					if err != nil {
+						slog.Error("Send chapter", "error", err)
 						return err
 					}
 
