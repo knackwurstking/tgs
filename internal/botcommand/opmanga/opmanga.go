@@ -27,12 +27,14 @@ type OPManga struct {
 	register []tgs.BotCommandScope
 }
 
-func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
+func NewOPManga(bot *tgbotapi.BotAPI, reply chan *botcommand.Reply) *OPManga {
 	return &OPManga{
 		BotAPI: bot,
 
 		register: []tgs.BotCommandScope{},
 		targets:  botcommand.NewTargets(),
+
+		reply: reply,
 	}
 }
 

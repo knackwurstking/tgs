@@ -27,7 +27,7 @@ func NewConfig(bot *tgbotapi.BotAPI, reply chan *botcommand.Reply) *Config {
 		IP:      ip.NewIP(bot),
 		Stats:   stats.NewStats(bot),
 		Journal: journal.NewJournal(bot, reply),
-		OPManga: opmanga.NewOPManga(bot),
+		OPManga: opmanga.NewOPManga(bot, reply),
 		Reply:   reply,
 	}
 }
