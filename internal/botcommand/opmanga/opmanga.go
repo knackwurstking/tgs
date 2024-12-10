@@ -114,7 +114,7 @@ func (opm *OPManga) Run(m *tgbotapi.Message) error {
 
 	msgConfig := tgbotapi.NewMessage(
 		m.Chat.ID,
-		"Hi there! Reply to this message to get the episode you want. I’ll give you about 5 minutes to answer.",
+		"Hey there! I need the chapter number. Reply to this message and I’ll send you the chapter. You’ll have about 5 minutes to respond.",
 	)
 	msgConfig.ReplyToMessageID = m.MessageID
 
@@ -249,7 +249,6 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 	}
 
 	// Search arcs data for chapter
-outer_loop:
 	for _, a := range arcs {
 		for _, c := range a.Chapters {
 			if c.Number() == chapterNumber {
@@ -271,9 +270,9 @@ outer_loop:
 					if err != nil {
 						return err
 					}
-				}
 
-				break outer_loop
+					return nil
+				}
 			}
 		}
 	}
