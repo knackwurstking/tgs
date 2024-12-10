@@ -64,6 +64,10 @@ func (this *Stats) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *Stats) BotCommand() string {
+	return "stats"
+}
+
 func (this *Stats) Register() []tgs.BotCommandScope {
 	return this.register
 }
@@ -73,7 +77,7 @@ func (this *Stats) Targets() *Targets {
 }
 
 func (this *Stats) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandStats, "Get ID info", this.Register())
+	c.Add("/"+this.BotCommand(), "Get ID info", this.Register())
 }
 
 func (this *Stats) Run(message *tgbotapi.Message) error {

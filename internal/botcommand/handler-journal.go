@@ -10,6 +10,7 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/knackwurstking/tgs/internal/templates"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 	"gopkg.in/yaml.v3"
 )
@@ -108,13 +109,13 @@ type JournalTemplateData struct {
 
 func (this *JournalTemplateData) Patterns() []string {
 	return []string{
-		"templates/index.go.html",
-		"templates/journallist.go.html", // block: content
-		//"templates/pico.min.css", // block: style
-		"templates/ui.min.css",   // block: style
-		"templates/original.css", // block: theme
-		"templates/styles.css",   // block: custom-style
-		//"templates/ui.min.umd.cjs", // block: script
+		"data/index.go.html",
+		"data/journallist.go.html", // block: content
+		//"data/pico.min.css", // block: style
+		"data/ui.min.css",   // block: style
+		"data/original.css", // block: theme
+		"data/styles.css",   // block: custom-style
+		//"data/ui.min.umd.cjs", // block: script
 	}
 }
 
@@ -197,6 +198,10 @@ func (this *Journal) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *Journal) BotCommand() string {
+	return "journal"
+}
+
 func (this *Journal) Register() []tgs.BotCommandScope {
 	return this.register
 }
@@ -206,8 +211,8 @@ func (this *Journal) Targets() *Targets {
 }
 
 func (this *Journal) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandJournal+"list", "List journalctl logs", this.Register())
-	c.Add(BotCommandJournal, "Get a journalctl log", this.Register())
+	c.Add("/"+this.BotCommand()+"list", "List journalctl logs", this.Register())
+	c.Add("/"+this.BotCommand(), "Get a journalctl log", this.Register())
 }
 
 func (this *Journal) Run(message *tgbotapi.Message) error {
@@ -236,11 +241,11 @@ func (this *Journal) Run(message *tgbotapi.Message) error {
 }
 
 func (this *Journal) isListCommand(command string) bool {
-	return command == BotCommandJournal[1:]+"list"
+	return command == this.BotCommand()+"list"
 }
 
 func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
-	content, err := GetTemplateData(&JournalTemplateData{
+	content, err := templates.GetTemplateData(&JournalTemplateData{
 		PageTitle:   "Journal Units",
 		SystemUnits: this.units.System,
 		UserUnits:   this.units.User,
@@ -261,7 +266,7 @@ func (this *Journal) handleListCommand(message *tgbotapi.Message) error {
 
 func (this *Journal) replyCallback(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
-		"command", BotCommandJournal,
+		"command", this.BotCommand(),
 		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
 	)

@@ -116,16 +116,16 @@ func main() {
 
 						// Run commands here
 						switch v := update.Message.Command(); {
-						case strings.HasPrefix(v, botcommand.BotCommandIP[1:]):
+						case strings.HasPrefix(v, cfg.IP.BotCommand()):
 							runCommand(cfg.IP, update.Message)
 
-						case strings.HasPrefix(v, botcommand.BotCommandStats[1:]):
+						case strings.HasPrefix(v, cfg.Stats.BotCommand()):
 							runCommand(cfg.Stats, update.Message)
 
-						case strings.HasPrefix(v, botcommand.BotCommandJournal[1:]):
+						case strings.HasPrefix(v, cfg.Journal.BotCommand()):
 							runCommand(cfg.Journal, update.Message)
 
-						case strings.HasPrefix(v, botcommand.BotCommandOPManga[1:]):
+						case strings.HasPrefix(v, cfg.OPManga.BotCommand()):
 							runCommand(cfg.OPManga, update.Message)
 
 						default:

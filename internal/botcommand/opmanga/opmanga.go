@@ -1,4 +1,4 @@
-package botcommand
+package opmanga
 
 import (
 	"encoding/json"
@@ -12,71 +12,17 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/knackwurstking/tgs/internal/botcommand"
+	"github.com/knackwurstking/tgs/internal/templates"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 	"gopkg.in/yaml.v3"
 )
 
-type PDF struct {
-	name string
-	data []byte
-}
-
-func NewPDF(name string, data []byte) *PDF {
-	if data == nil {
-		data = []byte{}
-	}
-
-	return &PDF{
-		name: name,
-		data: data,
-	}
-}
-
-type OPMangaChapter struct {
-	Name   string
-	Path   string
-	Number int
-}
-
-func (this *OPMangaChapter) PDF() (pdf File, err error) {
-	// TODO: Read pdf data from path and return
-
-	return nil, fmt.Errorf("under construction")
-}
-
-type OPMangaArc struct {
-	Name     string
-	Chapters []OPMangaChapter
-}
-
-type OPMangaTemplateData struct {
-	PageTitle string
-	Arcs      []OPMangaArc
-}
-
-func (this *OPMangaTemplateData) Patterns() []string {
-	return []string{
-		"templates/index.go.html",
-		"templates/opmangalist.go.html", // block: content
-		//"templates/pico.min.css", // block style
-		"templates/ui.min.css",   // block: style
-		"templates/original.css", // block: theme
-		"templates/styles.css",   // block: custom-style
-		//"templates/ui.min.umd.cjs", // block: script
-	}
-}
-
-type OPMangaConfig struct {
-	Targets  *Targets              `json:"targets,omitempty" yaml:"targets,omitempty"`
-	Path     string                `json:"path" yaml:"path"`
-	Register []tgs.BotCommandScope `json:"register,omitempty" yaml:"register,omitempty"`
-}
-
 // OPManga implements the Handler interface
 type OPManga struct {
 	*tgbotapi.BotAPI
-	targets  *Targets
-	reply    chan *Reply
+	targets  *botcommand.Targets
+	reply    chan *botcommand.Reply
 	path     string
 	register []tgs.BotCommandScope
 }
@@ -86,12 +32,12 @@ func NewOPManga(bot *tgbotapi.BotAPI) *OPManga {
 		BotAPI: bot,
 
 		register: []tgs.BotCommandScope{},
-		targets:  NewTargets(),
+		targets:  botcommand.NewTargets(),
 	}
 }
 
 func (this *OPManga) MarshalJSON() ([]byte, error) {
-	return json.Marshal(OPMangaConfig{
+	return json.Marshal(Config{
 		Register: this.register,
 		Targets:  this.targets,
 		Path:     this.path,
@@ -99,7 +45,7 @@ func (this *OPManga) MarshalJSON() ([]byte, error) {
 }
 
 func (this *OPManga) UnmarshalJSON(data []byte) error {
-	d := OPMangaConfig{
+	d := Config{
 		Register: this.register,
 		Targets:  this.targets,
 		Path:     this.path,
@@ -117,7 +63,7 @@ func (this *OPManga) UnmarshalJSON(data []byte) error {
 }
 
 func (this *OPManga) MarshalYAML() (interface{}, error) {
-	return OPMangaConfig{
+	return Config{
 		Register: this.register,
 		Targets:  this.targets,
 		Path:     this.path,
@@ -125,7 +71,7 @@ func (this *OPManga) MarshalYAML() (interface{}, error) {
 }
 
 func (this *OPManga) UnmarshalYAML(value *yaml.Node) error {
-	d := OPMangaConfig{
+	d := Config{
 		Register: this.register,
 		Targets:  this.targets,
 		Path:     this.path,
@@ -142,17 +88,21 @@ func (this *OPManga) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *OPManga) BotCommand() string {
+	return "opmanga"
+}
+
 func (this *OPManga) Register() []tgs.BotCommandScope {
 	return this.register
 }
 
-func (this *OPManga) Targets() *Targets {
+func (this *OPManga) Targets() *botcommand.Targets {
 	return this.targets
 }
 
 func (this *OPManga) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandOPManga+"list", "List all available chapters", this.Register())
-	c.Add(BotCommandOPManga, "Request a chapter", this.Register())
+	c.Add("/"+this.BotCommand()+"list", "List all available chapters", this.Register())
+	c.Add("/"+this.BotCommand(), "Request a chapter", this.Register())
 }
 
 func (this *OPManga) Run(m *tgbotapi.Message) error {
@@ -171,7 +121,7 @@ func (this *OPManga) Run(m *tgbotapi.Message) error {
 		return err
 	}
 
-	this.reply <- &Reply{
+	this.reply <- &botcommand.Reply{
 		Message:  &msg,
 		Timeout:  time.Minute * 5,
 		Callback: this.replyCallback,
@@ -180,7 +130,7 @@ func (this *OPManga) Run(m *tgbotapi.Message) error {
 	return nil
 }
 
-func (this *OPManga) arcs() ([]OPMangaArc, error) {
+func (this *OPManga) arcs() ([]Arc, error) {
 	if this.path == "" {
 		return nil, fmt.Errorf("missing path")
 	}
@@ -193,57 +143,48 @@ func (this *OPManga) arcs() ([]OPMangaArc, error) {
 		return nil, fmt.Errorf("nope, need an directory here")
 	}
 
-	root, err := os.ReadDir(this.path)
+	dirEntries, err := os.ReadDir(this.path)
 	if err != nil {
 		return nil, err
 	}
 
-	arcs := make([]OPMangaArc, 0)
+	arcs := make([]Arc, 0)
 
-	for _, e1 := range root {
-		if !e1.IsDir() {
+	for _, dirEntry := range dirEntries {
+		if !dirEntry.IsDir() {
 			continue // Just ignore all non directories
 		}
 
-		sub, err := os.ReadDir(filepath.Join(this.path, e1.Name()))
+		sub, err := os.ReadDir(filepath.Join(this.path, dirEntry.Name()))
 		if err != nil {
 			continue // Ignore for now
 		}
 
-		arc := OPMangaArc{
-			Chapters: []OPMangaChapter{},
+		arc := Arc{
+			Chapters: []*Chapter{},
 		}
 
-		if sp := strings.SplitN(e1.Name(), " ", 2); len(sp) < 2 {
-			arc.Name = e1.Name()
+		if s := strings.SplitN(dirEntry.Name(), " ", 2); len(s) < 2 {
+			arc.Name = dirEntry.Name()
 		} else {
-			arc.Name = sp[1] // Ignore the prefixed number (ex.: "016 Thousand Sunny Arc")
+			arc.Name = s[1] // Ignore the prefixed number (ex.: "016 Thousand Sunny Arc")
 		}
 
-		for _, e2 := range sub {
-			if e2.IsDir() {
+		for _, subEntry := range sub {
+			if subEntry.IsDir() {
 				continue // Skip all directories
 			}
 
-			if filepath.Ext(e2.Name()) != ".pdf" {
+			if filepath.Ext(subEntry.Name()) != ".pdf" {
 				continue // Allow only pdf
 			}
 
-			chapter := OPMangaChapter{
-				Path: filepath.Join(this.path, e1.Name(), e2.Name()),
-			}
-
-			// Parse file: "0441 Duell auf Banaro Island.pdf", remove ".pdf", Get prefixed
-			// number and chapter name
-			fileSplit := strings.SplitN(strings.TrimSuffix(e2.Name(), ".pdf"), " ", 2)
-
-			if n, err := strconv.Atoi(fileSplit[0]); err != nil {
+			chapter, err := NewChapter(
+				filepath.Join(this.path, dirEntry.Name(), subEntry.Name()),
+			)
+			if err != nil {
 				return nil, err
-			} else {
-				chapter.Number = n
 			}
-
-			chapter.Name = fileSplit[1]
 
 			arc.Chapters = append(arc.Chapters, chapter)
 		}
@@ -255,7 +196,7 @@ func (this *OPManga) arcs() ([]OPMangaArc, error) {
 }
 
 func (this *OPManga) isListCommand(c string) bool {
-	return c == BotCommandOPManga[1:]+"list"
+	return c == this.BotCommand()+"list"
 }
 
 func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
@@ -264,7 +205,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 		return err
 	}
 
-	content, err := GetTemplateData(&OPMangaTemplateData{
+	content, err := templates.GetTemplateData(&TemplateData{
 		PageTitle: "One Piece Manga",
 		Arcs:      arcs,
 	})
@@ -284,7 +225,7 @@ func (this *OPManga) handleListCommand(m *tgbotapi.Message) error {
 
 func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
-		"command", BotCommandOPManga,
+		"command", this.BotCommand(),
 		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
 	)
@@ -309,7 +250,7 @@ func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 outer_loop:
 	for _, a := range arcs {
 		for _, c := range a.Chapters {
-			if c.Number == n {
+			if c.Number() == n {
 				if pdf, err := c.PDF(); err != nil {
 					return err
 				} else {
@@ -335,5 +276,5 @@ outer_loop:
 		}
 	}
 
-	return fmt.Errorf("chapter numbrer %d not found", n)
+	return fmt.Errorf("chapter number %d not found", n)
 }

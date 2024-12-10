@@ -71,6 +71,10 @@ func (this *IP) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (this *IP) BotCommand() string {
+	return "ip"
+}
+
 func (this *IP) Register() []tgs.BotCommandScope {
 	return this.register
 }
@@ -80,7 +84,7 @@ func (this *IP) Targets() *Targets {
 }
 
 func (this *IP) AddCommands(c *tgs.MyBotCommands) {
-	c.Add(BotCommandIP, "Get server IP", this.Register())
+	c.Add("/"+this.BotCommand(), "Get server IP", this.Register())
 }
 
 func (this *IP) Run(message *tgbotapi.Message) error {
