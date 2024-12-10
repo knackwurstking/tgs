@@ -1,6 +1,7 @@
 package opmanga
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -43,6 +44,7 @@ func (chapter *Chapter) Number() int {
 }
 
 func (chapter *Chapter) PDF() (pdf botcommand.File, err error) {
+	slog.Debug("Read pdf", "path", chapter.Path)
 	if data, err := os.ReadFile(chapter.Path); err != nil {
 		return nil, err
 	} else {
