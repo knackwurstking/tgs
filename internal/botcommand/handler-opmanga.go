@@ -16,13 +16,29 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type PDF struct {
+	name string
+	data []byte
+}
+
+func NewPDF(name string, data []byte) *PDF {
+	if data == nil {
+		data = []byte{}
+	}
+
+	return &PDF{
+		name: name,
+		data: data,
+	}
+}
+
 type OPMangaChapter struct {
 	Name   string
 	Path   string
 	Number int
 }
 
-func (this *OPMangaChapter) PDF() ([]byte, error) {
+func (this *OPMangaChapter) PDF() (pdf File, err error) {
 	// TODO: Read pdf data from path and return
 
 	return nil, fmt.Errorf("under construction")
@@ -273,21 +289,51 @@ func (this *OPManga) replyCallback(message *tgbotapi.Message) error {
 		"message.Text", message.Text,
 	)
 
-	_, err := this.arcs()
+	arcs, err := this.arcs()
 	if err != nil {
 		return err
 	}
 
 	// Parse message and get episode string
-	r := regexp.MustCompile(`[0-9]+`)
-	m := r.FindString(message.Text)
-	if m == "" {
+	match := regexp.MustCompile(`[0-9]+`).FindString(message.Text)
+	if match == "" {
 		return fmt.Errorf("nothing found, need a number here: %s", message.Text)
 	}
 
-	// TODO: Search arcs data for chapter
+	n, err := strconv.Atoi(match)
+	if err != nil {
+		return err
+	}
 
-	// TODO: Read chapter pdf data and send the document to the client
+	// Search arcs data for chapter
+outer_loop:
+	for _, a := range arcs {
+		for _, c := range a.Chapters {
+			if c.Number == n {
+				if pdf, err := c.PDF(); err != nil {
+					return err
+				} else {
+					chatID := message.Chat.ID
 
-	return fmt.Errorf("under construction")
+					documentConfig := tgbotapi.NewDocument(chatID, tgbotapi.FileBytes{
+						Name:  pdf.Name(),
+						Bytes: pdf.Data(),
+					})
+
+					msgConfig := tgbotapi.NewMessage(chatID, "")
+					msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
+					msgConfig.ReplyMarkup = documentConfig
+
+					_, err = this.Send(msgConfig)
+					if err != nil {
+						return err
+					}
+				}
+
+				break outer_loop
+			}
+		}
+	}
+
+	return fmt.Errorf("chapter numbrer %d not found", n)
 }
