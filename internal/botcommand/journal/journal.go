@@ -100,9 +100,9 @@ func (j *Journal) Targets() *botcommand.Targets {
 	return j.targets
 }
 
-func (j *Journal) AddCommands(c *tgs.MyBotCommands) {
-	c.Add("/"+j.BotCommand()+"list", "List journalctl logs", j.Register())
-	c.Add("/"+j.BotCommand(), "Get a journalctl log", j.Register())
+func (j *Journal) AddCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/"+j.BotCommand()+"list", "List journalctl logs", j.Register())
+	mbc.Add("/"+j.BotCommand(), "Get a journalctl log", j.Register())
 }
 
 func (j *Journal) Run(message *tgbotapi.Message) error {

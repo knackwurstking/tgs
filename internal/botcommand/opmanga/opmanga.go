@@ -100,9 +100,9 @@ func (opm *OPManga) Targets() *botcommand.Targets {
 	return opm.targets
 }
 
-func (opm *OPManga) AddCommands(c *tgs.MyBotCommands) {
-	c.Add("/"+opm.BotCommand()+"list", "List all available chapters", opm.Register())
-	c.Add("/"+opm.BotCommand(), "Request a chapter", opm.Register())
+func (opm *OPManga) AddCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/"+opm.BotCommand()+"list", "List all available chapters", opm.Register())
+	mbc.Add("/"+opm.BotCommand(), "Request a chapter", opm.Register())
 }
 
 func (opm *OPManga) Run(m *tgbotapi.Message) error {
@@ -150,12 +150,12 @@ func (opm *OPManga) arcs() ([]Arc, error) {
 
 	arcs := make([]Arc, 0)
 
-	for _, dirEntry := range dirEntries {
-		if !dirEntry.IsDir() {
+	for _, e := range dirEntries {
+		if !e.IsDir() {
 			continue // Just ignore all non directories
 		}
 
-		sub, err := os.ReadDir(filepath.Join(opm.path, dirEntry.Name()))
+		subDirEntries, err := os.ReadDir(filepath.Join(opm.path, e.Name()))
 		if err != nil {
 			continue // Ignore for now
 		}
@@ -164,23 +164,23 @@ func (opm *OPManga) arcs() ([]Arc, error) {
 			Chapters: []*Chapter{},
 		}
 
-		if s := strings.SplitN(dirEntry.Name(), " ", 2); len(s) < 2 {
-			arc.Name = dirEntry.Name()
+		if s := strings.SplitN(e.Name(), " ", 2); len(s) < 2 {
+			arc.Name = e.Name()
 		} else {
 			arc.Name = s[1] // Ignore the prefixed number (ex.: "016 Thousand Sunny Arc")
 		}
 
-		for _, subEntry := range sub {
-			if subEntry.IsDir() {
+		for _, e2 := range subDirEntries {
+			if e2.IsDir() {
 				continue // Skip all directories
 			}
 
-			if filepath.Ext(subEntry.Name()) != ".pdf" {
+			if filepath.Ext(e2.Name()) != ".pdf" {
 				continue // Allow only pdf
 			}
 
 			chapter, err := NewChapter(
-				filepath.Join(opm.path, dirEntry.Name(), subEntry.Name()),
+				filepath.Join(opm.path, e.Name(), e2.Name()),
 			)
 			if err != nil {
 				return nil, err
@@ -241,7 +241,7 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 		return fmt.Errorf("nothing found, need a number here: %s", message.Text)
 	}
 
-	n, err := strconv.Atoi(match)
+	chapterNumber, err := strconv.Atoi(match)
 	if err != nil {
 		return err
 	}
@@ -250,7 +250,7 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 outer_loop:
 	for _, a := range arcs {
 		for _, c := range a.Chapters {
-			if c.Number() == n {
+			if c.Number() == chapterNumber {
 				if pdf, err := c.PDF(); err != nil {
 					return err
 				} else {
@@ -276,5 +276,5 @@ outer_loop:
 		}
 	}
 
-	return fmt.Errorf("chapter number %d not found", n)
+	return fmt.Errorf("chapter number %d not found", chapterNumber)
 }

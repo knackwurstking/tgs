@@ -17,7 +17,7 @@ type Handler interface {
 
 	Register() []tgs.BotCommandScope
 	Targets() *Targets
-	AddCommands(c *tgs.MyBotCommands)
+	AddCommands(mbc *tgs.MyBotCommands)
 	Run(message *tgbotapi.Message) error
 }
 

@@ -79,8 +79,8 @@ func (ip *IP) Targets() *botcommand.Targets {
 	return ip.targets
 }
 
-func (ip *IP) AddCommands(c *tgs.MyBotCommands) {
-	c.Add("/"+ip.BotCommand(), "Get server IP", ip.Register())
+func (ip *IP) AddCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/"+ip.BotCommand(), "Get server IP", ip.Register())
 }
 
 func (ip *IP) Run(message *tgbotapi.Message) error {

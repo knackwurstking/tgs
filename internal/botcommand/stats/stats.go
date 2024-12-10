@@ -72,8 +72,8 @@ func (s *Stats) Targets() *botcommand.Targets {
 	return s.targets
 }
 
-func (s *Stats) AddCommands(c *tgs.MyBotCommands) {
-	c.Add("/"+s.BotCommand(), "Get ID info", s.Register())
+func (s *Stats) AddCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/"+s.BotCommand(), "Get ID info", s.Register())
 }
 
 func (s *Stats) Run(message *tgbotapi.Message) error {
