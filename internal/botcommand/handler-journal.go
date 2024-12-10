@@ -108,13 +108,13 @@ type JournalTemplateData struct {
 
 func (this *JournalTemplateData) Patterns() []string {
 	return []string{
-		"templates/index.html",
-		"templates/journallist.html",
-		//"templates/pico.min.css",
-		"templates/styles.css",
-		"templates/original.css",
-		"templates/ui.min.css",
-		//"templates/ui.min.umd.cjs",
+		"templates/index.go.html",
+		"templates/journallist.go.html", // block: content
+		//"templates/pico.min.css", // block: style
+		"templates/ui.min.css",   // block: style
+		"templates/original.css", // block: theme
+		"templates/styles.css",   // block: custom-style
+		//"templates/ui.min.umd.cjs", // block: script
 	}
 }
 
