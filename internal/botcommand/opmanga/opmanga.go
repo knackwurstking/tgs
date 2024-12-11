@@ -263,7 +263,10 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 					//	Bytes: pdf.Data(),
 					//})
 
-					msgConfig := tgbotapi.NewMessage(chatID, "")
+					msgConfig := tgbotapi.NewMessage(
+						chatID,
+						fmt.Sprintf("%d %s", c.Number(), c.Name()),
+					)
 					msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
 					msgConfig.ReplyMarkup = documentConfig
 
