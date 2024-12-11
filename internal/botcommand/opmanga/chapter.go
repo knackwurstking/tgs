@@ -1,13 +1,9 @@
 package opmanga
 
 import (
-	"log/slog"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/knackwurstking/tgs/internal/botcommand"
 )
 
 type Chapter struct {
@@ -41,13 +37,4 @@ func (chapter *Chapter) Name() string {
 
 func (chapter *Chapter) Number() int {
 	return chapter.number
-}
-
-func (chapter *Chapter) PDF() (pdf botcommand.File, err error) {
-	slog.Debug("Read pdf", "path", chapter.Path)
-	if data, err := os.ReadFile(chapter.Path); err != nil {
-		return nil, err
-	} else {
-		return NewPDF(filepath.Base(chapter.Path), data), nil
-	}
 }
