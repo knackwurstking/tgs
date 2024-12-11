@@ -180,7 +180,7 @@ func (j *Journal) replyCallback(message *tgbotapi.Message) error {
 
 	var (
 		fileName string
-		content  []byte
+		content  []byte = []byte{}
 		err      error
 	)
 
@@ -206,6 +206,10 @@ func (j *Journal) replyCallback(message *tgbotapi.Message) error {
 
 	if err != nil {
 		return err
+	}
+
+	if len(content) == 0 {
+		return fmt.Errorf("unit not found: %s", strings.Join(messageSplit, " "))
 	}
 
 	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
