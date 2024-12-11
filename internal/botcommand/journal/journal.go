@@ -112,7 +112,9 @@ func (j *Journal) Run(message *tgbotapi.Message) error {
 
 	msgConfig := tgbotapi.NewMessage(
 		message.Chat.ID,
-		"Hi there! Could you please send me the name of the journal? You’ll need to reply to this message to get it. I’ll give you a little time, about 5 minutes, to answer!",
+		"Hey there\\! Can you send me the name of the journal?\n\n"+
+			"You’ll have about 5 minutes to respond to this message\\.\n\n"+
+			">You need to reply to this message for this to work\\.",
 	)
 	msgConfig.ReplyToMessageID = message.MessageID
 

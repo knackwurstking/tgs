@@ -114,9 +114,12 @@ func (opm *OPManga) Run(m *tgbotapi.Message) error {
 
 	msgConfig := tgbotapi.NewMessage(
 		m.Chat.ID,
-		"Hey there! I need the chapter number. Reply to this message and I’ll send you the chapter. You’ll have about 5 minutes to respond.",
+		"Hey there\\! Can you send me the chapter number?\n\n"+
+			"You’ll have about 5 minutes to respond to this message\\.\n\n"+
+			">You need to reply to this message for this to work\\.",
 	)
 	msgConfig.ReplyToMessageID = m.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
 
 	msg, err := opm.Send(msgConfig)
 	if err != nil || opm.reply == nil {
