@@ -8,4 +8,4 @@
   - journallist
   - journal
   - opmangalist
-  - opmanga [work-in-progress]
+  - opmanga
