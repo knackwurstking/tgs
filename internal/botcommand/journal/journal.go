@@ -171,21 +171,24 @@ func (j *Journal) replyCallback(message *tgbotapi.Message) error {
 		)
 	}
 
-	level := "user"
+	level := ""
 	for _, t := range messageSplit {
-		if t == "system" {
+		switch t {
+		case "system":
 			level = "system"
+		case "user":
+			level = "user"
 		}
 	}
 
 	var (
 		fileName string
-		content  []byte = []byte{}
+		content  = []byte{}
 		err      error
 	)
 
-	if level == "system" {
-		for _, unit := range j.units.System {
+	if level == "user" || level == "" {
+		for _, unit := range j.units.User {
 			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
 				content, err = j.units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
@@ -194,8 +197,8 @@ func (j *Journal) replyCallback(message *tgbotapi.Message) error {
 		}
 	}
 
-	if level == "user" {
-		for _, unit := range j.units.User {
+	if level == "system" || level == "" {
+		for _, unit := range j.units.System {
 			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
 				content, err = j.units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
