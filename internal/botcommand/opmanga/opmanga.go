@@ -262,15 +262,16 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 					//	Name:  pdf.Name(),
 					//	Bytes: pdf.Data(),
 					//})
+					documentConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
 
-					msgConfig := tgbotapi.NewMessage(
-						chatID,
-						fmt.Sprintf("%d %s", c.Number(), c.Name()),
-					)
-					msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
-					msgConfig.ReplyMarkup = documentConfig
+					//msgConfig := tgbotapi.NewMessage(
+					//	chatID,
+					//	fmt.Sprintf("%d %s", c.Number(), c.Name()),
+					//)
+					//msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
+					//msgConfig.ReplyMarkup = documentConfig
 
-					_, err = opm.Send(msgConfig)
+					_, err = opm.Send(documentConfig)
 					if err != nil {
 						slog.Error("Send chapter", "error", err)
 						return err
