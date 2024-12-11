@@ -117,6 +117,7 @@ func (j *Journal) Run(message *tgbotapi.Message) error {
 			">You need to reply to this message for this to work\\.",
 	)
 	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
 
 	msg, err := j.Send(msgConfig)
 	if err != nil || j.reply == nil {
