@@ -1,11 +1,11 @@
 # CHANGELOG
 
-## v1.0.0 [unreleased]
+## v1.0.0 [2024-12-11]
 
-- Commands added:
-  - ip
-  - stats
-  - journallist
-  - journal
-  - opmangalist
-  - opmanga
+- Commands:
+  - /ip
+  - /stats
+  - /journallist
+  - /journal
+  - /opmangalist
+  - /opmanga
