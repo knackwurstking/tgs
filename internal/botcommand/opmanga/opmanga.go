@@ -252,15 +252,16 @@ func (opm *OPManga) replyCallback(message *tgbotapi.Message) error {
 	for _, a := range arcs {
 		for _, c := range a.Chapters {
 			if c.Number() == chapterNumber {
-				if pdf, err := c.PDF(); err != nil {
+				if _, err := c.PDF(); err != nil {
 					return err
 				} else {
 					chatID := message.Chat.ID
 
-					documentConfig := tgbotapi.NewDocument(chatID, tgbotapi.FileBytes{
-						Name:  pdf.Name(),
-						Bytes: pdf.Data(),
-					})
+					documentConfig := tgbotapi.NewDocument(chatID, tgbotapi.FilePath(c.Path))
+					//documentConfig := tgbotapi.NewDocument(chatID, tgbotapi.FileBytes{
+					//	Name:  pdf.Name(),
+					//	Bytes: pdf.Data(),
+					//})
 
 					msgConfig := tgbotapi.NewMessage(chatID, "")
 					msgConfig.ReplyToMessageID = message.ReplyToMessage.MessageID
