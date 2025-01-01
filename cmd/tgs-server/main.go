@@ -140,7 +140,7 @@ func main() {
 		}),
 		CommandFlags: []cli.CommandFlag{
 			cli.HelpCommandFlag(),
-			cli.VersionCommandFlag("1.0.0"),
+			cli.VersionCommandFlag("1.1.0"),
 		},
 	}
 
