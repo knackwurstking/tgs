@@ -1,4 +1,4 @@
-{{define "custom-style"}}
+{{define "styles"}}
 [disabled] {
     touch-action: none;
     pointer-events: none;
