@@ -2,11 +2,15 @@
 
 ## v1.1.0 [unreleased]
 
-[ui v2.0.0](https://github.com/knackwurstking/ui/tree/dev?tab=readme-ov-file)
+> I can't release this until [ui v2.0.0](https://github.com/knackwurstking/ui/tree/dev?tab=readme-ov-file) is complete
 
 **Updated**:
 
-Updated UI library to v2.0.0 and update the HTML templates
+- Updated UI library to [v2.0.0](https://github.com/knackwurstking/ui/tree/dev?tab=readme-ov-file)
+
+**Added**:
+
+- Logging new users
 
 ## v1.0.0 [2024-12-11]
 
