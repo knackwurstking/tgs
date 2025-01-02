@@ -26,6 +26,8 @@ ip:
               # Type of chat, can be either "private", "group", "supergroup" or "channel"
               type: supergroup
               message_thread_id: 5
+              # TODO: Include a “users” field here to restrict command execution to specific users
+              # within this topic.
 
 stats:
     register:
