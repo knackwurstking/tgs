@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.1.0 [unreleased]
+## v1.1.0 [2025-02-11]
 
 > I can't release this until [ui v2.0.0](https://github.com/knackwurstking/ui/tree/dev?tab=readme-ov-file) is complete
 
