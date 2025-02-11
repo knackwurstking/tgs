@@ -1,29 +1,21 @@
 <!doctype html>
 
-<html>
+<html lang="de" data-theme="auto">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         <title>{{.PageTitle}}</title>
 
         <style>
-            {{block "style" .}} {{end}}
+            {{block "ui" .}} {{end}}
         </style>
 
         <style>
-            {{block "theme" .}} {{end}}
+            {{block "styles" .}} {{end}}
         </style>
-
-        <style>
-            {{block "custom-style" .}} {{end}}
-        </style>
-
-        <script>
-            {{block "script" .}} {{end}}
-        </script>
     </head>
 
-    <body data-theme="dark">
+    <body>
         {{block "content" .}} {{end}}
     </body>
 </html>

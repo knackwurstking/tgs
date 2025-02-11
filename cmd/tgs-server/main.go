@@ -93,24 +93,35 @@ func main() {
 							continue
 						}
 
+						if len(update.Message.NewChatMembers) > 0 {
+							for _, u := range update.Message.NewChatMembers {
+								// Get the chat ID, I'm not sure if it'll always be set
+								chatID := int64(-1)
+								if update.Message.Chat != nil {
+									chatID = update.Message.Chat.ID
+								}
+
+								// NOTE: It is necessary to record the user statistics here, so I
+								// use “warn” instead of “debug”
+								slog.Warn("New chat member", "chat_id", chatID, "user", u)
+							}
+						}
+
 						if !update.Message.IsCommand() {
 							if update.Message.ReplyToMessage == nil {
-								slog.Debug("Got a new update",
-									"update.Message.Text", update.Message.Text,
-								)
 								continue
 							}
 
 							replyID := update.Message.ReplyToMessage.MessageID
 							if r, ok := replyCallbacks[replyID]; ok {
 								r.Run(update.Message)
-								continue
+							} else {
+								slog.Debug("Got a new update",
+									"replyID", replyID,
+									"update.Message.Text", update.Message.Text,
+								)
 							}
 
-							slog.Debug("Got a new update",
-								"replyID", replyID,
-								"update.Message.Text", update.Message.Text,
-							)
 							continue
 						}
 
@@ -140,7 +151,7 @@ func main() {
 		}),
 		CommandFlags: []cli.CommandFlag{
 			cli.HelpCommandFlag(),
-			cli.VersionCommandFlag("1.0.0"),
+			cli.VersionCommandFlag("1.1.0"),
 		},
 	}
 
