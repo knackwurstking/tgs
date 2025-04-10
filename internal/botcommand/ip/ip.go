@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	IPURL = "https://ifconfig.io"
+	IP4URL = "https://ifconfig.io"
+	IP6URL = "https://ipv6.icanhazip.com "
 )
 
 // IP implements the Handler interface
@@ -84,12 +85,22 @@ func (ip *IP) AddCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (ip *IP) Run(message *tgbotapi.Message) error {
-	address, err := ip.fetchAddressFromURL()
+	ipv4, err := ip.fetchIP4AddressFromURL()
 	if err != nil {
-		return err
+		ipv4 = err.Error()
 	}
 
-	msgConfig := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`%s`", address))
+	ipv6, err := ip.fetchIP6AddressFromURL()
+	if err != nil {
+		ipv6 = err.Error()
+	}
+
+	msgConfig := tgbotapi.NewMessage(
+		message.Chat.ID,
+		fmt.Sprintf(
+			"**IPv4**: `%s`\n**IPv6**: `%s`", ipv4, ipv6,
+		),
+	)
 	msgConfig.ReplyToMessageID = message.MessageID
 	msgConfig.ParseMode = "MarkdownV2"
 
@@ -97,14 +108,34 @@ func (ip *IP) Run(message *tgbotapi.Message) error {
 	return err
 }
 
-func (ip *IP) fetchAddressFromURL() (address string, err error) {
-	resp, err := http.Get(IPURL)
+func (ip *IP) fetchIP4AddressFromURL() (address string, err error) {
+	resp, err := http.Get(IP4URL)
 	if err != nil {
 		return address, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		return address, fmt.Errorf("request to %s: %d (%s)",
-			IPURL, resp.StatusCode, resp.Status,
+			IP4URL, resp.StatusCode, resp.Status,
+		)
+	}
+
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return address, err
+	}
+
+	return strings.Trim(string(data), "\n\r\t "), nil
+}
+
+func (ip *IP) fetchIP6AddressFromURL() (address string, err error) {
+	resp, err := http.Get(IP6URL)
+	if err != nil {
+		return address, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return address, fmt.Errorf("request to %s: %d (%s)",
+			IP6URL, resp.StatusCode, resp.Status,
 		)
 	}
 
