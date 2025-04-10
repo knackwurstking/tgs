@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.2.0 [unreleased]
+## v1.2.0 [2025-04-10]
 
 - Added ipv6 address to /ip bot command
 
@@ -17,9 +17,9 @@
 ## v1.0.0 [2024-12-11]
 
 - Commands:
-    - /ip
-    - /stats
-    - /journallist
-    - /journal
-    - /opmangalist
-    - /opmanga
+  - /ip
+  - /stats
+  - /journallist
+  - /journal
+  - /opmangalist
+  - /opmanga
