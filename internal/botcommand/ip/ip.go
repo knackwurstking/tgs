@@ -15,7 +15,7 @@ import (
 
 const (
 	IP4URL = "https://ifconfig.io"
-	IP6URL = "https://ipv6.icanhazip.com "
+	IP6URL = "https://ipv6.icanhazip.com"
 )
 
 // IP implements the Handler interface
