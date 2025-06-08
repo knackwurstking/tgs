@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v2.0.0 [unreleased]
+
+- [ ] Pluginify the tgs-server somehow and create some plugins:
+    - [ ] ip
+    - [ ] journal
+    - [ ] opmanga
+    - [ ] stats
+- [ ] For this to work, Create a basic struct or interface each plugin should use
+
 ## v1.2.0 [2025-04-10]
 
 - Added ipv6 address to /ip bot command
