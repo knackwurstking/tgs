@@ -1,6 +1,6 @@
 module github.com/knackwurstking/tgs
 
-go 1.23
+go 1.24
 
 require (
 	github.com/SuperPaintman/nice v0.0.0-20211001214957-a29cd3367b17

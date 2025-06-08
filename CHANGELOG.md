@@ -2,12 +2,13 @@
 
 ## v2.0.0 [unreleased]
 
-- [ ] Pluginify the tgs-server somehow and create some plugins:
+- [ ] Add each "botcommand" as a extension using golang build tags (?)
     - [ ] ip
     - [ ] journal
     - [ ] opmanga
     - [ ] stats
-- [ ] For this to work, Create a basic struct or interface each plugin should use
+    - [ ] pgvisregister
+- [ ] Use a separate config for each botcommand (?)
 
 ## v1.2.0 [2025-04-10]
 
