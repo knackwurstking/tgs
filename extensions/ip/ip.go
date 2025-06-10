@@ -30,7 +30,7 @@ type IP struct {
 	data *Data
 }
 
-func NewIP(api *tgbotapi.BotAPI) *IP {
+func New(api *tgbotapi.BotAPI) *IP {
 	return &IP{
 		BotAPI: api,
 		data: &Data{
@@ -40,8 +40,8 @@ func NewIP(api *tgbotapi.BotAPI) *IP {
 	}
 }
 
-func NewIPExtension(api *tgbotapi.BotAPI) extension.Extension {
-	return NewIP(api)
+func NewExtension(api *tgbotapi.BotAPI) extension.Extension {
+	return New(api)
 }
 
 func (ip *IP) SetBot(api *tgbotapi.BotAPI) {
