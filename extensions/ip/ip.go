@@ -72,12 +72,44 @@ func (ip *IP) Targets() *botcommand.Targets {
 	return ip.data.Targets
 }
 
+func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/ip", "Get server IP", ip.Register())
+}
+
 func (ip *IP) Is(command string) bool {
 	return strings.HasPrefix(command, "ip")
 }
 
-func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/ip", "Get server IP", ip.Register())
+func (ip *IP) Handle(message *tgbotapi.Message) error {
+	if ip.BotAPI == nil {
+		panic("BotAPI is nil!")
+	}
+
+	if command := message.Command(); command != "ip" {
+		return fmt.Errorf("unknown command: %s", command)
+	}
+
+	ipv4, err := ip.GetIPv4AddressFromURL()
+	if err != nil {
+		ipv4 = err.Error()
+	}
+
+	ipv6, err := ip.GetIPv6AddressFromURL()
+	if err != nil {
+		ipv6 = err.Error()
+	}
+
+	msgConfig := tgbotapi.NewMessage(
+		message.Chat.ID,
+		fmt.Sprintf(
+			"**IPv4**: `%s`\n**IPv6**: `%s`", ipv4, ipv6,
+		),
+	)
+	msgConfig.ReplyToMessageID = message.MessageID
+	msgConfig.ParseMode = "MarkdownV2"
+
+	_, err = ip.Send(msgConfig)
+	return err
 }
 
 func (ip *IP) GetIPv4AddressFromURL() (address string, err error) {
@@ -118,36 +150,4 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 	}
 
 	return strings.Trim(string(data), "\n\r\t "), nil
-}
-
-func (ip *IP) Handle(message *tgbotapi.Message) error {
-	if ip.BotAPI == nil {
-		panic("BotAPI is nil!")
-	}
-
-	if command := message.Command(); command != "ip" {
-		return fmt.Errorf("unknown command: %s", command)
-	}
-
-	ipv4, err := ip.GetIPv4AddressFromURL()
-	if err != nil {
-		ipv4 = err.Error()
-	}
-
-	ipv6, err := ip.GetIPv6AddressFromURL()
-	if err != nil {
-		ipv6 = err.Error()
-	}
-
-	msgConfig := tgbotapi.NewMessage(
-		message.Chat.ID,
-		fmt.Sprintf(
-			"**IPv4**: `%s`\n**IPv6**: `%s`", ipv4, ipv6,
-		),
-	)
-	msgConfig.ReplyToMessageID = message.MessageID
-	msgConfig.ParseMode = "MarkdownV2"
-
-	_, err = ip.Send(msgConfig)
-	return err
 }
