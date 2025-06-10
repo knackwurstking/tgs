@@ -69,7 +69,9 @@ func main() {
 
 				{ // Register bot commands here
 					myBotCommands := tgs.NewMyBotCommands()
-					cfg.IP.AddCommands(myBotCommands)
+					// TODO: Add extension commands
+
+					// cfg.IP.AddCommands(myBotCommands)
 					cfg.Stats.AddCommands(myBotCommands)
 					cfg.Journal.AddCommands(myBotCommands)
 					cfg.OPManga.AddCommands(myBotCommands)
@@ -126,9 +128,10 @@ func main() {
 						}
 
 						// Run commands here
+						// TODO: Check extensions for matching command prefixes
 						switch v := update.Message.Command(); {
-						case strings.HasPrefix(v, cfg.IP.BotCommand()):
-							runCommand(cfg.IP, update.Message)
+						// case strings.HasPrefix(v, cfg.IP.BotCommand()):
+						//	runCommand(cfg.IP, update.Message)
 
 						case strings.HasPrefix(v, cfg.Stats.BotCommand()):
 							runCommand(cfg.Stats, update.Message)
