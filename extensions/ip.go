@@ -1,5 +1,5 @@
-///go:build ip
-/// +build ip
+//go:build ip
+// +build ip
 
 package extensions
 
