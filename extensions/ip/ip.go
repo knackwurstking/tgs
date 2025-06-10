@@ -72,6 +72,10 @@ func (ip *IP) Targets() *botcommand.Targets {
 	return ip.data.Targets
 }
 
+func (ip *IP) Is(command string) bool {
+	return strings.HasPrefix(command, "ip")
+}
+
 func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/ip", "Get server IP", ip.Register())
 }

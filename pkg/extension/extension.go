@@ -15,6 +15,7 @@ type Extension interface {
 	UnmarshalYAML(value *yaml.Node) error
 	Register() []tgs.BotCommandScope
 	Targets() *botcommand.Targets
+	Is(command string) bool
 	Commands(mbc *tgs.MyBotCommands)
 	Handler(message *tgbotapi.Message) error
 }
