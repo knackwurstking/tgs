@@ -60,11 +60,12 @@ func main() {
 				bot, err = tgbotapi.NewBotAPI(cfg.Token)
 				if err != nil {
 					return err
-				} else {
 				}
 
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 				bot.Debug = false
+
+				// TODO: Load extensions here, this will replace the next line
 				cfg.SetBot(bot)
 
 				{ // Register bot commands here
