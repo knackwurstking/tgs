@@ -154,23 +154,29 @@ func handleUpdate(update tgbotapi.Update, cfg *config.Config) {
 		return
 	}
 
-	// Run commands here
-	// TODO: Check extensions for matching command prefixes `e.Is(v)`
-	switch v := update.Message.Command(); {
+	// Run commands
+	command := update.Message.Command()
+	for _, e := range extensions.Register {
+		if e.Is(command) {
+			e.Handle(update.Message)
+		}
+	}
+
+	switch {
 	// case strings.HasPrefix(v, cfg.IP.BotCommand()):
 	//	runCommand(cfg.IP, update.Message)
 
-	case strings.HasPrefix(v, cfg.Stats.BotCommand()):
+	case strings.HasPrefix(command, cfg.Stats.BotCommand()):
 		handleCommand(cfg.Stats, update.Message)
 
-	case strings.HasPrefix(v, cfg.Journal.BotCommand()):
+	case strings.HasPrefix(command, cfg.Journal.BotCommand()):
 		handleCommand(cfg.Journal, update.Message)
 
-	case strings.HasPrefix(v, cfg.OPManga.BotCommand()):
+	case strings.HasPrefix(command, cfg.OPManga.BotCommand()):
 		handleCommand(cfg.OPManga, update.Message)
 
 	default:
-		slog.Warn("Command not found!", "command", v)
+		slog.Warn("Command not found!", "command", command)
 	}
 }
 
