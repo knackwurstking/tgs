@@ -120,7 +120,7 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 	return strings.Trim(string(data), "\n\r\t "), nil
 }
 
-func (ip *IP) Handler(message *tgbotapi.Message) error {
+func (ip *IP) Handle(message *tgbotapi.Message) error {
 	if ip.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}

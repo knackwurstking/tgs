@@ -17,5 +17,5 @@ type Extension interface {
 	Targets() *botcommand.Targets
 	Is(command string) bool
 	Commands(mbc *tgs.MyBotCommands)
-	Handler(message *tgbotapi.Message) error
+	Handle(message *tgbotapi.Message) error
 }
