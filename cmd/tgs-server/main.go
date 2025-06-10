@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -26,15 +25,7 @@ func main() {
 		Name:  "tgs-server",
 		Usage: cli.Usage("Telegram scripts server, the scripts part was kicked from the project :)"),
 		Action: cli.ActionFunc(func(cmd *cli.Command) cli.ActionRunner {
-			var configPath string
-
-			cli.StringVar(cmd, &configPath, "config",
-				cli.Usage("Path to server configuration (yaml)"),
-				cli.WithShort("c"),
-				cli.Required,
-			)
-
-			return actionHandler(configPath)
+			return actionHandler()
 		}),
 		CommandFlags: []cli.CommandFlag{
 			cli.HelpCommandFlag(),
@@ -45,7 +36,7 @@ func main() {
 	app.HandleError(app.Run())
 }
 
-func actionHandler(configPath string) func(cmd *cli.Command) error {
+func actionHandler() func(cmd *cli.Command) error {
 	return func(cmd *cli.Command) error {
 		var (
 			err error
@@ -62,12 +53,17 @@ func actionHandler(configPath string) func(cmd *cli.Command) error {
 			),
 		)
 
-		if err = loadConfig(cfg, configPath); err != nil {
+		var configHome string
+		if configHome, err = os.UserConfigDir(); err != nil {
 			return err
 		}
 
-		if err = checkConfig(cfg); err != nil {
+		if err = loadConfig(filepath.Join(configHome, "api.yaml"), cfg); err != nil {
 			return err
+		}
+
+		if cfg.Token == "" {
+			return fmt.Errorf("missing token")
 		}
 
 		bot, err = tgbotapi.NewBotAPI(cfg.Token)
@@ -80,9 +76,12 @@ func actionHandler(configPath string) func(cmd *cli.Command) error {
 
 		// Setup bots
 		for _, e := range extensions.Register {
-			e.SetBot(bot)
+			err = loadConfig(filepath.Join(configHome, e.ConfigPath()), e)
+			if err != nil {
+				return err
+			}
 
-			// TODO: Load configuration (yaml)
+			e.SetBot(bot)
 		}
 
 		cfg.SetBot(bot)
@@ -299,9 +298,9 @@ func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 	return false
 }
 
-func loadConfig(cfg *config.Config, path string) error {
+func loadConfig(path string, v any) error {
 	extension := filepath.Ext(path)
-	if extension != ".yaml" && extension != ".json" {
+	if extension != ".yaml" {
 		return fmt.Errorf("unknown file type: %s", extension)
 	}
 
@@ -310,17 +309,5 @@ func loadConfig(cfg *config.Config, path string) error {
 		return err
 	}
 
-	if extension == ".yaml" {
-		return yaml.Unmarshal(data, cfg)
-	}
-
-	return json.Unmarshal(data, cfg)
-}
-
-func checkConfig(cfg *config.Config) error {
-	if cfg.Token == "" {
-		return fmt.Errorf("missing token")
-	}
-
-	return nil
+	return yaml.Unmarshal(data, v)
 }
