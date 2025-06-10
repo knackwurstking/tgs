@@ -6,5 +6,5 @@ package extensions
 import "github.com/knackwurstking/tgs/extensions/ip"
 
 func init() {
-	register = append(register, ip.NewIPExtension())
+	Register = append(Register, ip.NewIPExtension(nil))
 }
