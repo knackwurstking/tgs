@@ -34,128 +34,7 @@ func main() {
 				cli.Required,
 			)
 
-			return func(cmd *cli.Command) error {
-				var (
-					err error
-					bot *tgbotapi.BotAPI
-					cfg = config.New(bot, make(chan *botcommand.Reply))
-				)
-
-				slog.SetDefault(
-					slog.New(
-						tint.NewHandler(os.Stderr, &tint.Options{
-							AddSource: true,
-							Level:     slog.LevelDebug,
-						}),
-					),
-				)
-
-				if err = loadConfig(cfg, configPath); err != nil {
-					return err
-				}
-
-				if err = checkConfig(cfg); err != nil {
-					return err
-				}
-
-				bot, err = tgbotapi.NewBotAPI(cfg.Token)
-				if err != nil {
-					return err
-				}
-
-				slog.Info("Authorized bot", "username", bot.Self.UserName)
-				bot.Debug = false
-
-				// Pass bot to extensions
-				for _, e := range extensions.Register {
-					e.SetBot(bot)
-				}
-				cfg.SetBot(bot)
-
-				{ // Register bot commands here
-					myBotCommands := tgs.NewMyBotCommands()
-					// TODO: Add extension commands
-
-					// cfg.IP.AddCommands(myBotCommands)
-					cfg.Stats.AddCommands(myBotCommands)
-					cfg.Journal.AddCommands(myBotCommands)
-					cfg.OPManga.AddCommands(myBotCommands)
-
-					if err = myBotCommands.Register(bot); err != nil {
-						return err
-					}
-				}
-
-				// Enter the main loop
-				updateConfig := tgbotapi.NewUpdate(0)
-				updateConfig.Timeout = 60 // 1min
-
-				updateChan := bot.GetUpdatesChan(updateConfig)
-				for {
-					select {
-					case update := <-updateChan:
-						updateConfig.Offset = update.UpdateID + 1
-
-						if update.Message == nil {
-							continue
-						}
-
-						if len(update.Message.NewChatMembers) > 0 {
-							for _, u := range update.Message.NewChatMembers {
-								// Get the chat ID, I'm not sure if it'll always be set
-								chatID := int64(-1)
-								if update.Message.Chat != nil {
-									chatID = update.Message.Chat.ID
-								}
-
-								// NOTE: It is necessary to record the user statistics here, so I
-								// use “warn” instead of “debug”
-								slog.Warn("New chat member", "chat_id", chatID, "user", u)
-							}
-						}
-
-						if !update.Message.IsCommand() {
-							if update.Message.ReplyToMessage == nil {
-								continue
-							}
-
-							replyID := update.Message.ReplyToMessage.MessageID
-							if r, ok := replyCallbacks[replyID]; ok {
-								r.Run(update.Message)
-							} else {
-								slog.Debug("Got a new update",
-									"replyID", replyID,
-									"update.Message.Text", update.Message.Text,
-								)
-							}
-
-							continue
-						}
-
-						// Run commands here
-						// TODO: Check extensions for matching command prefixes
-						switch v := update.Message.Command(); {
-						// case strings.HasPrefix(v, cfg.IP.BotCommand()):
-						//	runCommand(cfg.IP, update.Message)
-
-						case strings.HasPrefix(v, cfg.Stats.BotCommand()):
-							runCommand(cfg.Stats, update.Message)
-
-						case strings.HasPrefix(v, cfg.Journal.BotCommand()):
-							runCommand(cfg.Journal, update.Message)
-
-						case strings.HasPrefix(v, cfg.OPManga.BotCommand()):
-							runCommand(cfg.OPManga, update.Message)
-
-						default:
-							slog.Warn("Command not found!", "command", v)
-						}
-
-					case reply := <-cfg.Reply:
-						go handleReplies(reply, bot)
-					}
-				}
-			}
+			return actionHandler(configPath)
 		}),
 		CommandFlags: []cli.CommandFlag{
 			cli.HelpCommandFlag(),
@@ -164,6 +43,135 @@ func main() {
 	}
 
 	app.HandleError(app.Run())
+}
+
+func actionHandler(configPath string) func(cmd *cli.Command) error {
+	return func(cmd *cli.Command) error {
+		var (
+			err error
+			bot *tgbotapi.BotAPI
+			cfg = config.New(bot, make(chan *botcommand.Reply))
+		)
+
+		slog.SetDefault(
+			slog.New(
+				tint.NewHandler(os.Stderr, &tint.Options{
+					AddSource: true,
+					Level:     slog.LevelDebug,
+				}),
+			),
+		)
+
+		if err = loadConfig(cfg, configPath); err != nil {
+			return err
+		}
+
+		if err = checkConfig(cfg); err != nil {
+			return err
+		}
+
+		bot, err = tgbotapi.NewBotAPI(cfg.Token)
+		if err != nil {
+			return err
+		}
+
+		slog.Info("Authorized bot", "username", bot.Self.UserName)
+		bot.Debug = false
+
+		// Pass bot to extensions
+		for _, e := range extensions.Register {
+			e.SetBot(bot)
+		}
+		cfg.SetBot(bot)
+
+		// Register bot commands here
+		myBotCommands := tgs.NewMyBotCommands()
+
+		// Add commands from extension
+		for _, e := range extensions.Register {
+			e.Commands(myBotCommands)
+		}
+
+		// cfg.IP.AddCommands(myBotCommands)
+		cfg.Stats.AddCommands(myBotCommands)
+		cfg.Journal.AddCommands(myBotCommands)
+		cfg.OPManga.AddCommands(myBotCommands)
+
+		if err = myBotCommands.Register(bot); err != nil {
+			return err
+		}
+
+		// Enter the main loop
+		updateConfig := tgbotapi.NewUpdate(0)
+		updateConfig.Timeout = 60 // 1min
+
+		updateChan := bot.GetUpdatesChan(updateConfig)
+		for {
+			select {
+			case update := <-updateChan:
+				updateConfig.Offset = update.UpdateID + 1
+				go handleUpdate(update, cfg)
+
+			case reply := <-cfg.Reply:
+				go handleReplies(reply, bot)
+			}
+		}
+	}
+}
+
+func handleUpdate(update tgbotapi.Update, cfg *config.Config) {
+	if update.Message == nil {
+		return
+	}
+
+	if len(update.Message.NewChatMembers) > 0 {
+		for _, u := range update.Message.NewChatMembers {
+			// Get the chat ID, I'm not sure if it'll always be set
+			chatID := int64(-1)
+			if update.Message.Chat != nil {
+				chatID = update.Message.Chat.ID
+			}
+
+			slog.Warn("New chat member", "chat_id", chatID, "user", u)
+		}
+	}
+
+	if !update.Message.IsCommand() {
+		if update.Message.ReplyToMessage == nil {
+			return
+		}
+
+		replyID := update.Message.ReplyToMessage.MessageID
+		if r, ok := replyCallbacks[replyID]; ok {
+			r.Run(update.Message)
+		} else {
+			slog.Debug("Got a new update",
+				"replyID", replyID,
+				"update.Message.Text", update.Message.Text,
+			)
+		}
+
+		return
+	}
+
+	// Run commands here
+	// TODO: Check extensions for matching command prefixes
+	switch v := update.Message.Command(); {
+	// case strings.HasPrefix(v, cfg.IP.BotCommand()):
+	//	runCommand(cfg.IP, update.Message)
+
+	case strings.HasPrefix(v, cfg.Stats.BotCommand()):
+		runCommand(cfg.Stats, update.Message)
+
+	case strings.HasPrefix(v, cfg.Journal.BotCommand()):
+		runCommand(cfg.Journal, update.Message)
+
+	case strings.HasPrefix(v, cfg.OPManga.BotCommand()):
+		runCommand(cfg.OPManga, update.Message)
+
+	default:
+		slog.Warn("Command not found!", "command", v)
+	}
 }
 
 func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
@@ -258,20 +266,23 @@ func isValidTarget(message *tgbotapi.Message, handler botcommand.Handler) bool {
 	}
 
 	// Chat ID check & message thread ID if chat is forum
-	if handler.Targets().Chats != nil {
-		for _, t := range handler.Targets().Chats {
-			if t.ID == message.Chat.ID && (t.Type == message.Chat.Type && t.Type != "") {
-				if message.Chat.IsForum {
-					if t.MessageThreadID <= 0 {
-						return true
-					}
+	chats := handler.Targets().Chats
+	if chats == nil {
+		return false
+	}
 
-					if t.MessageThreadID == message.MessageThreadID {
-						return true
-					}
-				} else {
+	for _, t := range chats {
+		if t.ID == message.Chat.ID && (t.Type == message.Chat.Type && t.Type != "") {
+			if message.Chat.IsForum {
+				if t.MessageThreadID <= 0 {
 					return true
 				}
+
+				if t.MessageThreadID == message.MessageThreadID {
+					return true
+				}
+			} else {
+				return true
 			}
 		}
 	}
