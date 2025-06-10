@@ -44,6 +44,10 @@ func NewIPExtension(api *tgbotapi.BotAPI) extension.Extension {
 	return NewIP(api)
 }
 
+func (ip *IP) SetBot(api *tgbotapi.BotAPI) {
+	ip.BotAPI = api
+}
+
 func (ip *IP) ConfigPath() string {
 	return "ip.config"
 }
@@ -113,6 +117,10 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 }
 
 func (ip *IP) Handler(message *tgbotapi.Message) error {
+	if ip.BotAPI == nil {
+		panic("BotAPI is nil!")
+	}
+
 	if command := message.Command(); command != "ip" {
 		return fmt.Errorf("unknown command: %s", command)
 	}

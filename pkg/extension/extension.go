@@ -9,6 +9,7 @@ import (
 )
 
 type Extension interface {
+	SetBot(api *tgbotapi.BotAPI)
 	ConfigPath() string
 	MarshalYAML() (any, error)
 	UnmarshalYAML(value *yaml.Node) error
