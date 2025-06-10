@@ -13,6 +13,7 @@ import (
 	"github.com/lmittmann/tint"
 	"gopkg.in/yaml.v3"
 
+	"github.com/knackwurstking/tgs/extensions"
 	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/internal/config"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -65,7 +66,10 @@ func main() {
 				slog.Info("Authorized bot", "username", bot.Self.UserName)
 				bot.Debug = false
 
-				// TODO: Load extensions here, this will replace the next line
+				// Pass bot to extensions
+				for _, e := range extensions.Register {
+					e.SetBot(bot)
+				}
 				cfg.SetBot(bot)
 
 				{ // Register bot commands here
