@@ -155,26 +155,26 @@ func handleUpdate(update tgbotapi.Update, cfg *config.Config) {
 	}
 
 	// Run commands here
-	// TODO: Check extensions for matching command prefixes
+	// TODO: Check extensions for matching command prefixes `e.Is(v)`
 	switch v := update.Message.Command(); {
 	// case strings.HasPrefix(v, cfg.IP.BotCommand()):
 	//	runCommand(cfg.IP, update.Message)
 
 	case strings.HasPrefix(v, cfg.Stats.BotCommand()):
-		runCommand(cfg.Stats, update.Message)
+		handleCommand(cfg.Stats, update.Message)
 
 	case strings.HasPrefix(v, cfg.Journal.BotCommand()):
-		runCommand(cfg.Journal, update.Message)
+		handleCommand(cfg.Journal, update.Message)
 
 	case strings.HasPrefix(v, cfg.OPManga.BotCommand()):
-		runCommand(cfg.OPManga, update.Message)
+		handleCommand(cfg.OPManga, update.Message)
 
 	default:
 		slog.Warn("Command not found!", "command", v)
 	}
 }
 
-func runCommand(handler botcommand.Handler, message *tgbotapi.Message) {
+func handleCommand(handler botcommand.Handler, message *tgbotapi.Message) {
 	if !isValidTarget(message, handler) {
 		slog.Debug("Invalid target",
 			"command", message.Command(),
