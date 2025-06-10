@@ -4,31 +4,6 @@ define:
 
 token: <token>
 
-ip:
-    # `[]tgbotapi.BotCommandScope`
-    register:
-        # Types:
-        #   - default
-        #   - all_private_chats
-        #   - all_group_chats
-        #   - all_chat_administrators
-        #   - chat, needs: "chat_id"
-        #   - chat_administrators, needs: "chat_id"
-        #   - chat_member, needs: "chat_id" & "user_id"
-        - type: chat
-          chat_id: *AliceChatID
-
-    targets:
-        # Currently,you can only set either chat IDs or user IDs, not both. Combining these options
-        # is not possible (yet)
-        chats:
-            - id: *AliceChatID
-              # Type of chat, can be either "private", "group", "supergroup" or "channel"
-              type: supergroup
-              message_thread_id: 5
-              # TODO: Include a “users” field here to restrict command execution to specific users
-              # within this topic.
-
 stats:
     register:
         - type: default

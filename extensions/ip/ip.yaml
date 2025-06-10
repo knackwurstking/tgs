@@ -1,1 +1,23 @@
 # NOTE: This is just an example
+define:
+    - &AliceChatID <number>
+
+# `[]tgs.BotCommandScope`
+register:
+    # Types:
+    #   - default
+    #   - all_private_chats
+    #   - all_group_chats
+    #   - all_chat_administrators
+    #   - chat, needs: "chat_id"
+    #   - chat_administrators, needs: "chat_id"
+    #   - chat_member, needs: "chat_id" & "user_id"
+    - type: chat
+      chat_id: *AliceChatID
+
+targets:
+    chats:
+        # Types: "private", "group", "supergroup" or "channel"
+        - type: supergroup
+          id: *AliceChatID
+          message_thread_id: 5
