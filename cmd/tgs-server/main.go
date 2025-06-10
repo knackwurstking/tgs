@@ -78,10 +78,13 @@ func actionHandler(configPath string) func(cmd *cli.Command) error {
 		slog.Info("Authorized bot", "username", bot.Self.UserName)
 		bot.Debug = false
 
-		// Pass bot to extensions
+		// Setup bots
 		for _, e := range extensions.Register {
 			e.SetBot(bot)
+
+			// TODO: Load configuration (yaml)
 		}
+
 		cfg.SetBot(bot)
 
 		// Register bot commands here
