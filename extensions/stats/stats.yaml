@@ -1,0 +1,11 @@
+# NOTE: This is just an example
+define:
+    - &AliceChatID <number>
+
+register:
+    - type: default
+    - type: chat
+      chat_id: *AliceChatID
+
+targets:
+    all: true
