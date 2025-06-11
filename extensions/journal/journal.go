@@ -1,4 +1,4 @@
-package ip
+package journal
 
 import (
 	"fmt"
@@ -163,17 +163,9 @@ func (j *Journal) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(j.data)
 }
 
-func (j *Journal) Register() []tgs.BotCommandScope {
-	return j.data.Register
-}
-
-func (j *Journal) Targets() *botcommand.Targets {
-	return j.data.Targets
-}
-
 func (j *Journal) Commands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/journal", "Get a journalctl log", j.Register())
-	mbc.Add("/journallist", "List journalctl logs", j.Register())
+	mbc.Add("/journal", "Get a journalctl log", j.data.Register)
+	mbc.Add("/journallist", "List journalctl logs", j.data.Register)
 }
 
 func (j *Journal) Is(message *tgbotapi.Message) bool {

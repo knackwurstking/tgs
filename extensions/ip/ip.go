@@ -60,16 +60,8 @@ func (ip *IP) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(ip.data)
 }
 
-func (ip *IP) Register() []tgs.BotCommandScope {
-	return ip.data.Register
-}
-
-func (ip *IP) Targets() *botcommand.Targets {
-	return ip.data.Targets
-}
-
 func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/ip", "Get server IP", ip.Register())
+	mbc.Add("/ip", "Get server IP", ip.data.Register)
 }
 
 func (ip *IP) Is(message *tgbotapi.Message) bool {

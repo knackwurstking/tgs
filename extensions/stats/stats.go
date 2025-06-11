@@ -43,7 +43,7 @@ func (s *Stats) SetBot(api *tgbotapi.BotAPI) {
 }
 
 func (s *Stats) ConfigPath() string {
-	return "ip.config"
+	return "stats.config"
 }
 
 func (s *Stats) MarshalYAML() (any, error) {
@@ -54,16 +54,8 @@ func (s *Stats) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(s.data)
 }
 
-func (s *Stats) Register() []tgs.BotCommandScope {
-	return s.data.Register
-}
-
-func (s *Stats) Targets() *botcommand.Targets {
-	return s.data.Targets
-}
-
 func (s *Stats) Commands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/stats", "Get ID info", s.Register())
+	mbc.Add("/stats", "Get ID info", s.data.Register)
 }
 
 func (s *Stats) Is(message *tgbotapi.Message) bool {
