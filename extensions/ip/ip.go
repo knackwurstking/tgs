@@ -9,7 +9,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
@@ -20,7 +19,7 @@ const (
 )
 
 type Data struct {
-	Targets  *botcommand.Targets   `yaml:"targets,omitempty"`
+	Targets  *extension.Targets    `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 }
 
@@ -34,7 +33,7 @@ func New(api *tgbotapi.BotAPI) *IP {
 	return &IP{
 		BotAPI: api,
 		data: &Data{
-			Targets:  botcommand.NewTargets(),
+			Targets:  extension.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 		},
 	}

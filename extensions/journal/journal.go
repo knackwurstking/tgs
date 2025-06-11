@@ -11,7 +11,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/internal/templates"
 	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -119,10 +118,10 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *botcommand.Targets    `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope  `yaml:"register,omitempty"`
-	Units    *Units                 `yaml:"units,omitempty"`
-	Reply    chan *botcommand.Reply `yaml:"-"`
+	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+	Units    *Units                `yaml:"units,omitempty"`
+	Reply    chan *extension.Reply `yaml:"-"`
 }
 
 type Journal struct {
@@ -135,7 +134,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 	return &Journal{
 		BotAPI: api,
 		data: &Data{
-			Targets:  botcommand.NewTargets(),
+			Targets:  extension.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 			Units:    NewUnits(),
 			// Reply: ,
@@ -214,7 +213,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		}
 
 		// FIXME: Reply is not nil for now, need to implement this somehow
-		j.data.Reply <- &botcommand.Reply{
+		j.data.Reply <- &extension.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
 			Callback: j.replyCallback,

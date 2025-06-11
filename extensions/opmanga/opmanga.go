@@ -13,7 +13,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/internal/botcommand"
 	"github.com/knackwurstking/tgs/internal/templates"
 	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -72,10 +71,10 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *botcommand.Targets    `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope  `yaml:"register,omitempty"`
-	Path     string                 `yaml:"path"`
-	Reply    chan *botcommand.Reply `yaml:"-"`
+	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+	Path     string                `yaml:"path"`
+	Reply    chan *extension.Reply `yaml:"-"`
 }
 
 type OPManga struct {
@@ -88,7 +87,7 @@ func New(api *tgbotapi.BotAPI) *OPManga {
 	return &OPManga{
 		BotAPI: api,
 		data: &Data{
-			Targets:  botcommand.NewTargets(),
+			Targets:  extension.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 			// Reply: ,
 		},
@@ -124,7 +123,6 @@ func (o *OPManga) Is(message *tgbotapi.Message) bool {
 	return strings.HasPrefix(message.Command(), "opmanga")
 }
 
-// TODO: Continue here
 func (o *OPManga) Handle(message *tgbotapi.Message) error {
 	if o.BotAPI == nil {
 		panic("BotAPI is nil!")
@@ -148,7 +146,7 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 			return err
 		}
 
-		o.data.Reply <- &botcommand.Reply{
+		o.data.Reply <- &extension.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
 			Callback: o.replyCallback,

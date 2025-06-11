@@ -1,4 +1,4 @@
-package botcommand
+package extension
 
 type Targets struct {
 	Users []UserTarget `json:"users,omitempty" yaml:"users,omitempty"`

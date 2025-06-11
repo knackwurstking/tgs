@@ -1,4 +1,4 @@
-package botcommand
+package extension
 
 import (
 	"errors"
