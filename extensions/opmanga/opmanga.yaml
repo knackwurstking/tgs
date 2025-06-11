@@ -1,0 +1,18 @@
+# NOTE: This is just an example
+define:
+    - &OPChatID <number>
+
+register:
+    - type: chat
+      chat_id: *OPChatID
+
+targets:
+    chats:
+        - id: *OPChatID
+          type: supergroup
+          message_thread_id: 2
+        - id: *OPChatID
+          type: supergroup
+          message_thread_id: 3
+
+path: "/Volumes/media/Data/One Piece/Manga"
