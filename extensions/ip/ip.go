@@ -72,14 +72,16 @@ func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/ip", "Get server IP", ip.Register())
 }
 
-func (ip *IP) Is(command string) bool {
-	return strings.HasPrefix(command, "ip")
+func (ip *IP) Is(message *tgbotapi.Message) bool {
+	return strings.HasPrefix(message.Command(), "ip")
 }
 
 func (ip *IP) Handle(message *tgbotapi.Message) error {
 	if ip.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	// TODO: Check for valid targets here
 
 	if command := message.Command(); command != "ip" {
 		return fmt.Errorf("unknown command: %s", command)

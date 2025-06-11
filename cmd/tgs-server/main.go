@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/SuperPaintman/nice/cli"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -137,72 +136,74 @@ func handleUpdate(update tgbotapi.Update, cfg *config.Config) {
 		}
 	}
 
-	if !update.Message.IsCommand() {
-		if update.Message.ReplyToMessage == nil {
-			return
-		}
+	// NOTE: Handle reply callbacks (out dated)
+	//
+	// if !update.Message.IsCommand() {
+	//	if update.Message.ReplyToMessage == nil {
+	//		return
+	//	}
+	//
+	//	replyID := update.Message.ReplyToMessage.MessageID
+	//	if r, ok := replyCallbacks[replyID]; ok {
+	//		r.Run(update.Message)
+	//	} else {
+	//		slog.Debug("Got a new update",
+	//			"replyID", replyID,
+	//			"update.Message.Text", update.Message.Text,
+	//		)
+	//	}
+	//
+	//	return
+	//}
 
-		replyID := update.Message.ReplyToMessage.MessageID
-		if r, ok := replyCallbacks[replyID]; ok {
-			r.Run(update.Message)
-		} else {
-			slog.Debug("Got a new update",
-				"replyID", replyID,
-				"update.Message.Text", update.Message.Text,
-			)
-		}
-
-		return
-	}
-
-	// Run commands
-	command := update.Message.Command()
 	for _, e := range extensions.Register {
-		if e.Is(command) {
-			e.Handle(update.Message)
+		if e.Is(update.Message) {
+			go e.Handle(update.Message)
 		}
 	}
 
-	switch {
-	case strings.HasPrefix(command, cfg.Stats.BotCommand()):
-		handleCommand(cfg.Stats, update.Message)
+	// switch {
+	// case strings.HasPrefix(command, cfg.Stats.BotCommand()):
+	//	handleCommand(cfg.Stats, update.Message)
 
-	case strings.HasPrefix(command, cfg.OPManga.BotCommand()):
-		handleCommand(cfg.OPManga, update.Message)
+	// case strings.HasPrefix(command, cfg.OPManga.BotCommand()):
+	//	handleCommand(cfg.OPManga, update.Message)
 
-	default:
-		slog.Warn("Command not found!", "command", command)
-	}
+	//default:
+	//	slog.Warn("Command not found!", "command", command)
+	//}
 }
 
-func handleCommand(handler botcommand.Handler, message *tgbotapi.Message) {
-	if !isValidTarget(message, handler) {
-		slog.Debug("Invalid target",
-			"command", message.Command(),
-			"message.Chat.ID", message.Chat.ID,
-			"handler.Targets", handler.Targets(),
-		)
-		return
-	}
-
-	command := message.Command()
-	slog.Debug("Running command.",
-		"command", command,
-		"message.message_id", message.MessageID,
-		"message.from.username", message.From.UserName,
-		"message.from.id", message.From.ID,
-		"message.chat.id", message.Chat.ID,
-		"message.chat.title", message.Chat.Title,
-		"message.chat.type", message.Chat.Type,
-		"message.message_thread_id", message.MessageThreadID,
-	)
-
-	go func() {
-		if err := handler.Run(message); err != nil {
-			slog.Error("Command failed!", "command", command, "error", err)
-		}
-	}()
-}
+// TODO: Check for valid targets inside extension `...Is(...)`
+//
+//func handleCommand(handler botcommand.Handler, message *tgbotapi.Message) {
+//	if !isValidTarget(message, handler) {
+//		slog.Debug("Invalid target",
+//			"command", message.Command(),
+//			"message.Chat.ID", message.Chat.ID,
+//			"handler.Targets", handler.Targets(),
+//		)
+//		return
+//	}
+//
+//	command := message.Command()
+//	slog.Debug("Running command.",
+//		"command", command,
+//		"message.message_id", message.MessageID,
+//		"message.from.username", message.From.UserName,
+//		"message.from.id", message.From.ID,
+//		"message.chat.id", message.Chat.ID,
+//		"message.chat.title", message.Chat.Title,
+//		"message.chat.type", message.Chat.Type,
+//		"message.message_thread_id", message.MessageThreadID,
+//	)
+//
+//	go func() {
+//		if err := handler.Run(message); err != nil {
+//			slog.Error("Command failed!", "command", command, "error", err)
+//		}
+//	}()
+//}
 
 func handleReplies(r *botcommand.Reply, bot *tgbotapi.BotAPI) {
 	messageID := r.Message.MessageID

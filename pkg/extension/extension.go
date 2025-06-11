@@ -16,6 +16,6 @@ type Extension interface {
 	Register() []tgs.BotCommandScope
 	Targets() *botcommand.Targets
 	Commands(mbc *tgs.MyBotCommands)
-	Is(command string) bool
+	Is(message *tgbotapi.Message) bool
 	Handle(message *tgbotapi.Message) error
 }

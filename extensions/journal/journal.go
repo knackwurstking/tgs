@@ -176,14 +176,16 @@ func (j *Journal) Commands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/journallist", "List journalctl logs", j.Register())
 }
 
-func (j *Journal) Is(command string) bool {
-	return strings.HasPrefix(command, "journal")
+func (j *Journal) Is(message *tgbotapi.Message) bool {
+	return strings.HasPrefix(message.Command(), "journal")
 }
 
 func (j *Journal) Handle(message *tgbotapi.Message) error {
 	if j.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	// TODO: Check for valid targets here
 
 	switch command := message.Command(); command {
 	case "journallist":
