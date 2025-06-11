@@ -57,11 +57,7 @@ func (ip *IP) MarshalYAML() (any, error) {
 }
 
 func (ip *IP) UnmarshalYAML(value *yaml.Node) error {
-	if err := value.Decode(ip.data); err != nil {
-		return err
-	}
-
-	return nil
+	return value.Decode(ip.data)
 }
 
 func (ip *IP) Register() []tgs.BotCommandScope {

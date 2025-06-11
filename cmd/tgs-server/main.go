@@ -96,7 +96,6 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		// cfg.IP.AddCommands(myBotCommands)
 		cfg.Stats.AddCommands(myBotCommands)
-		cfg.Journal.AddCommands(myBotCommands)
 		cfg.OPManga.AddCommands(myBotCommands)
 
 		if err = myBotCommands.Register(bot); err != nil {
@@ -165,14 +164,8 @@ func handleUpdate(update tgbotapi.Update, cfg *config.Config) {
 	}
 
 	switch {
-	// case strings.HasPrefix(v, cfg.IP.BotCommand()):
-	//	runCommand(cfg.IP, update.Message)
-
 	case strings.HasPrefix(command, cfg.Stats.BotCommand()):
 		handleCommand(cfg.Stats, update.Message)
-
-	case strings.HasPrefix(command, cfg.Journal.BotCommand()):
-		handleCommand(cfg.Journal, update.Message)
 
 	case strings.HasPrefix(command, cfg.OPManga.BotCommand()):
 		handleCommand(cfg.OPManga, update.Message)

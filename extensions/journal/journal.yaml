@@ -1,1 +1,27 @@
 # NOTE: This is just an example
+define:
+    - &AliceChatID <number>
+
+register:
+    - type: chat
+      chat_id: *AliceChatID
+
+targets:
+    chats:
+        - id: *AliceChatID
+          type: supergroup
+          message_thread_id: 3
+
+units:
+    system:
+        - name: ssh
+          output: short
+    user:
+        - name: picow-led-server
+          output: cat
+        - name: op-anime-dl
+          output: cat
+        - name: op-manga-dl
+          output: cat
+        - name: tgs-server
+          output: cat
