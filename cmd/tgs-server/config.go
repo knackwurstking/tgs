@@ -1,9 +1,9 @@
-package config
+package main
 
 type Config struct {
 	Token string `json:"token" yaml:"token"`
 }
 
-func New() *Config {
+func NewConfig() *Config {
 	return &Config{}
 }
