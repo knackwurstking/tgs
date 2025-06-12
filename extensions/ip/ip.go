@@ -1,6 +1,7 @@
 package ip
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,7 +73,9 @@ func (ip *IP) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	// TODO: Check for valid targets here
+	if ok := ip.checkTargets(message); !ok {
+		return errors.New("invalid target")
+	}
 
 	if command := message.Command(); command != "ip" {
 		return fmt.Errorf("unknown command: %s", command)
@@ -139,4 +142,10 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 	}
 
 	return strings.Trim(string(data), "\n\r\t "), nil
+}
+
+func (ip *IP) checkTargets(message *tgbotapi.Message) bool {
+	// TODO: Check for valid targets here
+
+	return false
 }
