@@ -148,6 +148,7 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 			return err
 		}
 
+		// FIXME: Reply is nil for now, need to implement this somehow
 		o.data.Reply <- &tgs.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
