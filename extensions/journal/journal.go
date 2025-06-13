@@ -128,7 +128,7 @@ type Journal struct {
 	*tgbotapi.BotAPI
 
 	data      *Data
-	callbacks *tgs.ReplyCallbacks
+	callbacks tgs.ReplyCallbacks
 }
 
 func New(api *tgbotapi.BotAPI) *Journal {
@@ -140,7 +140,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 			Units:    NewUnits(),
 			// Reply: ,
 		},
-		callbacks: tgs.NewReplyCallbacks(),
+		callbacks: make(tgs.ReplyCallbacks, 0),
 	}
 }
 
