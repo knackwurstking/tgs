@@ -212,7 +212,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 			return err
 		}
 
-		// FIXME: Reply is not nil for now, need to implement this somehow
+		// FIXME: Reply is nil for now, need to implement this somehow
 		j.data.Reply <- &extension.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
