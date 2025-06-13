@@ -153,24 +153,48 @@ func (ip *IP) checkTargets(message *tgbotapi.Message) bool {
 		return true
 	}
 
-	ok := false
+	checkUserID := func(id int64, users []extension.UserTarget) bool {
+		if users == nil {
+			users = ip.data.Targets.Users
+		}
+
+		for _, user := range users {
+			if user.ID == id {
+				return true
+			}
+		}
+
+		return false
+	}
 
 	// User ID check
 	if ip.data.Targets.Users != nil {
-		for _, user := range ip.data.Targets.Users {
-			if user.ID == message.From.ID {
-				ok = true
-				break
-			}
-
-			ok = false
-		}
+		checkUserID(message.From.ID, nil)
 	}
 
 	// Chat ID check & message thread ID if chat is forum
+
 	if ip.data.Targets.Chats != nil {
-		// ...
+		for _, chat := range ip.data.Targets.Chats {
+			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type || chat.Type == "") {
+				if !message.Chat.IsForum {
+					if chat.Users == nil {
+						return true
+					}
+
+					return checkUserID(message.From.ID, chat.Users)
+				}
+
+				if chat.MessageThreadID <= 0 || chat.MessageThreadID == message.MessageThreadID {
+					if chat.Users == nil {
+						return true
+					}
+
+					return checkUserID(message.From.ID, chat.Users)
+				}
+			}
+		}
 	}
 
-	return ok
+	return false
 }
