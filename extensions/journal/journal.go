@@ -176,6 +176,13 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
+	// TODO: Check if message is a reply
+	if tgs.IsReply(message) {
+		// ...
+
+		return errors.New("under construction")
+	}
+
 	if ok := tgs.CheckTargets(message, j.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
