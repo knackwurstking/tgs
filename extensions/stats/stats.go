@@ -2,18 +2,18 @@ package stats
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
 type Data struct {
-	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 }
 
@@ -27,13 +27,13 @@ func New(api *tgbotapi.BotAPI) *Stats {
 	return &Stats{
 		BotAPI: api,
 		data: &Data{
-			Targets:  extension.NewTargets(),
+			Targets:  tgs.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 		},
 	}
 }
 
-func NewExtension(api *tgbotapi.BotAPI) extension.Extension {
+func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
@@ -66,7 +66,9 @@ func (s *Stats) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	// TODO: Check for valid targets here
+	if ok := tgs.CheckTargets(message, s.data.Targets); !ok {
+		return errors.New("invalid target")
+	}
 
 	if command := message.Command(); command != "stats" {
 		return fmt.Errorf("unknown command: %s", command)

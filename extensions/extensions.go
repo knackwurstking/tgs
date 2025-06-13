@@ -1,5 +1,5 @@
 package extensions
 
-import "github.com/knackwurstking/tgs/pkg/extension"
+import "github.com/knackwurstking/tgs/pkg/tgs"
 
-var Register = []extension.Extension{} // Containing all the extensions registered
+var Register = []tgs.Extension{} // Containing all the extensions registered

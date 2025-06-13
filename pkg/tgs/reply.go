@@ -1,4 +1,4 @@
-package extension
+package tgs
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-var ErrorTimeout = errors.New("TimeoutError")
+var ErrorReplyTimeout = errors.New("TimeoutError")
 
 type Reply struct {
 	Message  *tgbotapi.Message
@@ -41,7 +41,7 @@ func (this *Reply) StartTimeout() {
 	}
 
 	time.Sleep(this.Timeout)
-	this.done <- ErrorTimeout
+	this.done <- ErrorReplyTimeout
 }
 
 func (this *Reply) Done() chan error {

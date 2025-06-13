@@ -1,6 +1,7 @@
 package opmanga
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -14,7 +15,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/knackwurstking/tgs/internal/templates"
-	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -71,10 +71,10 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 	Path     string                `yaml:"path"`
-	Reply    chan *extension.Reply `yaml:"-"`
+	Reply    chan *tgs.Reply       `yaml:"-"`
 }
 
 type OPManga struct {
@@ -87,14 +87,14 @@ func New(api *tgbotapi.BotAPI) *OPManga {
 	return &OPManga{
 		BotAPI: api,
 		data: &Data{
-			Targets:  extension.NewTargets(),
+			Targets:  tgs.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 			// Reply: ,
 		},
 	}
 }
 
-func NewExtension(api *tgbotapi.BotAPI) extension.Extension {
+func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
@@ -128,7 +128,9 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	// TODO: Check for valid targets here
+	if ok := tgs.CheckTargets(message, o.data.Targets); !ok {
+		return errors.New("invalid target")
+	}
 
 	switch command := message.Command(); command {
 	case "opmanga":
@@ -146,7 +148,7 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 			return err
 		}
 
-		o.data.Reply <- &extension.Reply{
+		o.data.Reply <- &tgs.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
 			Callback: o.replyCallback,

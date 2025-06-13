@@ -1,6 +1,7 @@
 package journal
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/knackwurstking/tgs/internal/templates"
-	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -118,10 +118,10 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 	Units    *Units                `yaml:"units,omitempty"`
-	Reply    chan *extension.Reply `yaml:"-"`
+	Reply    chan *tgs.Reply       `yaml:"-"`
 }
 
 type Journal struct {
@@ -134,7 +134,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 	return &Journal{
 		BotAPI: api,
 		data: &Data{
-			Targets:  extension.NewTargets(),
+			Targets:  tgs.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 			Units:    NewUnits(),
 			// Reply: ,
@@ -142,7 +142,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 	}
 }
 
-func NewExtension(api *tgbotapi.BotAPI) extension.Extension {
+func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
@@ -176,7 +176,9 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	// TODO: Check for valid targets here
+	if ok := tgs.CheckTargets(message, j.data.Targets); !ok {
+		return errors.New("invalid target")
+	}
 
 	switch command := message.Command(); command {
 	case "journallist":
@@ -213,7 +215,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		}
 
 		// FIXME: Reply is nil for now, need to implement this somehow
-		j.data.Reply <- &extension.Reply{
+		j.data.Reply <- &tgs.Reply{
 			Message:  &msg,
 			Timeout:  time.Minute * 5,
 			Callback: j.replyCallback,

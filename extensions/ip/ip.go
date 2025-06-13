@@ -10,7 +10,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/knackwurstking/tgs/pkg/extension"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
@@ -20,7 +19,7 @@ const (
 )
 
 type Data struct {
-	Targets  *extension.Targets    `yaml:"targets,omitempty"`
+	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 }
 
@@ -34,13 +33,13 @@ func New(api *tgbotapi.BotAPI) *IP {
 	return &IP{
 		BotAPI: api,
 		data: &Data{
-			Targets:  extension.NewTargets(),
+			Targets:  tgs.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 		},
 	}
 }
 
-func NewExtension(api *tgbotapi.BotAPI) extension.Extension {
+func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
@@ -73,7 +72,7 @@ func (ip *IP) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	if ok := ip.checkTargets(message); !ok {
+	if ok := tgs.CheckTargets(message, ip.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
 
@@ -142,59 +141,4 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 	}
 
 	return strings.Trim(string(data), "\n\r\t "), nil
-}
-
-func (ip *IP) checkTargets(message *tgbotapi.Message) bool {
-	if ip.data.Targets == nil {
-		return false
-	}
-
-	if ip.data.Targets.All {
-		return true
-	}
-
-	checkUserID := func(id int64, users []extension.UserTarget) bool {
-		if users == nil {
-			users = ip.data.Targets.Users
-		}
-
-		for _, user := range users {
-			if user.ID == id {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	// User ID check
-	if ip.data.Targets.Users != nil {
-		checkUserID(message.From.ID, nil)
-	}
-
-	// Chat ID check & message thread ID if chat is forum
-
-	if ip.data.Targets.Chats != nil {
-		for _, chat := range ip.data.Targets.Chats {
-			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type || chat.Type == "") {
-				if !message.Chat.IsForum {
-					if chat.Users == nil {
-						return true
-					}
-
-					return checkUserID(message.From.ID, chat.Users)
-				}
-
-				if chat.MessageThreadID <= 0 || chat.MessageThreadID == message.MessageThreadID {
-					if chat.Users == nil {
-						return true
-					}
-
-					return checkUserID(message.From.ID, chat.Users)
-				}
-			}
-		}
-	}
-
-	return false
 }
