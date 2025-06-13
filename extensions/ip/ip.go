@@ -145,7 +145,32 @@ func (ip *IP) GetIPv6AddressFromURL() (address string, err error) {
 }
 
 func (ip *IP) checkTargets(message *tgbotapi.Message) bool {
-	// TODO: Check for valid targets here
+	if ip.data.Targets == nil {
+		return false
+	}
 
-	return false
+	if ip.data.Targets.All {
+		return true
+	}
+
+	ok := false
+
+	// User ID check
+	if ip.data.Targets.Users != nil {
+		for _, user := range ip.data.Targets.Users {
+			if user.ID == message.From.ID {
+				ok = true
+				break
+			}
+
+			ok = false
+		}
+	}
+
+	// Chat ID check & message thread ID if chat is forum
+	if ip.data.Targets.Chats != nil {
+		// ...
+	}
+
+	return ok
 }
