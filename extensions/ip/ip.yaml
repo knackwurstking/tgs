@@ -15,6 +15,7 @@ register:
     - type: chat
       chat_id: *AliceChatID
 
+# `extension.Targets`
 targets:
     chats:
         # Types: "private", "group", "supergroup" or "channel"

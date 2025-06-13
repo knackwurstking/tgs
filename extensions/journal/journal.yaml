@@ -2,10 +2,12 @@
 define:
     - &AliceChatID <number>
 
+# `[]tgs.BotCommandScope`
 register:
     - type: chat
       chat_id: *AliceChatID
 
+# `extension.Targets`
 targets:
     chats:
         - id: *AliceChatID

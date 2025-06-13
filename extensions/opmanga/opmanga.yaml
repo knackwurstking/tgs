@@ -2,10 +2,12 @@
 define:
     - &OPChatID <number>
 
+# `[]tgs.BotCommandScope`
 register:
     - type: chat
       chat_id: *OPChatID
 
+# `extension.Targets`
 targets:
     chats:
         - id: *OPChatID
