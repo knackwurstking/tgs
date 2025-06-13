@@ -8,6 +8,40 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+type ReplyCallback struct {
+	ID int // ID should be the reply message id
+	Fn func(message *tgbotapi.Message)
+}
+
+func NewReplyCallback(id int, fn func(message *tgbotapi.Message)) *ReplyCallback {
+	return &ReplyCallback{
+		ID: id,
+		Fn: fn,
+	}
+}
+
+type ReplyCallbacks []ReplyCallback
+
+func (r ReplyCallbacks) Set(callbacks ...*ReplyCallback) {
+	// TODO: ...
+}
+
+func (r ReplyCallbacks) Add(callbacks ...*ReplyCallback) {
+	// TODO: ...
+}
+
+func (r ReplyCallbacks) Get(id int) *ReplyCallback {
+	// TODO: ...
+
+	return nil
+}
+
+func (r *ReplyCallbacks) Delete(id int) {
+	// TODO: ...
+}
+
+// NOTE: Old stuff below
+
 var ErrorReplyTimeout = errors.New("TimeoutError")
 
 type Reply struct {

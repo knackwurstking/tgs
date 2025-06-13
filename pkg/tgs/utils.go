@@ -56,14 +56,3 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 
 	return false
 }
-
-func IsReply(message *tgbotapi.Message) bool {
-	if message.ReplyToMessage == nil {
-		return false
-	}
-
-	replyMessageID := message.ReplyToMessage.MessageID
-	// TODO: Search callbacks for this reply message id and run the callback
-
-	return false
-}

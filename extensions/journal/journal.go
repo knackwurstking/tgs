@@ -127,7 +127,8 @@ type Data struct {
 type Journal struct {
 	*tgbotapi.BotAPI
 
-	data *Data
+	data      *Data
+	callbacks *tgs.ReplyCallbacks
 }
 
 func New(api *tgbotapi.BotAPI) *Journal {
@@ -139,6 +140,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 			Units:    NewUnits(),
 			// Reply: ,
 		},
+		callbacks: tgs.NewReplyCallbacks(),
 	}
 }
 
@@ -176,9 +178,9 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	// TODO: Check if message is a reply
-	if tgs.IsReply(message) {
-		// ...
+	replyMessageID := message.ReplyToMessage.MessageID
+	if replyMessageID != 0 {
+		// TODO: Search callbacks for this reply message id and run the callback
 
 		return errors.New("under construction")
 	}
