@@ -10,10 +10,10 @@ import (
 
 type ReplyCallback struct {
 	ID int // ID should be the reply message id
-	Fn func(message *tgbotapi.Message)
+	Fn func(message *tgbotapi.Message) error
 }
 
-func NewReplyCallback(id int, fn func(message *tgbotapi.Message)) *ReplyCallback {
+func NewReplyCallback(id int, fn func(message *tgbotapi.Message) error) *ReplyCallback {
 	return &ReplyCallback{
 		ID: id,
 		Fn: fn,

@@ -121,7 +121,6 @@ type Data struct {
 	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 	Units    *Units                `yaml:"units,omitempty"`
-	Reply    chan *tgs.Reply       `yaml:"-"`
 }
 
 type Journal struct {
@@ -138,7 +137,6 @@ func New(api *tgbotapi.BotAPI) *Journal {
 			Targets:  tgs.NewTargets(),
 			Register: make([]tgs.BotCommandScope, 0),
 			Units:    NewUnits(),
-			// Reply: ,
 		},
 		callbacks: make(tgs.ReplyCallbacks, 0),
 	}
@@ -178,15 +176,17 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		panic("BotAPI is nil!")
 	}
 
-	replyMessageID := message.ReplyToMessage.MessageID
-	if replyMessageID != 0 {
-		// TODO: Search callbacks for this reply message id and run the callback
-
-		return errors.New("under construction")
-	}
-
 	if ok := tgs.CheckTargets(message, j.data.Targets); !ok {
 		return errors.New("invalid target")
+	}
+
+	replyMessageID := message.ReplyToMessage.MessageID
+	if replyMessageID != 0 {
+		if rcb := j.callbacks.Get(replyMessageID); rcb != nil {
+			return rcb.Fn(message)
+		}
+
+		return fmt.Errorf("reply for the message id %d not found", replyMessageID)
 	}
 
 	switch command := message.Command(); command {
@@ -219,16 +219,19 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		msgConfig.ParseMode = "MarkdownV2"
 
 		msg, err := j.Send(msgConfig)
-		if err != nil || j.data.Reply == nil {
+		if err != nil {
 			return err
 		}
 
-		// FIXME: Reply is nil for now, need to implement this somehow
-		j.data.Reply <- &tgs.Reply{
-			Message:  &msg,
-			Timeout:  time.Minute * 5,
-			Callback: j.replyCallback,
-		}
+		j.callbacks.Add(tgs.NewReplyCallback(
+			msg.MessageID,
+			j.journalReplyCallback,
+		))
+
+		go func() { // Auto Delete Function
+			time.Sleep(time.Minute * 5)
+			j.callbacks.Delete(msg.MessageID)
+		}()
 	default:
 		return fmt.Errorf("unknown command: %s", command)
 	}
@@ -236,7 +239,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (j *Journal) replyCallback(message *tgbotapi.Message) error {
+func (j *Journal) journalReplyCallback(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
 		"command", message.Command(),
 		"message.MessageID", message.MessageID,
