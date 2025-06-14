@@ -146,6 +146,10 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
+func (j *Journal) Name() string {
+	return "journal"
+}
+
 func (j *Journal) SetBot(api *tgbotapi.BotAPI) {
 	j.BotAPI = api
 }

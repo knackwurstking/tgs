@@ -99,6 +99,10 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
+func (o *OPManga) Name() string {
+	return "opmanga"
+}
+
 func (o *OPManga) SetBot(api *tgbotapi.BotAPI) {
 	o.BotAPI = api
 }

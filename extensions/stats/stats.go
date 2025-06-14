@@ -37,6 +37,10 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
+func (s *Stats) Name() string {
+	return "stats"
+}
+
 func (s *Stats) SetBot(api *tgbotapi.BotAPI) {
 	s.BotAPI = api
 }

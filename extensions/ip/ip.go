@@ -43,6 +43,10 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
+func (ip *IP) Name() string {
+	return "ip"
+}
+
 func (ip *IP) SetBot(api *tgbotapi.BotAPI) {
 	ip.BotAPI = api
 }
