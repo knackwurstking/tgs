@@ -133,7 +133,14 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	// TODO: Check message for reply stuff and run it
+	replyMessageID := message.ReplyToMessage.MessageID
+	if replyMessageID != 0 {
+		if cb, ok := o.callbacks.Get(replyMessageID); ok {
+			return cb(message)
+		}
+
+		return fmt.Errorf("reply for the message id %d not found", replyMessageID)
+	}
 
 	switch command := message.Command(); command {
 	case "opmanga":
@@ -147,16 +154,16 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		msgConfig.ParseMode = "MarkdownV2"
 
 		msg, err := o.Send(msgConfig)
-		if err != nil || o.data.Reply == nil {
+		if err != nil {
 			return err
 		}
 
-		// FIXME: Reply is nil for now, need to implement this somehow
-		o.data.Reply <- &tgs.Reply{
-			Message:  &msg,
-			Timeout:  time.Minute * 5,
-			Callback: o.replyCallback,
-		}
+		o.callbacks.Set(msg.MessageID, o.replyCallbackOPMangaCommand)
+
+		go func() { // Auto Delete Function
+			time.Sleep(time.Minute * 5)
+			o.callbacks.Delete(msg.MessageID)
+		}()
 
 		return nil
 	case "opmangalist":
@@ -186,7 +193,7 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 	}
 }
 
-func (o *OPManga) replyCallback(message *tgbotapi.Message) error {
+func (o *OPManga) replyCallbackOPMangaCommand(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
 		"command", message.Command(),
 		"message.MessageID", message.MessageID,
