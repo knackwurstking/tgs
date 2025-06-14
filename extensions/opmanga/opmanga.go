@@ -100,7 +100,7 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 }
 
 func (o *OPManga) Name() string {
-	return "opmanga"
+	return "OPManga"
 }
 
 func (o *OPManga) SetBot(api *tgbotapi.BotAPI) {
