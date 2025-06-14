@@ -225,6 +225,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 
 		j.callbacks.Set(msg.MessageID, j.replyCallbackJournalCommand)
 
+		// FIXME: Thix is ugly, I need a way to cancel this
 		go func() { // Auto Delete Function
 			time.Sleep(time.Minute * 5)
 			j.callbacks.Delete(msg.MessageID)
