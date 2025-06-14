@@ -1,4 +1,3 @@
-// TODO: Implementing the new reply method
 package opmanga
 
 import (
@@ -75,13 +74,13 @@ type Data struct {
 	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
 	Path     string                `yaml:"path"`
-	Reply    chan *tgs.Reply       `yaml:"-"`
 }
 
 type OPManga struct {
 	*tgbotapi.BotAPI
 
-	data *Data
+	data      *Data
+	callbacks tgs.ReplyCallbacks
 }
 
 func New(api *tgbotapi.BotAPI) *OPManga {
@@ -92,6 +91,7 @@ func New(api *tgbotapi.BotAPI) *OPManga {
 			Register: make([]tgs.BotCommandScope, 0),
 			// Reply: ,
 		},
+		callbacks: tgs.ReplyCallbacks{},
 	}
 }
 
@@ -132,6 +132,8 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 	if ok := tgs.CheckTargets(message, o.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
+
+	// TODO: Check message for reply stuff and run it
 
 	switch command := message.Command(); command {
 	case "opmanga":
