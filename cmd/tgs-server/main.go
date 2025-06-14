@@ -52,8 +52,11 @@ func actionHandler() func(cmd *cli.Command) error {
 			return err
 		}
 
+		apiConfigPath := filepath.Join(configHome, "api.yaml")
+		slog.Debug("API Config location", "path", apiConfigPath)
+
 		c := NewConfig()
-		if err = loadConfig(filepath.Join(configHome, "api.yaml"), c); err != nil {
+		if err = loadConfig(apiConfigPath, c); err != nil {
 			return err
 		}
 		if c.Token == "" {
@@ -70,7 +73,16 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		// Setup bots
 		for _, e := range extensions.Register {
-			err = loadConfig(filepath.Join(configHome, e.ConfigPath()), e)
+			if e.ConfigPath() == "" {
+				slog.Debug("Skip config for extension", "name", e.Name())
+				continue
+			}
+
+			configPath := filepath.Join(configHome, e.ConfigPath())
+			slog.Debug("Try to load extension configuration",
+				"name", e.Name(), "path", configPath)
+
+			err = loadConfig(configPath, e)
 			if err != nil {
 				return err
 			}
