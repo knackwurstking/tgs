@@ -138,7 +138,7 @@ func New(api *tgbotapi.BotAPI) *Journal {
 			Register: make([]tgs.BotCommandScope, 0),
 			Units:    NewUnits(),
 		},
-		callbacks: make(tgs.ReplyCallbacks, 0),
+		callbacks: tgs.ReplyCallbacks{},
 	}
 }
 
@@ -182,8 +182,8 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 
 	replyMessageID := message.ReplyToMessage.MessageID
 	if replyMessageID != 0 {
-		if rcb := j.callbacks.Get(replyMessageID); rcb != nil {
-			return rcb.Fn(message)
+		if cb, ok := j.callbacks.Get(replyMessageID); ok {
+			return cb(message)
 		}
 
 		return fmt.Errorf("reply for the message id %d not found", replyMessageID)
@@ -223,10 +223,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 			return err
 		}
 
-		j.callbacks.Add(tgs.NewReplyCallback(
-			msg.MessageID,
-			j.journalReplyCallback,
-		))
+		j.callbacks.Set(msg.MessageID, j.replyCallbackJournalCommand)
 
 		go func() { // Auto Delete Function
 			time.Sleep(time.Minute * 5)
@@ -239,7 +236,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (j *Journal) journalReplyCallback(message *tgbotapi.Message) error {
+func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
 		"command", message.Command(),
 		"message.MessageID", message.MessageID,
