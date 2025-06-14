@@ -2,19 +2,17 @@
 define:
     - &OPChatID <number>
 
-# `[]tgs.BotCommandScope`
 register:
     - type: chat
       chat_id: *OPChatID
 
-# `extension.Targets`
 targets:
     chats:
         - id: *OPChatID
           type: supergroup
-          message_thread_id: 2
+          message_thread_id: 3
         - id: *OPChatID
           type: supergroup
-          message_thread_id: 3
+          message_thread_id: 175
 
-path: "/Volumes/media/Data/One Piece/Manga"
+path: "/mnt/media/Data/One Piece/Manga"

@@ -2,12 +2,10 @@
 define:
     - &AliceChatID <number>
 
-# `[]tgs.BotCommandScope`
 register:
     - type: chat
       chat_id: *AliceChatID
 
-# `extension.Targets`
 targets:
     chats:
         - id: *AliceChatID
@@ -19,11 +17,17 @@ units:
         - name: ssh
           output: short
     user:
-        - name: picow-led-server
+        - name: picow-led
           output: cat
         - name: op-anime-dl
           output: cat
         - name: op-manga-dl
           output: cat
         - name: tgs-server
+          output: cat
+        - name: test-oauth
+          output: cat
+        - name: pg-vis-pwa
+          output: cat
+        - name: shift-scheduler
           output: cat
