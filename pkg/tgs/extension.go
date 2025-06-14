@@ -6,6 +6,7 @@ import (
 )
 
 type Extension interface {
+	Name() string
 	SetBot(api *tgbotapi.BotAPI)
 	ConfigPath() string
 	MarshalYAML() (any, error)
