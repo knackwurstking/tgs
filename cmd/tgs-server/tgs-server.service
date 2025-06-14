@@ -3,7 +3,7 @@ Description=Telegram bot server
 After=network.target
 
 [Service]
-ExecStart=tgs-server -c %h/.config/tgs-server/config.yaml
+ExecStart=tgs-server
 
 [Install]
 WantedBy=default.target
