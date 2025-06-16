@@ -1,14 +1,19 @@
 # CHANGELOG
 
-## v2.0.0 [unreleased]
+## v2.1.0 [unreleased]
 
-- [ ] Add each "botcommand" as a extension using golang build tags (?)
-    - [ ] ip
-    - [ ] journal
-    - [ ] opmanga
-    - [ ] stats
+- [ ] Add extension:
     - [ ] pgvisregister
-- [ ] Use a separate config for each botcommand (?)
+
+## v2.0.0 [2025-06-16]
+
+- [x] Add each "botcommand" as a extension using golang build tags (?)
+    - [x] ip
+    - [x] journal
+    - [x] opmanga
+    - [x] stats
+    - [ ] ~pgvisregister~ (Moved to v2.1.0)
+- [x] Use a separate config for each botcommand
 
 ## v1.2.0 [2025-04-10]
 
