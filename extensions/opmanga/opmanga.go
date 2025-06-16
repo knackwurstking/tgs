@@ -142,8 +142,6 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		if cb, ok := o.callbacks.Get(replyMessageID); ok {
 			return cb(message)
 		}
-
-		return fmt.Errorf("reply for the message id %d not found", replyMessageID)
 	}
 
 	switch command := message.Command(); command {
