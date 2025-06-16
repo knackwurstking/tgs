@@ -5,6 +5,12 @@
 - [ ] Add extension:
     - [ ] pgvis
 
+## v2.0.1 [2025-06-16]
+
+**Fixed**:
+
+- User check in `tgs.CheckTargets`
+
 ## v2.0.0 [2025-06-16]
 
 - [x] Add each "botcommand" as a extension using golang build tags (?)
