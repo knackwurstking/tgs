@@ -15,9 +15,13 @@ import (
 	"github.com/knackwurstking/tgs/pkg/tgs"
 )
 
+const (
+	applicationName = "tgs-server"
+)
+
 func main() {
 	app := cli.App{
-		Name:  "tgs-server",
+		Name:  applicationName,
 		Usage: cli.Usage("Telegram scripts server, the scripts part was kicked from the project :)"),
 		Action: cli.ActionFunc(func(cmd *cli.Command) cli.ActionRunner {
 			return actionHandler()
@@ -52,7 +56,7 @@ func actionHandler() func(cmd *cli.Command) error {
 			return err
 		}
 
-		apiConfigPath := filepath.Join(configHome, "api.yaml")
+		apiConfigPath := filepath.Join(configHome, applicationName, "api.yaml")
 		slog.Debug("API Config location", "path", apiConfigPath)
 
 		c := NewConfig()
@@ -78,7 +82,7 @@ func actionHandler() func(cmd *cli.Command) error {
 				continue
 			}
 
-			configPath := filepath.Join(configHome, e.ConfigPath())
+			configPath := filepath.Join(configHome, applicationName, e.ConfigPath())
 			slog.Debug("Try to load extension configuration",
 				"name", e.Name(), "path", configPath)
 
