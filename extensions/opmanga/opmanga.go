@@ -108,7 +108,7 @@ func (o *OPManga) SetBot(api *tgbotapi.BotAPI) {
 }
 
 func (o *OPManga) ConfigPath() string {
-	return "opmanga.config"
+	return "opmanga.yaml"
 }
 
 func (o *OPManga) MarshalYAML() (any, error) {

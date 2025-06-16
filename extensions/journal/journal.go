@@ -155,7 +155,7 @@ func (j *Journal) SetBot(api *tgbotapi.BotAPI) {
 }
 
 func (j *Journal) ConfigPath() string {
-	return "journal.config"
+	return "journal.yaml"
 }
 
 func (j *Journal) MarshalYAML() (any, error) {

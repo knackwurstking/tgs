@@ -46,7 +46,7 @@ func (s *Stats) SetBot(api *tgbotapi.BotAPI) {
 }
 
 func (s *Stats) ConfigPath() string {
-	return "stats.config"
+	return "stats.yaml"
 }
 
 func (s *Stats) MarshalYAML() (any, error) {

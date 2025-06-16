@@ -52,7 +52,7 @@ func (ip *IP) SetBot(api *tgbotapi.BotAPI) {
 }
 
 func (ip *IP) ConfigPath() string {
-	return "ip.config"
+	return "ip.yaml"
 }
 
 func (ip *IP) MarshalYAML() (any, error) {
