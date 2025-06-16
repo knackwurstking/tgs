@@ -128,7 +128,24 @@ func handleUpdate(update tgbotapi.Update) {
 
 	for _, e := range extensions.Register {
 		if e.Is(update.Message) {
-			go e.Handle(update.Message)
+			go func() {
+				slog.Info("Handle update",
+					"extension", e.Name(),
+					"message.MessageID", update.Message.MessageID,
+					"message.Chat", update.Message.Chat,
+					"message.From", update.Message.From,
+					"message.From.ID", update.Message.From.ID,
+					"message.ReplyToMessage", update.Message.ReplyToMessage,
+				)
+
+				if err := e.Handle(update.Message); err != nil {
+					slog.Warn("Handle update failed",
+						"extension", e.Name(),
+						"message.MessageID", update.Message.MessageID,
+						"error", err,
+					)
+				}
+			}()
 		}
 	}
 }
