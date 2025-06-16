@@ -27,7 +27,9 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 
 	// User ID check
 	if targets.Users != nil {
-		checkUserID(message.From.ID, nil)
+		if checkUserID(message.From.ID, nil) {
+			return true
+		}
 	}
 
 	// Chat ID check & message thread ID if chat is forum
