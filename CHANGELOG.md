@@ -3,7 +3,7 @@
 ## v2.1.0 [unreleased]
 
 - [ ] Add extension:
-    - [ ] pgvisregister
+    - [ ] pgvis
 
 ## v2.0.0 [2025-06-16]
 
