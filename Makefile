@@ -1,5 +1,8 @@
 all: init build
 
+clean:
+	git clean -xfd
+
 init:
 	go mod tidy -v
 
