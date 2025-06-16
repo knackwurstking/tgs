@@ -1,5 +1,7 @@
 all: init build
 
+EXTENSION_TAGS := stats,ip,journal,opmanga
+
 clean:
 	git clean -xfd
 
@@ -7,7 +9,7 @@ init:
 	go mod tidy -v
 
 run:
-	go run -v ./cmd/tgs-server
+	go run --tags=${EXTENSION_TAGS} -v ./cmd/tgs-server
 
 build:
-	go build -v -o ./bin/tgs-server ./cmd/tgs-server
+	go build --tags=${EXTENSION_TAGS} -v -o ./bin/tgs-server ./cmd/tgs-server
