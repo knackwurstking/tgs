@@ -166,16 +166,18 @@ func (j *Journal) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(j.data)
 }
 
-func (j *Journal) Commands(mbc *tgs.MyBotCommands) {
+func (j *Journal) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/journal", "Get a journalctl log", j.data.Register)
 	mbc.Add("/journallist", "List journalctl logs", j.data.Register)
 }
 
 func (j *Journal) Is(message *tgbotapi.Message) bool {
-	replyMessageID := message.ReplyToMessage.MessageID
-	if replyMessageID != 0 {
-		if _, ok := j.callbacks.Get(replyMessageID); ok {
-			return true
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if replyMessageID != 0 {
+			if _, ok := j.callbacks.Get(replyMessageID); ok {
+				return true
+			}
 		}
 	}
 
@@ -191,18 +193,20 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	replyMessageID := message.ReplyToMessage.MessageID
-	if replyMessageID != 0 {
-		if cb, ok := j.callbacks.Get(replyMessageID); ok {
-			err := cb(message)
-			if err != nil {
-				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
-				msg.ParseMode = "MarkdownV2"
-				msg.ReplyToMessageID = replyMessageID
-				_, err = j.Send(msg)
-			}
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if replyMessageID != 0 {
+			if cb, ok := j.callbacks.Get(replyMessageID); ok {
+				err := cb(message)
+				if err != nil {
+					msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+					msg.ParseMode = "MarkdownV2"
+					msg.ReplyToMessageID = replyMessageID
+					_, err = j.Send(msg)
+				}
 
-			return err
+				return err
+			}
 		}
 	}
 

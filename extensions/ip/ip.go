@@ -63,7 +63,7 @@ func (ip *IP) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(ip.data)
 }
 
-func (ip *IP) Commands(mbc *tgs.MyBotCommands) {
+func (ip *IP) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/ip", "Get server IP", ip.data.Register)
 }
 

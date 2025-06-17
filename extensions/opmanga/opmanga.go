@@ -119,16 +119,18 @@ func (o *OPManga) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(o.data)
 }
 
-func (o *OPManga) Commands(mbc *tgs.MyBotCommands) {
+func (o *OPManga) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/opmanga", "Request a chapter", o.data.Register)
 	mbc.Add("/opmangalist", "List all available chapters", o.data.Register)
 }
 
 func (o *OPManga) Is(message *tgbotapi.Message) bool {
-	replyMessageID := message.ReplyToMessage.MessageID
-	if replyMessageID != 0 {
-		if _, ok := o.callbacks.Get(replyMessageID); ok {
-			return true
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if replyMessageID != 0 {
+			if _, ok := o.callbacks.Get(replyMessageID); ok {
+				return true
+			}
 		}
 	}
 
@@ -144,18 +146,20 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	replyMessageID := message.ReplyToMessage.MessageID
-	if replyMessageID != 0 {
-		if cb, ok := o.callbacks.Get(replyMessageID); ok {
-			err := cb(message)
-			if err != nil {
-				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
-				msg.ParseMode = "MarkdownV2"
-				msg.ReplyToMessageID = replyMessageID
-				_, err = o.Send(msg)
-			}
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if replyMessageID != 0 {
+			if cb, ok := o.callbacks.Get(replyMessageID); ok {
+				err := cb(message)
+				if err != nil {
+					msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+					msg.ParseMode = "MarkdownV2"
+					msg.ReplyToMessageID = replyMessageID
+					_, err = o.Send(msg)
+				}
 
-			return err
+				return err
+			}
 		}
 	}
 

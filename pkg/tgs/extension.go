@@ -11,7 +11,7 @@ type Extension interface {
 	ConfigPath() string
 	MarshalYAML() (any, error)
 	UnmarshalYAML(value *yaml.Node) error
-	Commands(mbc *MyBotCommands)
+	AddBotCommands(mbc *MyBotCommands)
 	Is(message *tgbotapi.Message) bool
 	Handle(message *tgbotapi.Message) error
 }

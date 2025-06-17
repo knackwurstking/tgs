@@ -57,7 +57,7 @@ func (s *Stats) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(s.data)
 }
 
-func (s *Stats) Commands(mbc *tgs.MyBotCommands) {
+func (s *Stats) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/stats", "Get ID info", s.data.Register)
 }
 

@@ -99,7 +99,7 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		// Add commands from extension
 		for _, e := range extensions.Register {
-			e.Commands(myBotCommands)
+			e.AddBotCommands(myBotCommands)
 		}
 
 		if err = myBotCommands.Register(bot); err != nil {
