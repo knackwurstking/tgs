@@ -125,6 +125,13 @@ func (o *OPManga) Commands(mbc *tgs.MyBotCommands) {
 }
 
 func (o *OPManga) Is(message *tgbotapi.Message) bool {
+	replyMessageID := message.ReplyToMessage.MessageID
+	if replyMessageID != 0 {
+		if _, ok := o.callbacks.Get(replyMessageID); ok {
+			return true
+		}
+	}
+
 	return strings.HasPrefix(message.Command(), "opmanga")
 }
 

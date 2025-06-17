@@ -172,6 +172,13 @@ func (j *Journal) Commands(mbc *tgs.MyBotCommands) {
 }
 
 func (j *Journal) Is(message *tgbotapi.Message) bool {
+	replyMessageID := message.ReplyToMessage.MessageID
+	if replyMessageID != 0 {
+		if _, ok := j.callbacks.Get(replyMessageID); ok {
+			return true
+		}
+	}
+
 	return strings.HasPrefix(message.Command(), "journal")
 }
 
