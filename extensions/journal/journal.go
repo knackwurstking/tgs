@@ -198,7 +198,7 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 			if err != nil {
 				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
 				msg.ParseMode = "MarkdownV2"
-				msg.ReplyToMessageID = message.MessageID
+				msg.ReplyToMessageID = replyMessageID
 				_, err = j.Send(msg)
 			}
 
