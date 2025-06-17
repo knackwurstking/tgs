@@ -114,9 +114,6 @@ func actionHandler() func(cmd *cli.Command) error {
 		for {
 			select {
 			case update := <-updateChan:
-				slog.Debug("Got a new update", "update", update,
-					"update.Message", update.Message)
-
 				updateConfig.Offset = update.UpdateID + 1
 				go handleUpdate(update)
 			}
@@ -134,6 +131,7 @@ func handleUpdate(update tgbotapi.Update) {
 			go func() {
 				slog.Info("Handle update",
 					"extension", e.Name(),
+					"command", update.Message.Command(),
 					"message.MessageID", update.Message.MessageID,
 					"message.Chat", update.Message.Chat,
 					"message.From", update.Message.From,
