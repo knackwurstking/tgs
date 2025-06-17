@@ -194,7 +194,16 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 	replyMessageID := message.ReplyToMessage.MessageID
 	if replyMessageID != 0 {
 		if cb, ok := j.callbacks.Get(replyMessageID); ok {
-			return cb(message)
+			err := cb(message)
+			if err != nil {
+				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+				msg.ParseMode = "MarkdownV2"
+				msg.ReplyToMessageID = message.MessageID
+				_, err = j.Send(msg)
+				return err
+			}
+
+			return err
 		}
 	}
 
