@@ -6,12 +6,12 @@ import (
 )
 
 type Extension interface {
-	Name() string
-	SetBot(api *tgbotapi.BotAPI)
-	ConfigPath() string
-	MarshalYAML() (any, error)
-	UnmarshalYAML(value *yaml.Node) error
-	AddBotCommands(mbc *MyBotCommands)
-	Is(message *tgbotapi.Message) bool
-	Handle(message *tgbotapi.Message) error
+	Name() string                           // Name is used for logging
+	SetBot(api *tgbotapi.BotAPI)            // SetBot will pass the bot api to the extension
+	ConfigPath() string                     // ConfigPath gets the path to the extension config, will be joined with the base config path
+	MarshalYAML() (any, error)              // MarshalYAML config from extension struct
+	UnmarshalYAML(value *yaml.Node) error   // UnmarshalYAML config to extension struct
+	AddBotCommands(mbc *MyBotCommands)      // AddBotCommands `mbc.Add(...)`
+	Is(message *tgbotapi.Message) bool      // Is checks if message belongs to this extension
+	Handle(message *tgbotapi.Message) error // Handle will do shit
 }
