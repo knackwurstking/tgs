@@ -147,7 +147,15 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 	replyMessageID := message.ReplyToMessage.MessageID
 	if replyMessageID != 0 {
 		if cb, ok := o.callbacks.Get(replyMessageID); ok {
-			return cb(message)
+			err := cb(message)
+			if err != nil {
+				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+				msg.ParseMode = "MarkdownV2"
+				msg.ReplyToMessageID = replyMessageID
+				_, err = o.Send(msg)
+			}
+
+			return err
 		}
 	}
 
