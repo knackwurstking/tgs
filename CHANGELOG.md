@@ -5,6 +5,13 @@
 - [ ] Add extension:
     - [ ] pgvis
 
+## v2.0.2 [2025-06-17]
+
+**Fixed**:
+
+- /journal command, reply to message not working
+- /opmanga command, reply to message not working
+
 ## v2.0.1 [2025-06-16]
 
 **Fixed**:
