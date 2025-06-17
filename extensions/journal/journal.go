@@ -200,7 +200,6 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 				msg.ParseMode = "MarkdownV2"
 				msg.ReplyToMessageID = message.MessageID
 				_, err = j.Send(msg)
-				return err
 			}
 
 			return err
