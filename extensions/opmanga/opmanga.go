@@ -125,8 +125,10 @@ func (o *OPManga) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (o *OPManga) Is(message *tgbotapi.Message) bool {
-	if _, ok := o.callbacks.Get(message.ReplyToMessage.MessageID); ok {
-		return true
+	if message.ReplyToMessage != nil {
+		if _, ok := o.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+			return true
+		}
 	}
 
 	return strings.HasPrefix(message.Command(), "opmanga")
@@ -141,17 +143,19 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	replyMessageID := message.ReplyToMessage.MessageID
-	if cb, ok := o.callbacks.Get(replyMessageID); ok {
-		err := cb(message)
-		if err != nil {
-			msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
-			msg.ParseMode = "MarkdownV2"
-			msg.ReplyToMessageID = replyMessageID
-			_, err = o.Send(msg)
-		}
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if cb, ok := o.callbacks.Get(replyMessageID); ok {
+			err := cb(message)
+			if err != nil {
+				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+				msg.ParseMode = "MarkdownV2"
+				msg.ReplyToMessageID = replyMessageID
+				_, err = o.Send(msg)
+			}
 
-		return err
+			return err
+		}
 	}
 
 	switch command := message.Command(); command {

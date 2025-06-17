@@ -172,8 +172,10 @@ func (j *Journal) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (j *Journal) Is(message *tgbotapi.Message) bool {
-	if _, ok := j.callbacks.Get(message.ReplyToMessage.MessageID); ok {
-		return true
+	if message.ReplyToMessage != nil {
+		if _, ok := j.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+			return true
+		}
 	}
 
 	return strings.HasPrefix(message.Command(), "journal")
@@ -188,17 +190,19 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	replyMessageID := message.ReplyToMessage.MessageID
-	if cb, ok := j.callbacks.Get(replyMessageID); ok {
-		err := cb(message)
-		if err != nil {
-			msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
-			msg.ParseMode = "MarkdownV2"
-			msg.ReplyToMessageID = replyMessageID
-			_, err = j.Send(msg)
-		}
+	if message.ReplyToMessage != nil {
+		replyMessageID := message.ReplyToMessage.MessageID
+		if cb, ok := j.callbacks.Get(replyMessageID); ok {
+			err := cb(message)
+			if err != nil {
+				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
+				msg.ParseMode = "MarkdownV2"
+				msg.ReplyToMessageID = replyMessageID
+				_, err = j.Send(msg)
+			}
 
-		return err
+			return err
+		}
 	}
 
 	switch command := message.Command(); command {
