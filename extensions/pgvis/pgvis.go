@@ -2,6 +2,7 @@ package pgvis
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -60,11 +61,28 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (p *PGVis) Is(message *tgbotapi.Message) bool {
+	if _, ok := p.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+		return true
+	}
+
 	return strings.HasPrefix(message.Command(), "pgvis")
 }
 
 func (p *PGVis) Handle(message *tgbotapi.Message) error {
-	// TODO: ...
+	if p.BotAPI == nil {
+		panic("BotAPI is nil!")
+	}
+
+	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
+		return errors.New("invalid target")
+	}
+
+	switch command := message.Command(); command {
+	case "pgvisregister":
+		// TODO: ...
+	default:
+		return fmt.Errorf("unknown command: %s", command)
+	}
 
 	return errors.New("under construction")
 }
