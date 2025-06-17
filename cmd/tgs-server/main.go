@@ -136,7 +136,6 @@ func handleUpdate(update tgbotapi.Update) {
 					"message.Chat", update.Message.Chat,
 					"message.From", update.Message.From,
 					"message.From.ID", update.Message.From.ID,
-					"message.ReplyToMessage", update.Message.ReplyToMessage,
 				)
 
 				if err := e.Handle(update.Message); err != nil {

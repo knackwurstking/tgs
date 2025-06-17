@@ -255,8 +255,9 @@ func (j *Journal) Handle(message *tgbotapi.Message) error {
 func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
 		"command", message.Command(),
-		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
+		"message.MessageID", message.MessageID,
+		"message.ReplyToMessage.MessageID", message.ReplyToMessage.MessageID,
 	)
 
 	messageSplit := strings.Split(message.Text, " ")

@@ -212,8 +212,9 @@ func (o *OPManga) Handle(message *tgbotapi.Message) error {
 func (o *OPManga) replyCallbackOPMangaCommand(message *tgbotapi.Message) error {
 	slog.Debug("Handle reply callback",
 		"command", message.Command(),
-		"message.MessageID", message.MessageID,
 		"message.Text", message.Text,
+		"message.MessageID", message.MessageID,
+		"message.ReplyToMessage.MessageID", message.ReplyToMessage.MessageID,
 	)
 
 	arcs, err := o.arcs()
