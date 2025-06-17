@@ -1,23 +1,5 @@
 # CHANGELOG
 
-## v2.1.0 [unreleased]
-
-- [ ] Add extension:
-    - [ ] pgvis
-
-## v2.0.2 [2025-06-17]
-
-**Fixed**:
-
-- /journal command, reply to message not working
-- /opmanga command, reply to message not working
-
-## v2.0.1 [2025-06-16]
-
-**Fixed**:
-
-- User check in `tgs.CheckTargets`
-
 ## v2.0.0 [2025-06-16]
 
 - [x] Add each "botcommand" as a extension using golang build tags (?)
@@ -25,7 +7,7 @@
     - [x] journal
     - [x] opmanga
     - [x] stats
-    - [ ] ~pgvisregister~ (Moved to v2.1.0)
+    - [ ] pgvis
 - [x] Use a separate config for each botcommand
 
 ## v1.2.0 [2025-04-10]
