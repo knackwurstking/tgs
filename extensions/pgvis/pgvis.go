@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -60,34 +61,6 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/pgvissingup", "Get an api key for the \"PG Vis Server\" project.", p.data.Register)
 }
 
-// TODO: Move to Handle and remove this method
-func (p *PGVis) Start() {
-	slog.Debug("Handle Start", "extension", p.Name())
-
-	// TODO: Iter Targets
-	msgConfig := tgbotapi.NewMessage(p.data.Targets.Chats[0].ID, "PG Vis Server registration")
-	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
-		[]tgbotapi.InlineKeyboardButton{
-			tgbotapi.NewInlineKeyboardButtonURL(
-				"Sing Up", "url-to-pgvis-server-telegram-registration",
-			),
-		},
-	)
-	// TODO: How to set a thread id as target
-
-	if _, err := p.Send(msgConfig); err != nil {
-		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-	}
-
-	// TODO: Send register inline button to target(s)
-	// 	- inline keyboard button
-	// 	- callback url to pgvis server sing up
-	// 	- pass telegram user id
-	// 	- chat id
-	// 	- thread id
-	// 	- user name (can be empty)
-}
-
 func (p *PGVis) Is(message *tgbotapi.Message) bool {
 	if message.ReplyToMessage != nil {
 		if _, ok := p.callbacks.Get(message.ReplyToMessage.MessageID); ok {
@@ -95,7 +68,7 @@ func (p *PGVis) Is(message *tgbotapi.Message) bool {
 		}
 	}
 
-	return false
+	return strings.HasPrefix(message.Command(), "pgvis")
 }
 
 func (p *PGVis) Handle(message *tgbotapi.Message) error {
@@ -109,6 +82,34 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 
 	command := message.Command()
 	if command != "" {
+	}
+
+	switch command {
+	case "pgvissingup":
+		msgConfig := tgbotapi.NewMessage(message.Chat.ID, "PG Vis Server registration")
+		msgConfig.ReplyToMessageID = message.MessageID
+
+		// TODO: How to pass telegram user credentials
+		msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+			[]tgbotapi.InlineKeyboardButton{
+				tgbotapi.NewInlineKeyboardButtonURL(
+					"Sing Up", "url-to-pgvis-server-telegram-registration",
+				),
+			},
+		)
+
+		if _, err := p.Send(msgConfig); err != nil {
+			slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+		}
+
+		// TODO: Send register inline button to target(s)
+		// 	- inline keyboard button
+		// 	- callback url to pgvis server sing up
+		// 	- pass telegram user id
+		// 	- chat id
+		// 	- thread id
+		// 	- user name (can be empty)
+	default:
 		return fmt.Errorf("unknown command: %s", command)
 	}
 
