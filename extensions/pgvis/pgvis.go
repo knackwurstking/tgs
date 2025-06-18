@@ -3,7 +3,6 @@ package pgvis
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -56,9 +55,7 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(p.data)
 }
 
-func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgvisregister", "PG: Vis server registration", p.data.Register)
-}
+func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {}
 
 func (p *PGVis) Is(message *tgbotapi.Message) bool {
 	if message.ReplyToMessage != nil {
@@ -67,7 +64,7 @@ func (p *PGVis) Is(message *tgbotapi.Message) bool {
 		}
 	}
 
-	return strings.HasPrefix(message.Command(), "pgvis")
+	return false
 }
 
 func (p *PGVis) Handle(message *tgbotapi.Message) error {
@@ -79,18 +76,10 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	switch command := message.Command(); command {
-	case "pgvisregister":
+	// TODO: Get text from message, parse and handle
 
-		msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Press this button to sign up, and get a API key for the \"PG: Vis Server\" project\\.")
-		msgConfig.ReplyToMessageID = message.MessageID
-		msgConfig.ParseMode = "MarkdownV2"
-		msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardButtonData("Sign Up", "Sign Up")
-
-		if _, err := p.Send(msgConfig); err != nil {
-			return err
-		}
-	default:
+	command := message.Command()
+	if command != "" {
 		return fmt.Errorf("unknown command: %s", command)
 	}
 
