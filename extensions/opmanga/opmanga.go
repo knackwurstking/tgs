@@ -124,20 +124,26 @@ func (o *OPManga) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/opmangalist", "List all available chapters", o.data.Register)
 }
 
-func (o *OPManga) Is(message *tgbotapi.Message) bool {
-	if message.ReplyToMessage != nil {
-		if _, ok := o.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+func (o *OPManga) Is(update tgbotapi.Update) bool {
+	if update.Message == nil {
+		return false
+	}
+
+	if update.Message.ReplyToMessage != nil {
+		if _, ok := o.callbacks.Get(update.Message.ReplyToMessage.MessageID); ok {
 			return true
 		}
 	}
 
-	return strings.HasPrefix(message.Command(), "opmanga")
+	return strings.HasPrefix(update.Message.Command(), "opmanga")
 }
 
-func (o *OPManga) Handle(message *tgbotapi.Message) error {
+func (o *OPManga) Handle(update tgbotapi.Update) error {
 	if o.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	message := update.Message
 
 	if ok := tgs.CheckTargets(message, o.data.Targets); !ok {
 		return errors.New("invalid target")

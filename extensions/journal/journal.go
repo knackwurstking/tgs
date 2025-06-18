@@ -171,20 +171,26 @@ func (j *Journal) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/journallist", "List journalctl logs", j.data.Register)
 }
 
-func (j *Journal) Is(message *tgbotapi.Message) bool {
-	if message.ReplyToMessage != nil {
-		if _, ok := j.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+func (j *Journal) Is(update tgbotapi.Update) bool {
+	if update.Message == nil {
+		return false
+	}
+
+	if update.Message.ReplyToMessage != nil {
+		if _, ok := j.callbacks.Get(update.Message.ReplyToMessage.MessageID); ok {
 			return true
 		}
 	}
 
-	return strings.HasPrefix(message.Command(), "journal")
+	return strings.HasPrefix(update.Message.Command(), "journal")
 }
 
-func (j *Journal) Handle(message *tgbotapi.Message) error {
+func (j *Journal) Handle(update tgbotapi.Update) error {
 	if j.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	message := update.Message
 
 	if ok := tgs.CheckTargets(message, j.data.Targets); !ok {
 		return errors.New("invalid target")

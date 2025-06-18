@@ -61,14 +61,20 @@ func (s *Stats) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/stats", "Get ID info", s.data.Register)
 }
 
-func (s *Stats) Is(message *tgbotapi.Message) bool {
-	return strings.HasPrefix(message.Command(), "stats")
+func (s *Stats) Is(update tgbotapi.Update) bool {
+	if update.Message == nil {
+		return false
+	}
+
+	return strings.HasPrefix(update.Message.Command(), "stats")
 }
 
-func (s *Stats) Handle(message *tgbotapi.Message) error {
+func (s *Stats) Handle(update tgbotapi.Update) error {
 	if s.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	message := update.Message
 
 	if ok := tgs.CheckTargets(message, s.data.Targets); !ok {
 		return errors.New("invalid target")

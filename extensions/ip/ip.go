@@ -67,14 +67,20 @@ func (ip *IP) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/ip", "Get server IP", ip.data.Register)
 }
 
-func (ip *IP) Is(message *tgbotapi.Message) bool {
-	return strings.HasPrefix(message.Command(), "ip")
+func (ip *IP) Is(update tgbotapi.Update) bool {
+	if update.Message == nil {
+		return false
+	}
+
+	return strings.HasPrefix(update.Message.Command(), "ip")
 }
 
-func (ip *IP) Handle(message *tgbotapi.Message) error {
+func (ip *IP) Handle(update tgbotapi.Update) error {
 	if ip.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
+
+	message := update.Message
 
 	if ok := tgs.CheckTargets(message, ip.data.Targets); !ok {
 		return errors.New("invalid target")

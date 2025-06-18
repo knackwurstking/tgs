@@ -122,10 +122,6 @@ func actionHandler() func(cmd *cli.Command) error {
 }
 
 func handleUpdate(update tgbotapi.Update) {
-	if update.Message == nil {
-		return
-	}
-
 	if update.Message != nil {
 		slog.Debug(
 			"New update",
@@ -136,24 +132,25 @@ func handleUpdate(update tgbotapi.Update) {
 			"message.Chat", update.Message.Chat,
 			"message.ReplyToMessage", update.Message.ReplyToMessage,
 		)
+	} else {
+		slog.Debug("New update without a message",
+			"update.CallbackQuery", update.CallbackQuery,
+			"update", update,
+		)
+	}
+
+	if update.Message == nil && update.CallbackQuery == nil {
+		return
 	}
 
 	for _, e := range extensions.Register {
-		if e.Is(update.Message) {
+		if e.Is(update) {
 			go func() {
-				slog.Info("Handle update",
-					"extension", e.Name(),
-					"command", update.Message.Command(),
-					"message.MessageID", update.Message.MessageID,
-					"message.Chat", update.Message.Chat,
-					"message.From", update.Message.From,
-					"message.From.ID", update.Message.From.ID,
-				)
+				slog.Debug("Handle update", "extension", e.Name())
 
-				if err := e.Handle(update.Message); err != nil {
+				if err := e.Handle(update); err != nil {
 					slog.Warn("Handle update failed",
 						"extension", e.Name(),
-						"message.MessageID", update.Message.MessageID,
 						"error", err,
 					)
 				}
