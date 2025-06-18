@@ -61,8 +61,10 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (p *PGVis) Is(message *tgbotapi.Message) bool {
-	if _, ok := p.callbacks.Get(message.ReplyToMessage.MessageID); ok {
-		return true
+	if message.ReplyToMessage != nil {
+		if _, ok := p.callbacks.Get(message.ReplyToMessage.MessageID); ok {
+			return true
+		}
 	}
 
 	return strings.HasPrefix(message.Command(), "pgvis")
