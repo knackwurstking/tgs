@@ -87,7 +87,9 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 		msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Press this button to sign up, and get a API key for the \"PG: Vis Server\" project\\.")
 		msgConfig.ReplyToMessageID = message.MessageID
 		msgConfig.ParseMode = "MarkdownV2"
-		msgConfig.ReplyMarkup = keyboardButton
+		msgConfig.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+			[]tgbotapi.KeyboardButton{keyboardButton},
+		)
 
 		if _, err := p.Send(msgConfig); err != nil {
 			return err
