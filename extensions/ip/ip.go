@@ -67,6 +67,8 @@ func (ip *IP) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/ip", "Get server IP", ip.data.Register)
 }
 
+func (ip *IP) Start()
+
 func (ip *IP) Is(message *tgbotapi.Message) bool {
 	return strings.HasPrefix(message.Command(), "ip")
 }

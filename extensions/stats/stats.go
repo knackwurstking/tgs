@@ -61,6 +61,8 @@ func (s *Stats) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/stats", "Get ID info", s.data.Register)
 }
 
+func (s *Stats) Start()
+
 func (s *Stats) Is(message *tgbotapi.Message) bool {
 	return strings.HasPrefix(message.Command(), "stats")
 }

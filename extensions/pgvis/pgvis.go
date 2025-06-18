@@ -55,7 +55,17 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(p.data)
 }
 
-func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {}
+func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands)
+
+func (p *PGVis) Start() {
+	// TODO: Send register inline button to target(s)
+	// 	- inline keyboard button
+	// 	- callback url to pgvis server sing up
+	// 	- pass telegram user id
+	// 	- chat id
+	// 	- thread id
+	// 	- user name (can be empty)
+}
 
 func (p *PGVis) Is(message *tgbotapi.Message) bool {
 	if message.ReplyToMessage != nil {
@@ -75,14 +85,6 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
-
-	// TODO: ...
-	// 	- inline keyboard button
-	// 	- callback url to pgvis server sing up
-	// 	- pass telegram user id
-	// 	- chat id
-	// 	- thread id
-	// 	- user name (can be empty)
 
 	command := message.Command()
 	if command != "" {

@@ -171,6 +171,8 @@ func (j *Journal) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/journallist", "List journalctl logs", j.data.Register)
 }
 
+func (j *Journal) Start()
+
 func (j *Journal) Is(message *tgbotapi.Message) bool {
 	if message.ReplyToMessage != nil {
 		if _, ok := j.callbacks.Get(message.ReplyToMessage.MessageID); ok {

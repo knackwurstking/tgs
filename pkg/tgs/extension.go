@@ -12,6 +12,7 @@ type Extension interface {
 	MarshalYAML() (any, error)              // MarshalYAML config from extension struct
 	UnmarshalYAML(value *yaml.Node) error   // UnmarshalYAML config to extension struct
 	AddBotCommands(mbc *MyBotCommands)      // AddBotCommands `mbc.Add(...)`
+	Start()                                 // Start will be called before entering the update loop
 	Is(message *tgbotapi.Message) bool      // Is checks if message belongs to this extension
 	Handle(message *tgbotapi.Message) error // Handle will do shit
 }
