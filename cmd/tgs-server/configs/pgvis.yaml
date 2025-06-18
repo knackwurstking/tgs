@@ -1,0 +1,3 @@
+# NOTE: This is just an example
+targets:
+    all: true
