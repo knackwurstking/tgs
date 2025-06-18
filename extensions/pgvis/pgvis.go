@@ -55,9 +55,18 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(p.data)
 }
 
-func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands)
+func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {}
 
 func (p *PGVis) Start() {
+	msgConfig := tgbotapi.NewMessage(p.data.Targets.Chats[0].ID, "PG Vis Server registration")
+	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		[]tgbotapi.InlineKeyboardButton{
+			tgbotapi.NewInlineKeyboardButtonURL(
+				"Sing Up", "url-to-pgvis-server-telegram-registration",
+			),
+		},
+	)
+
 	// TODO: Send register inline button to target(s)
 	// 	- inline keyboard button
 	// 	- callback url to pgvis server sing up
