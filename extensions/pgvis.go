@@ -1,5 +1,5 @@
-//go:build stats
-// +build stats
+//go:build pgvis
+// +build pgvis
 
 package extensions
 
