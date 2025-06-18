@@ -76,7 +76,13 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	// TODO: Get text from message, parse and handle
+	// TODO: ...
+	// 	- inline keyboard button
+	// 	- callback url to pgvis server sing up
+	// 	- pass telegram user id
+	// 	- chat id
+	// 	- thread id
+	// 	- user name (can be empty)
 
 	command := message.Command()
 	if command != "" {
