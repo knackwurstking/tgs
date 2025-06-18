@@ -106,10 +106,6 @@ func actionHandler() func(cmd *cli.Command) error {
 			return err
 		}
 
-		for _, e := range extensions.Register {
-			e.Start() // NOTE: Maybe using a goroutine here?
-		}
-
 		// Enter the main loop
 		updateConfig := tgbotapi.NewUpdate(0)
 		updateConfig.Timeout = 60 // 1min
