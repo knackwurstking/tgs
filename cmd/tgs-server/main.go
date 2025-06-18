@@ -131,6 +131,9 @@ func handleUpdate(update tgbotapi.Update) {
 			"New update",
 			"message.Command", update.Message.Command,
 			"message.Text", update.Message.Text,
+			"message.From", update.Message.From,
+			"message.From.ID", update.Message.From.ID,
+			"message.Chat", update.Message.Chat,
 			"message.ReplyToMessage", update.Message.ReplyToMessage,
 		)
 	}
