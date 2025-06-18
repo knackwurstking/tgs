@@ -56,11 +56,15 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(p.data)
 }
 
-func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {}
+func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/pgvissingup", "Get an api key for the \"PG Vis Server\" project.", p.data.Register)
+}
 
+// TODO: Move to Handle and remove this method
 func (p *PGVis) Start() {
 	slog.Debug("Handle Start", "extension", p.Name())
 
+	// TODO: Iter Targets
 	msgConfig := tgbotapi.NewMessage(p.data.Targets.Chats[0].ID, "PG Vis Server registration")
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
@@ -69,6 +73,7 @@ func (p *PGVis) Start() {
 			),
 		},
 	)
+	// TODO: How to set a thread id as target
 
 	if _, err := p.Send(msgConfig); err != nil {
 		slog.Error("Sending message failed", "extension", p.Name(), "error", err)

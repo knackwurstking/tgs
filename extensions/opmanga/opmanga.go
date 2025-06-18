@@ -124,8 +124,6 @@ func (o *OPManga) AddBotCommands(mbc *tgs.MyBotCommands) {
 	mbc.Add("/opmangalist", "List all available chapters", o.data.Register)
 }
 
-func (o *OPManga) Start() {}
-
 func (o *OPManga) Is(message *tgbotapi.Message) bool {
 	if message.ReplyToMessage != nil {
 		if _, ok := o.callbacks.Get(message.ReplyToMessage.MessageID); ok {

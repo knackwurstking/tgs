@@ -2,6 +2,10 @@
 define:
     - &PGVisServerChatID <number>
 
+register:
+    - type: chat
+      chat_id: *PGVisServerChatID
+
 targets:
     chats:
         - id: *PGVisServerChatID
