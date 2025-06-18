@@ -126,11 +126,14 @@ func handleUpdate(update tgbotapi.Update) {
 		return
 	}
 
-	slog.Debug(
-		"New update",
-		"message", update.Message,
-		"message.ReplyToMessage", update.Message.ReplyToMessage,
-	)
+	if update.Message != nil {
+		slog.Debug(
+			"New update",
+			"message.Command", update.Message.Command,
+			"message.Text", update.Message.Text,
+			"message.ReplyToMessage", update.Message.ReplyToMessage,
+		)
+	}
 
 	for _, e := range extensions.Register {
 		if e.Is(update.Message) {
