@@ -94,5 +94,5 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 		return fmt.Errorf("unknown command: %s", command)
 	}
 
-	return errors.New("under construction")
+	return nil
 }
