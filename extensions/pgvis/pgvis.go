@@ -81,15 +81,11 @@ func (p *PGVis) Handle(message *tgbotapi.Message) error {
 
 	switch command := message.Command(); command {
 	case "pgvisregister":
-		// TODO: Create a message with a button for requesting a api key
-		keyboardButton := tgbotapi.NewKeyboardButton("Sign Up")
 
 		msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Press this button to sign up, and get a API key for the \"PG: Vis Server\" project\\.")
 		msgConfig.ReplyToMessageID = message.MessageID
 		msgConfig.ParseMode = "MarkdownV2"
-		msgConfig.ReplyMarkup = tgbotapi.NewReplyKeyboard(
-			[]tgbotapi.KeyboardButton{keyboardButton},
-		)
+		msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardButtonData("Sign Up", "Sign Up")
 
 		if _, err := p.Send(msgConfig); err != nil {
 			return err
