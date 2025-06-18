@@ -1,6 +1,6 @@
 all: init build
 
-EXTENSION_TAGS := stats,ip,journal,opmanga
+EXTENSION_TAGS := stats,ip,journal,opmanga,pgvis
 
 clean:
 	git clean -xfd
