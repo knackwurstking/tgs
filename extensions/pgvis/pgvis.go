@@ -3,6 +3,7 @@ package pgvis
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -58,6 +59,8 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {}
 
 func (p *PGVis) Start() {
+	slog.Debug("Handle Start", "extension", p.Name())
+
 	msgConfig := tgbotapi.NewMessage(p.data.Targets.Chats[0].ID, "PG Vis Server registration")
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
@@ -66,6 +69,10 @@ func (p *PGVis) Start() {
 			),
 		},
 	)
+
+	if _, err := p.Send(msgConfig); err != nil {
+		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	}
 
 	// TODO: Send register inline button to target(s)
 	// 	- inline keyboard button
