@@ -1,3 +1,10 @@
 # NOTE: This is just an example
+# TODO: Lock this to pg vis server chat id and thread id
+define:
+    - &PGVisServerChatID <number>
+
 targets:
-    all: true
+    chats:
+        - id: *PGVisServerChatID
+          type: supergroup
+          message_thread_id: <number>
