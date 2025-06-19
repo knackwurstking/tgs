@@ -67,17 +67,22 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
 	if update.Message == nil {
-		if update.CallbackQuery != nil {
-			slog.Debug("Got a CallbackQuery",
-				"extension", p.Name(),
-				"CallbackQuery.Data", update.CallbackQuery.Data,
-				"CallbackQuery.Message", update.CallbackQuery.Message,
-			)
-			// TODO: Validate `CallbackQuery.Data`, or whatever
-			return true
+		if update.CallbackQuery == nil {
+			return false
 		}
 
-		return false
+		slog.Debug("Got a CallbackQuery",
+			"extension", p.Name(),
+			"CallbackQuery.Data", update.CallbackQuery.Data,
+			"CallbackQuery.Message", update.CallbackQuery.Message,
+		)
+
+		switch update.CallbackQuery.Data {
+		case CBDataSingUpRequest:
+			return true
+		default:
+			return false
+		}
 	}
 
 	if update.Message.ReplyToMessage != nil {
@@ -99,7 +104,15 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if update.CallbackQuery != nil {
 		switch queryData := update.CallbackQuery.Data; queryData {
 		case CBDataSingUpRequest:
-			// TODO: ...
+			// TODO: Get user (ID, Name), check target (From), send private message with api key to user (From)
+			slog.Debug("@TODO: Need to check targets here",
+				"ChatInstance", update.CallbackQuery.ChatInstance,
+				"From.ID", update.CallbackQuery.From.ID,
+				"From.UserName", update.CallbackQuery.From.UserName,
+				"From.FirstName", update.CallbackQuery.From.FirstName,
+				"From.LastName", update.CallbackQuery.From.LastName,
+				"Message.Chat.ID", update.CallbackQuery.Message.Chat.ID,
+			)
 		default:
 			return fmt.Errorf("unknown callback query data: %s", queryData)
 		}
