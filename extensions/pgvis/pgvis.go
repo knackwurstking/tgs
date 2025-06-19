@@ -11,6 +11,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	CBDataSingUpRequest = "Please, sign me up!"
+)
+
 type Data struct {
 	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
 	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
@@ -92,38 +96,48 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 	message := update.Message
 
-	// TODO:Handle callback queries here
-	if message == nil {
+	if update.CallbackQuery != nil {
+		switch queryData := update.CallbackQuery.Data; queryData {
+		case CBDataSingUpRequest:
+			// TODO: ...
+		default:
+			return fmt.Errorf("unknown callback query data: %s", queryData)
+		}
+
 		return nil
 	}
 
-	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
-		return errors.New("invalid target")
-	}
-
-	switch command := message.Command(); command {
-	case "pgvissingup":
-		msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Bitte ignorieren, bin am testen!")
-		msgConfig.ReplyToMessageID = message.MessageID
-
-		button := tgbotapi.NewInlineKeyboardButtonData(
-			"Sing Up", "/singup",
-		)
-		cbData := "Please, sign me up!"
-		button.CallbackData = &cbData
-
-		msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
-			[]tgbotapi.InlineKeyboardButton{
-				button,
-			},
-		)
-
-		if _, err := p.Send(msgConfig); err != nil {
-			slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	if message != nil {
+		if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
+			return errors.New("invalid target")
 		}
-	default:
-		return fmt.Errorf("unknown command: %s", command)
+
+		switch command := message.Command(); command {
+		case "pgvissingup":
+			msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Bitte ignorieren, bin am testen!")
+			msgConfig.ReplyToMessageID = message.MessageID
+
+			button := tgbotapi.NewInlineKeyboardButtonData(
+				"Sing Up", "/singup",
+			)
+			cbData := CBDataSingUpRequest
+			button.CallbackData = &cbData
+
+			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+				[]tgbotapi.InlineKeyboardButton{
+					button,
+				},
+			)
+
+			if _, err := p.Send(msgConfig); err != nil {
+				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+			}
+		default:
+			return fmt.Errorf("unknown command: %s", command)
+		}
+
+		return nil
 	}
 
-	return nil
+	return fmt.Errorf("there is nothing to do here")
 }
