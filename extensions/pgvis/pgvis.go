@@ -74,7 +74,6 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 		slog.Debug("Got a CallbackQuery",
 			"extension", p.Name(),
 			"CallbackQuery.Data", update.CallbackQuery.Data,
-			"CallbackQuery.Message", update.CallbackQuery.Message,
 		)
 
 		switch update.CallbackQuery.Data {

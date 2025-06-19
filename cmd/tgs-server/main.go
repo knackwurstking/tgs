@@ -135,7 +135,6 @@ func handleUpdate(update tgbotapi.Update) {
 	} else {
 		slog.Debug("New update without a message",
 			"update.CallbackQuery", update.CallbackQuery,
-			"update", update,
 		)
 	}
 
