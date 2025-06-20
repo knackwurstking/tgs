@@ -103,8 +103,8 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if update.CallbackQuery != nil {
 		switch queryData := update.CallbackQuery.Data; queryData {
 		case CBDataSingUpRequest:
-			slog.Debug("@TODO: Need to check targets here",
-				"ChatInstance", update.CallbackQuery.ChatInstance,
+			slog.Debug("Callback Query",
+				"Data", update.CallbackQuery.Data,
 				"From.ID", update.CallbackQuery.From.ID,
 				"From.UserName", update.CallbackQuery.From.UserName,
 				"From.FirstName", update.CallbackQuery.From.FirstName,
