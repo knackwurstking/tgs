@@ -18,7 +18,7 @@ func NewMyBotCommands() *MyBotCommands {
 	}
 }
 
-func (this *MyBotCommands) Add(command string, description string, scopes []BotCommandScope) {
+func (this *MyBotCommands) Add(command string, description string, scopes []Scope) {
 	for _, scope := range scopes {
 		scopeString := fmt.Sprintf("%s:%d:%d", scope.Type, scope.ChatID, scope.UserID)
 

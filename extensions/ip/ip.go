@@ -19,8 +19,8 @@ const (
 )
 
 type Data struct {
-	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
 }
 
 type IP struct {
@@ -33,8 +33,8 @@ func New(api *tgbotapi.BotAPI) *IP {
 	return &IP{
 		BotAPI: api,
 		data: &Data{
-			Targets:  tgs.NewTargets(),
-			Register: make([]tgs.BotCommandScope, 0),
+			Targets: tgs.NewTargets(),
+			Scopes:  make([]tgs.Scope, 0),
 		},
 	}
 }
@@ -64,7 +64,7 @@ func (ip *IP) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (ip *IP) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/ip", "Get server IP", ip.data.Register)
+	mbc.Add("/ip", "Get server IP", ip.data.Scopes)
 }
 
 func (ip *IP) Is(update tgbotapi.Update) bool {

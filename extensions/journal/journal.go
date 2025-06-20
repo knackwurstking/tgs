@@ -118,9 +118,9 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-	Units    *Units                `yaml:"units,omitempty"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
+	Units   *Units       `yaml:"units,omitempty"`
 }
 
 type Journal struct {
@@ -134,9 +134,9 @@ func New(api *tgbotapi.BotAPI) *Journal {
 	return &Journal{
 		BotAPI: api,
 		data: &Data{
-			Targets:  tgs.NewTargets(),
-			Register: make([]tgs.BotCommandScope, 0),
-			Units:    NewUnits(),
+			Targets: tgs.NewTargets(),
+			Scopes:  make([]tgs.Scope, 0),
+			Units:   NewUnits(),
 		},
 		callbacks: tgs.ReplyCallbacks{},
 	}
@@ -167,8 +167,8 @@ func (j *Journal) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (j *Journal) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/journal", "Get a journalctl log", j.data.Register)
-	mbc.Add("/journallist", "List journalctl logs", j.data.Register)
+	mbc.Add("/journal", "Get a journalctl log", j.data.Scopes)
+	mbc.Add("/journallist", "List journalctl logs", j.data.Scopes)
 }
 
 func (j *Journal) Is(update tgbotapi.Update) bool {

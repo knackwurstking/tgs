@@ -34,7 +34,7 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 
 	if targets.Chats != nil {
 		for _, chat := range targets.Chats {
-			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type || chat.Type == "") {
+			if chat.ID == message.Chat.ID && (string(chat.Type) == message.Chat.Type || chat.Type == "") {
 				if !message.Chat.IsForum {
 					if chat.Users == nil {
 						return true
@@ -93,7 +93,7 @@ func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *T
 
 	if targets.Chats != nil {
 		for _, chat := range targets.Chats {
-			if chat.ID == qChat.ID && (chat.Type == qChat.Type || chat.Type == "") {
+			if chat.ID == qChat.ID && (string(chat.Type) == qChat.Type || chat.Type == "") {
 				if !qChat.IsForum {
 					if chat.Users == nil {
 						return true

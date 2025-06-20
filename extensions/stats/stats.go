@@ -13,8 +13,8 @@ import (
 )
 
 type Data struct {
-	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
 }
 
 type Stats struct {
@@ -27,8 +27,8 @@ func New(api *tgbotapi.BotAPI) *Stats {
 	return &Stats{
 		BotAPI: api,
 		data: &Data{
-			Targets:  tgs.NewTargets(),
-			Register: make([]tgs.BotCommandScope, 0),
+			Targets: tgs.NewTargets(),
+			Scopes:  make([]tgs.Scope, 0),
 		},
 	}
 }
@@ -58,7 +58,7 @@ func (s *Stats) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (s *Stats) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/stats", "Get ID info", s.data.Register)
+	mbc.Add("/stats", "Get ID info", s.data.Scopes)
 }
 
 func (s *Stats) Is(update tgbotapi.Update) bool {

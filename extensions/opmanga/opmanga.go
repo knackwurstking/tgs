@@ -71,9 +71,9 @@ func (td *TemplateData) Patterns() []string {
 }
 
 type Data struct {
-	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
-	Path     string                `yaml:"path"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
+	Path    string       `yaml:"path"`
 }
 
 type OPManga struct {
@@ -87,8 +87,8 @@ func New(api *tgbotapi.BotAPI) *OPManga {
 	return &OPManga{
 		BotAPI: api,
 		data: &Data{
-			Targets:  tgs.NewTargets(),
-			Register: make([]tgs.BotCommandScope, 0),
+			Targets: tgs.NewTargets(),
+			Scopes:  make([]tgs.Scope, 0),
 			// Reply: ,
 		},
 		callbacks: tgs.ReplyCallbacks{},
@@ -120,8 +120,8 @@ func (o *OPManga) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (o *OPManga) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/opmanga", "Request a chapter", o.data.Register)
-	mbc.Add("/opmangalist", "List all available chapters", o.data.Register)
+	mbc.Add("/opmanga", "Request a chapter", o.data.Scopes)
+	mbc.Add("/opmangalist", "List all available chapters", o.data.Scopes)
 }
 
 func (o *OPManga) Is(update tgbotapi.Update) bool {

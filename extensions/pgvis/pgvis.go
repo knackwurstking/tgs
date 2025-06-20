@@ -16,8 +16,8 @@ const (
 )
 
 type Data struct {
-	Targets  *tgs.Targets          `yaml:"targets,omitempty"`
-	Register []tgs.BotCommandScope `yaml:"register,omitempty"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
 }
 
 type PGVis struct {
@@ -30,8 +30,8 @@ type PGVis struct {
 func New(api *tgbotapi.BotAPI) *PGVis {
 	return &PGVis{
 		data: &Data{
-			Targets:  tgs.NewTargets(),
-			Register: make([]tgs.BotCommandScope, 0),
+			Targets: tgs.NewTargets(),
+			Scopes:  make([]tgs.Scope, 0),
 		},
 		callbacks: tgs.ReplyCallbacks{},
 	}
@@ -62,7 +62,7 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgvissingup", "Get an api key for the \"PG Vis Server\" project.", p.data.Register)
+	mbc.Add("/pgvissingup", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
 }
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
