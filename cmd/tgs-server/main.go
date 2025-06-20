@@ -130,7 +130,6 @@ func handleUpdate(update tgbotapi.Update) {
 			"message.From", update.Message.From,
 			"message.From.ID", update.Message.From.ID,
 			"message.Chat", update.Message.Chat,
-			"message.ReplyToMessage", update.Message.ReplyToMessage,
 		)
 	} else {
 		slog.Debug("New update without a message",
