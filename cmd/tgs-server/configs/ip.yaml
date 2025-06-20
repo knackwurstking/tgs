@@ -10,7 +10,6 @@ scopes:
 # `tgs.Targets`
 targets:
     chats:
-        # Types: "private", "group", "supergroup" or "channel"
         - type: supergroup
           id: *AliceChatID
           message_thread_id: 5
