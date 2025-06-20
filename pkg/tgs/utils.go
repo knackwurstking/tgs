@@ -32,8 +32,6 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 		}
 	}
 
-	// Chat ID check & message thread ID if chat is forum
-
 	if targets.Chats != nil {
 		for _, chat := range targets.Chats {
 			if chat.ID == message.Chat.ID && (chat.Type == message.Chat.Type || chat.Type == "") {
@@ -51,6 +49,65 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 					}
 
 					return checkUserID(message.From.ID, chat.Users)
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *Targets) bool {
+	if targets == nil {
+		return false
+	}
+
+	if targets.All {
+		return true
+	}
+
+	checkUserID := func(id int64, users []UserTarget) bool {
+		if users == nil {
+			users = targets.Users
+		}
+
+		for _, user := range users {
+			if user.ID == id {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	qFrom := callbackQuery.From
+
+	if targets.Users != nil {
+		if checkUserID(qFrom.ID, nil) {
+			return true
+		}
+	}
+
+	qMessage := callbackQuery.Message
+	qChat := qMessage.Chat
+
+	if targets.Chats != nil {
+		for _, chat := range targets.Chats {
+			if chat.ID == qChat.ID && (chat.Type == qChat.Type || chat.Type == "") {
+				if !qChat.IsForum {
+					if chat.Users == nil {
+						return true
+					}
+
+					return checkUserID(qFrom.ID, chat.Users)
+				}
+
+				if chat.MessageThreadID <= 0 || chat.MessageThreadID == qMessage.MessageThreadID {
+					if chat.Users == nil {
+						return true
+					}
+
+					return checkUserID(qMessage.From.ID, chat.Users)
 				}
 			}
 		}
