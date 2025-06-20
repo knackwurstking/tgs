@@ -2,16 +2,8 @@
 define:
     - &AliceChatID <number>
 
-# `[]tgs.BotCommandScope`
+# `[]tgs.Scope`
 scopes:
-    # Types:
-    #   - default
-    #   - all_private_chats
-    #   - all_group_chats
-    #   - all_chat_administrators
-    #   - chat, needs: "chat_id"
-    #   - chat_administrators, needs: "chat_id"
-    #   - chat_member, needs: "chat_id" & "user_id"
     - type: chat
       chat_id: *AliceChatID
 

@@ -2,10 +2,12 @@
 define:
     - &AliceChatID <number>
 
+# `[]tgs.Scope`
 scopes:
     - type: default
     - type: chat
       chat_id: *AliceChatID
 
+# `tgs.Targets`
 targets:
     all: true
