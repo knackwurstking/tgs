@@ -2,7 +2,7 @@
 define:
     - &PGVisServerChatID <number>
 
-register:
+scopes:
     - type: chat
       chat_id: *PGVisServerChatID
 

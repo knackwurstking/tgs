@@ -2,7 +2,7 @@
 define:
     - &AliceChatID <number>
 
-register:
+scopes:
     - type: chat
       chat_id: *AliceChatID
 

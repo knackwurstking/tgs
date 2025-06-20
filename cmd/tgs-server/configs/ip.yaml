@@ -3,7 +3,7 @@ define:
     - &AliceChatID <number>
 
 # `[]tgs.BotCommandScope`
-register:
+scopes:
     # Types:
     #   - default
     #   - all_private_chats
@@ -15,7 +15,7 @@ register:
     - type: chat
       chat_id: *AliceChatID
 
-# `extension.Targets`
+# `tgs.Targets`
 targets:
     chats:
         # Types: "private", "group", "supergroup" or "channel"
