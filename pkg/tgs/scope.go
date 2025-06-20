@@ -5,9 +5,9 @@ const (
 	ScopeAllPrivateChats       ScopeType = "all_private_chats"
 	ScopeAllGroupChats         ScopeType = "all_group_chats"
 	ScopeAllChatAdministrators ScopeType = "all_chat_administrators"
-	ScopeChat                  ScopeType = "chat"
-	ScopeChatAdministrators    ScopeType = "chat_administrators"
-	ScopeChatMember            ScopeType = "chat_member"
+	ScopeChat                  ScopeType = "chat"                // ScopeChat requires "chat_id"
+	ScopeChatAdministrators    ScopeType = "chat_administrators" // ScopeChatAdministrators requires "chat_id"
+	ScopeChatMember            ScopeType = "chat_member"         // ScopeChatMember requires "chat_id" & "user_id"
 )
 
 type ScopeType string
