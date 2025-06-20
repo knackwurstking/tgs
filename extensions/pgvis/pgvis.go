@@ -132,6 +132,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 		switch command := message.Command(); command {
 		case "pgvissingup":
+			// TODO: Create a proper message here
 			msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Bitte ignorieren, bin am testen!")
 			msgConfig.ReplyToMessageID = message.MessageID
 
