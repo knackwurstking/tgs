@@ -103,7 +103,6 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if update.CallbackQuery != nil {
 		switch queryData := update.CallbackQuery.Data; queryData {
 		case CBDataSingUpRequest:
-			// TODO: Get user (ID, Name), check target (From), send private message with api key to user (From)
 			slog.Debug("@TODO: Need to check targets here",
 				"ChatInstance", update.CallbackQuery.ChatInstance,
 				"From.ID", update.CallbackQuery.From.ID,
@@ -112,6 +111,13 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				"From.LastName", update.CallbackQuery.From.LastName,
 				"Message.Chat.ID", update.CallbackQuery.Message.Chat.ID,
 			)
+
+			if ok := tgs.CheckCallbackQueryTargets(update.CallbackQuery, p.data.Targets); !ok {
+				return errors.New("invalid target")
+			}
+
+			// TODO: Get user (ID, Name), send a private
+			// 		 message with the api key to the user (From)
 		default:
 			return fmt.Errorf("unknown callback query data: %s", queryData)
 		}
