@@ -116,8 +116,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				return errors.New("invalid target")
 			}
 
-			// TODO: Generate a new api key for this user here, if not already exists
-			apiKey := "<api-key>"
+			apiKey := GenApiKey()
 
 			// Into message
 			msgConfig := tgbotapi.NewMessage(
@@ -139,6 +138,15 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
+
+			defer func() {
+				user := NewUser(
+					update.CallbackQuery.From.ID,
+					update.CallbackQuery.From.UserName,
+					apiKey,
+				)
+				// TODO: Create a new user for the pg vis server database
+			}()
 
 			// Link the sing up page now
 			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID,
