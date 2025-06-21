@@ -3,7 +3,7 @@ package pgvis
 func GenApiKey() string {
 	// TODO: ...
 
-	return ""
+	return "<api-key>"
 }
 
 type User struct {
@@ -13,7 +13,9 @@ type User struct {
 }
 
 func NewUser(id int64, userName string, apiKey string) *User {
-	// TODO: ...
-
-	return nil
+	return &User{
+		ID:       id,
+		UserName: userName,
+		ApiKey:   apiKey,
+	}
 }
