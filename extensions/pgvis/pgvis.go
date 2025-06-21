@@ -116,8 +116,46 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				return errors.New("invalid target")
 			}
 
-			// TODO: Get user (ID, Name), send a private
-			// 		 message with the api key to the user (From)
+			// TODO: Generate a new api key for this user here, if not already exists
+			apiKey := "<api-key>"
+
+			// Into message
+			msgConfig := tgbotapi.NewMessage(
+				update.CallbackQuery.From.ID,
+				fmt.Sprintf(
+					"Den folgenden Api Key bitte sicher aufbewahren, "+
+						"das ist dein zugang zur App. Dieser key ist gebunden "+
+						"an deine Telegram ID.",
+				),
+			)
+
+			if _, err := p.Send(msgConfig); err != nil {
+				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+			}
+
+			// Api key message
+			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID, apiKey)
+
+			if _, err := p.Send(msgConfig); err != nil {
+				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+			}
+
+			// Link the sing up page now
+			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID,
+				"Zur registrierung gehts hier lang")
+
+			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+				[]tgbotapi.InlineKeyboardButton{
+					tgbotapi.NewInlineKeyboardButtonURL(
+						"Registrierung",
+						fmt.Sprintf("https://knackwurstking.com/pg-vis/signup?key=%s", apiKey),
+					),
+				},
+			)
+
+			if _, err := p.Send(msgConfig); err != nil {
+				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+			}
 		default:
 			return fmt.Errorf("unknown callback query data: %s", queryData)
 		}
@@ -132,8 +170,15 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 		switch command := message.Command(); command {
 		case "pgvissingup":
-			// TODO: Create a proper message here
-			msgConfig := tgbotapi.NewMessage(message.Chat.ID, "Bitte ignorieren, bin am testen!")
+			msgConfig := tgbotapi.NewMessage(
+				message.Chat.ID,
+				fmt.Sprintf(
+					"Wenn du auf den \"Sing Up\" Button klickst, "+
+						"bekommst du deinen Api Key zugesendet.\n\n"+
+						"Bitte ignorieren, immer noch am testen.",
+				),
+			)
+
 			msgConfig.ReplyToMessageID = message.MessageID
 
 			button := tgbotapi.NewInlineKeyboardButtonData(
