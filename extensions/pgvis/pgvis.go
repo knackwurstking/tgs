@@ -16,8 +16,9 @@ const (
 )
 
 type Data struct {
-	Targets *tgs.Targets `yaml:"targets,omitempty"`
-	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
+	Targets  *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes   []tgs.Scope  `yaml:"scopes,omitempty"`
+	DataBase string       `yaml:"database"`
 }
 
 type PGVis struct {
@@ -116,7 +117,10 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				return errors.New("invalid target")
 			}
 
-			apiKey := GenApiKey()
+			user := NewUser(
+				update.CallbackQuery.From.ID,
+				update.CallbackQuery.From.UserName,
+			)
 
 			// Into message
 			msgConfig := tgbotapi.NewMessage(
@@ -133,20 +137,11 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			}
 
 			// Api key message
-			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID, apiKey)
+			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID, user.ApiKey)
 
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
-
-			defer func() {
-				user := NewUser(
-					update.CallbackQuery.From.ID,
-					update.CallbackQuery.From.UserName,
-					apiKey,
-				)
-				// TODO: Create a new user for the pg vis server database
-			}()
 
 			// Link the sing up page now
 			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID,
@@ -156,7 +151,10 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				[]tgbotapi.InlineKeyboardButton{
 					tgbotapi.NewInlineKeyboardButtonURL(
 						"Registrierung",
-						fmt.Sprintf("https://knackwurstking.com/pg-vis/signup?key=%s", apiKey),
+						fmt.Sprintf(
+							"https://knackwurstking.com/pg-vis/signup?key=%s",
+							user.ApiKey,
+						),
 					),
 				},
 			)
