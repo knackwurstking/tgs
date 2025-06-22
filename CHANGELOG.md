@@ -1,13 +1,13 @@
 # CHANGELOG
 
-## v2.0.0 [2025-06-16]
+## v2.0.0 [unreleased]
 
 - [x] Add each "botcommand" as a extension using golang build tags (?)
     - [x] ip
     - [x] journal
     - [x] opmanga
     - [x] stats
-    - [ ] pgvis
+    - [ ] pgvis (work-in-progress)
 - [x] Use a separate config for each botcommand
 
 **Changed**:
