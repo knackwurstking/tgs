@@ -10,6 +10,10 @@
     - [ ] pgvis
 - [x] Use a separate config for each botcommand
 
+**Changed**:
+
+- Update ui.css (go templates) from v2.0.0 to v4.3.0
+
 ## v1.2.0 [2025-04-10]
 
 - Added ipv6 address to /ip bot command
