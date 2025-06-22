@@ -112,7 +112,7 @@ func (td *TemplateData) Patterns() []string {
 	return []string{
 		"data/index.go.html",
 		"data/journallist.go.html", // block: content
-		"data/ui-v2.0.0.css",       // block: ui
+		"data/ui-v4.3.0.css",       // block: ui
 		"data/styles.css",          // block: styles
 	}
 }
