@@ -26,7 +26,7 @@ func NewUser(id int64, userName string) (*User, error) {
 	// Get api key for this user (telegram id), if possible
 	cmd := exec.Command("pg-vis", "user", "show", "--api-key", fmt.Sprintf("%d", id))
 
-	if err := cmd.Run(); err != nil {
+	if out, err := cmd.Output(); err != nil {
 		if c, ok := err.(*exec.ExitError); !ok {
 			// Command failed
 			return u, err
@@ -41,7 +41,7 @@ func NewUser(id int64, userName string) (*User, error) {
 				)
 			} else {
 				// Create user, using the pg-vis command here
-				cmd := exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
+				cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
 
 				if err := cmd.Run(); err != nil {
 					return u, fmt.Errorf("creating user failed: %s", err.Error())
@@ -50,26 +50,19 @@ func NewUser(id int64, userName string) (*User, error) {
 		}
 	} else {
 		// Get the api-key from the command output
-		if apiKey, err := cmd.Output(); err != nil {
-			return u, fmt.Errorf("output error: %s", err.Error())
-		} else {
-			u.ApiKey = string(apiKey)
-		}
+		u.ApiKey = string(out)
 	}
 
 	// If the user has no api-key, create a new one one
 	if u.ApiKey == "" {
-		cmd := exec.Command("pg-vis", "api-key")
+		cmd = exec.Command("pg-vis", "api-key")
 
-		if err := cmd.Run(); err != nil {
+		out, err := cmd.Output()
+		if err != nil {
 			return u, fmt.Errorf("generating a new api key failed: %s", err.Error())
 		}
 
-		if apiKey, err := cmd.Output(); err != nil {
-			return u, fmt.Errorf("output error: %s", err.Error())
-		} else {
-			u.ApiKey = string(apiKey)
-		}
+		u.ApiKey = string(out)
 	}
 
 	return u, nil
