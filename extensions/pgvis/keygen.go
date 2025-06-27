@@ -25,8 +25,14 @@ func NewUser(id int64, userName string) (*User, error) {
 			return u, err
 		} else {
 			slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
-			// TODO: Check the exit code, only continue if user not found,
-			// 		 need to find out which exit code this is
+
+			// NOTE: For now, 1 is the exit code in use for not found
+			if c.ExitCode() != 1 {
+				return u, fmt.Errorf(
+					"pg-vis command failed with an exit code %d",
+					c.ExitCode(),
+				)
+			}
 		}
 	} else {
 		if apiKey, err := cmd.Output(); err != nil {
