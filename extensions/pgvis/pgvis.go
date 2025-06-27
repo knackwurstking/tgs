@@ -117,10 +117,26 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				return errors.New("invalid target")
 			}
 
-			user := NewUser(
+			user, err := NewUser(
 				update.CallbackQuery.From.ID,
 				update.CallbackQuery.From.UserName,
 			)
+			if err != nil {
+				msgConfig := tgbotapi.NewMessage(
+					update.CallbackQuery.From.ID,
+					fmt.Sprintf(
+						"Ups, etwas ist schief gelaufen: \n`%s`",
+						err.Error(),
+					),
+				)
+				msgConfig.ParseMode = "MarkdownV2"
+
+				if _, err = p.Send(msgConfig); err != nil {
+					slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+				}
+
+				return nil
+			}
 
 			// Into message
 			msgConfig := tgbotapi.NewMessage(
