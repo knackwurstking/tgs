@@ -13,5 +13,3 @@ targets:
         - id: *PGVisServerChatID
           type: supergroup
           message_thread_id: <number>
-
-database: <path-to-pg-vis-server-database>

@@ -16,9 +16,8 @@ const (
 )
 
 type Data struct {
-	Targets  *tgs.Targets `yaml:"targets,omitempty"`
-	Scopes   []tgs.Scope  `yaml:"scopes,omitempty"`
-	DataBase string       `yaml:"database"`
+	Targets *tgs.Targets `yaml:"targets,omitempty"`
+	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
 }
 
 type PGVis struct {
