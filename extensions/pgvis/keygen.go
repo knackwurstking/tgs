@@ -40,7 +40,12 @@ func NewUser(id int64, userName string) (*User, error) {
 					c.ExitCode(),
 				)
 			} else {
-				// TODO: Create user, using the pg-vis command here
+				// Create user, using the pg-vis command here
+				cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
+
+				if err := cmd.Run(); err != nil {
+					return u, fmt.Errorf("creating user failed: %s", err.Error())
+				}
 			}
 		}
 	} else {
