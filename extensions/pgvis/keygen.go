@@ -30,7 +30,7 @@ func NewUser(id int64, userName string) (*User, error) {
 		} else {
 			slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
 
-			// NOTE: For now, 1 is the exit code in use for not found
+			// NOTE: For now, 10 is the exit code in use for not found
 			if c.ExitCode() != PGVisExitCodeNotFound {
 				return u, fmt.Errorf(
 					"pg-vis command failed with an exit code %d",
