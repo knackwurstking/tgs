@@ -25,6 +25,8 @@ func NewUser(id int64, userName string) (*User, error) {
 			return u, err
 		} else {
 			slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
+			// TODO: Check the exit code, only continue if user not found,
+			// 		 need to find out which exit code this is
 		}
 	} else {
 		if apiKey, err := cmd.Output(); err != nil {
@@ -35,7 +37,6 @@ func NewUser(id int64, userName string) (*User, error) {
 	}
 
 	if u.ApiKey == "" {
-		// TODO: Only generate a new api key if user does not already exists, check
 		u.ApiKey = generateApiKey()
 	}
 
