@@ -59,15 +59,18 @@ func NewUser(id int64, userName string) (*User, error) {
 
 	// If the user has no api-key, create a new one one
 	if u.ApiKey == "" {
-		u.ApiKey = generateApiKey()
-		// TODO: Update user, using the pg-vis command here
+		cmd = exec.Command("pg-vis", "api-key")
+
+		if err := cmd.Run(); err != nil {
+			return u, fmt.Errorf("generating a new api key failed: %s", err.Error())
+		}
+
+		if apiKey, err := cmd.Output(); err != nil {
+			return u, fmt.Errorf("output error: %s", err.Error())
+		} else {
+			u.ApiKey = string(apiKey)
+		}
 	}
 
 	return u, nil
-}
-
-func generateApiKey() string {
-	// TODO: Generate a new api key, use the pg-vis command for this
-
-	return "<api-key>"
 }
