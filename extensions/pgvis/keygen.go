@@ -41,7 +41,7 @@ func NewUser(id int64, userName string) (*User, error) {
 				)
 			} else {
 				// Create user, using the pg-vis command here
-				cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
+				cmd := exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
 
 				if err := cmd.Run(); err != nil {
 					return u, fmt.Errorf("creating user failed: %s", err.Error())
@@ -59,7 +59,7 @@ func NewUser(id int64, userName string) (*User, error) {
 
 	// If the user has no api-key, create a new one one
 	if u.ApiKey == "" {
-		cmd = exec.Command("pg-vis", "api-key")
+		cmd := exec.Command("pg-vis", "api-key")
 
 		if err := cmd.Run(); err != nil {
 			return u, fmt.Errorf("generating a new api key failed: %s", err.Error())
