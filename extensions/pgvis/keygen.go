@@ -23,12 +23,11 @@ func NewUser(id int64, userName string) (*User, error) {
 		ApiKey:   "",
 	}
 
-	// Get api key for this user (telegram id), if possible
 	cmd := exec.Command("pg-vis", "user", "show", "--api-key", fmt.Sprintf("%d", id))
 
 	if out, err := cmd.Output(); err != nil {
+		// Error handling
 		if c, ok := err.(*exec.ExitError); !ok {
-			// Command failed
 			return u, err
 		} else {
 			slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
@@ -39,13 +38,12 @@ func NewUser(id int64, userName string) (*User, error) {
 					"pg-vis command failed with an exit code %d",
 					c.ExitCode(),
 				)
-			} else {
-				// Create user, using the pg-vis command here
-				cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
+			}
 
-				if err := cmd.Run(); err != nil {
-					return u, fmt.Errorf("creating user failed: %s", err.Error())
-				}
+			// Add a new user to the pg-vis database
+			cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
+			if err := cmd.Run(); err != nil {
+				return u, fmt.Errorf("creating user failed: %s", err.Error())
 			}
 		}
 	} else {
