@@ -44,7 +44,8 @@ func NewUser(id int64, userName string) (*User, error) {
 }
 
 func generateApiKey() string {
-	// TODO: Generate a new api key, Use the pg-vis command for this
+	// TODO: Generate a new api key, use the pg-vis command for this, and
+	// 		 create the user
 
 	return "<api-key>"
 }
