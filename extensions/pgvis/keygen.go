@@ -6,6 +6,10 @@ import (
 	"os/exec"
 )
 
+const (
+	PGVisExitCodeNotFound = 10
+)
+
 type User struct {
 	ID       int64  `json:"id"`
 	UserName string `json:"user_name"`
@@ -27,7 +31,7 @@ func NewUser(id int64, userName string) (*User, error) {
 			slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
 
 			// NOTE: For now, 1 is the exit code in use for not found
-			if c.ExitCode() != 1 {
+			if c.ExitCode() != PGVisExitCodeNotFound {
 				return u, fmt.Errorf(
 					"pg-vis command failed with an exit code %d",
 					c.ExitCode(),
