@@ -66,31 +66,17 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
-	if update.Message == nil {
-		if update.CallbackQuery == nil {
-			return false
-		}
+	slog.Debug("...", "update", update)
 
-		slog.Debug("Got a CallbackQuery",
-			"extension", p.Name(),
-			"CallbackQuery.Data", update.CallbackQuery.Data,
-		)
+	command := update.Message.Command()
 
-		switch update.CallbackQuery.Data {
-		case CBDataSingUpRequest:
-			return true
-		default:
-			return false
-		}
-	}
-
-	if update.Message.ReplyToMessage != nil {
-		if _, ok := p.callbacks.Get(update.Message.ReplyToMessage.MessageID); ok {
+	if command == "start" {
+		if update.Message.Text == fmt.Sprintf("/start pgvissingup") {
 			return true
 		}
 	}
 
-	return strings.HasPrefix(update.Message.Command(), "pgvis")
+	return strings.HasPrefix(command, "pgvis")
 }
 
 func (p *PGVis) Handle(update tgbotapi.Update) error {
@@ -100,46 +86,20 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 	message := update.Message
 
-	if update.CallbackQuery != nil {
-		switch queryData := update.CallbackQuery.Data; queryData {
-		case CBDataSingUpRequest:
-			slog.Debug("Callback Query",
-				"Data", update.CallbackQuery.Data,
-				"From.ID", update.CallbackQuery.From.ID,
-				"From.UserName", update.CallbackQuery.From.UserName,
-				"From.FirstName", update.CallbackQuery.From.FirstName,
-				"From.LastName", update.CallbackQuery.From.LastName,
-				"Message.Chat.ID", update.CallbackQuery.Message.Chat.ID,
-			)
+	if message != nil {
 
-			if ok := tgs.CheckCallbackQueryTargets(update.CallbackQuery, p.data.Targets); !ok {
-				return errors.New("invalid target")
-			}
+		switch command := message.Command(); command {
+		case "start":
+			// TODO: Need to check if user is allowed
 
-			user, err := NewUser(
-				update.CallbackQuery.From.ID,
-				update.CallbackQuery.From.UserName,
-			)
+			user, err := NewUser(message.From.ID, message.From.UserName)
 			if err != nil {
-				msgConfig := tgbotapi.NewMessage(
-					update.CallbackQuery.From.ID,
-					fmt.Sprintf(
-						"Ups, etwas ist schief gelaufen: \n`%s`",
-						err.Error(),
-					),
-				)
-				msgConfig.ParseMode = "MarkdownV2"
-
-				if _, err = p.Send(msgConfig); err != nil {
-					slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-				}
-
-				return nil
+				return err
 			}
 
-			// Into message
+			// Info message
 			msgConfig := tgbotapi.NewMessage(
-				update.CallbackQuery.From.ID,
+				message.From.ID,
 				fmt.Sprintf(
 					"Den folgenden Api Key bitte sicher aufbewahren, "+
 						"das ist dein zugang zur App. Dieser key ist gebunden "+
@@ -151,14 +111,14 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
 
-			// Api key message
-			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID, user.ApiKey)
+			// ApiKey message
+			msgConfig = tgbotapi.NewMessage(message.From.ID, user.ApiKey)
 
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
 
-			// Link the sing up page now
+			// Link to the pg-vis server singup page
 			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID,
 				"Zur registrierung gehts hier lang")
 
@@ -177,20 +137,12 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
-		default:
-			return fmt.Errorf("unknown callback query data: %s", queryData)
-		}
 
-		return nil
-	}
-
-	if message != nil {
-		if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
-			return errors.New("invalid target")
-		}
-
-		switch command := message.Command(); command {
 		case "pgvissingup":
+			if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
+				return errors.New("invalid target")
+			}
+
 			msgConfig := tgbotapi.NewMessage(
 				message.Chat.ID,
 				fmt.Sprintf(
