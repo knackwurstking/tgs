@@ -96,6 +96,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 		case "pgvissingup":
 			return p.handlePGVisSingUp(message)
+
 		default:
 			return fmt.Errorf("unknown command: %s", command)
 		}
