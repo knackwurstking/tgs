@@ -11,23 +11,9 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 		return true
 	}
 
-	checkUserID := func(id int64, users []UserTarget) bool {
-		if users == nil {
-			users = targets.Users
-		}
-
-		for _, user := range users {
-			if user.ID == id {
-				return true
-			}
-		}
-
-		return false
-	}
-
 	// User ID check
 	if targets.Users != nil {
-		if checkUserID(message.From.ID, nil) {
+		if checkUserID(message.From.ID, targets.Users) {
 			return true
 		}
 	}
@@ -57,6 +43,20 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 	return false
 }
 
+func CheckTargetsForUser(id int64, targets *Targets) bool {
+	if targets == nil {
+		return false
+	}
+
+	if targets.All {
+		return true
+	}
+
+	// TODO: Check target
+
+	return false
+}
+
 func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *Targets) bool {
 	if targets == nil {
 		return false
@@ -66,24 +66,10 @@ func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *T
 		return true
 	}
 
-	checkUserID := func(id int64, users []UserTarget) bool {
-		if users == nil {
-			users = targets.Users
-		}
-
-		for _, user := range users {
-			if user.ID == id {
-				return true
-			}
-		}
-
-		return false
-	}
-
 	qFrom := callbackQuery.From
 
 	if targets.Users != nil {
-		if checkUserID(qFrom.ID, nil) {
+		if checkUserID(qFrom.ID, targets.Users) {
 			return true
 		}
 	}
@@ -110,6 +96,16 @@ func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *T
 					return checkUserID(qMessage.From.ID, chat.Users)
 				}
 			}
+		}
+	}
+
+	return false
+}
+
+func checkUserID(id int64, users []UserTarget) bool {
+	for _, user := range users {
+		if user.ID == id {
+			return true
 		}
 	}
 
