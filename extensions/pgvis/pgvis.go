@@ -86,7 +86,9 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 		switch command := message.Command(); command {
 		case "start":
-			// TODO: Need to check if user is allowed
+			if !tgs.CheckTargetsForUser(message.From.ID, p.data.Targets) {
+				return errors.New("invalid target")
+			}
 
 			user, err := NewUser(message.From.ID, message.From.UserName)
 			if err != nil {
