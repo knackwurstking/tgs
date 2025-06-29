@@ -43,36 +43,6 @@ func CheckTargets(message *tgbotapi.Message, targets *Targets) bool {
 	return false
 }
 
-func CheckTargetsForUser(id int64, targets *Targets) bool {
-	if targets == nil {
-		return false
-	}
-
-	if targets.All {
-		return true
-	}
-
-	if targets.Users != nil {
-		if checkUserID(id, targets.Users) {
-			return true
-		}
-	}
-
-	if targets.Chats != nil {
-		for _, c := range targets.Chats {
-			if c.Users != nil {
-				if checkUserID(id, c.Users) {
-					return true
-				}
-			}
-
-			// TODO: Get users for each chat and check
-		}
-	}
-
-	return false
-}
-
 func CheckCallbackQueryTargets(callbackQuery *tgbotapi.CallbackQuery, targets *Targets) bool {
 	if targets == nil {
 		return false
