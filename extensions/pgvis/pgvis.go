@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/google/uuid"
 	"github.com/knackwurstking/tgs/pkg/tgs"
 	"gopkg.in/yaml.v3"
 )
@@ -23,8 +25,9 @@ type Data struct {
 type PGVis struct {
 	*tgbotapi.BotAPI
 
-	data      *Data
-	callbacks tgs.ReplyCallbacks
+	data *Data
+
+	keys []string
 }
 
 func New(api *tgbotapi.BotAPI) *PGVis {
@@ -33,7 +36,7 @@ func New(api *tgbotapi.BotAPI) *PGVis {
 			Targets: tgs.NewTargets(),
 			Scopes:  make([]tgs.Scope, 0),
 		},
-		callbacks: tgs.ReplyCallbacks{},
+		keys: make([]string, 0),
 	}
 }
 
@@ -69,7 +72,7 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 	command := update.Message.Command()
 
 	if command == "start" {
-		return update.Message.Text == fmt.Sprintf("/start pgvissingup")
+		return strings.HasPrefix(update.Message.Text, "/start pgvissingup-")
 	}
 
 	return strings.HasPrefix(command, "pgvis")
@@ -86,7 +89,16 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 		switch command := message.Command(); command {
 		case "start":
-			if !tgs.CheckTargetsForUser(message.From.ID, p.data.Targets) {
+			key := strings.SplitN(message.Text, "-", 2)[1]
+			if !slices.Contains(p.keys, key) {
+				msgConfig := tgbotapi.NewMessage(message.From.ID,
+					"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
+
+				if _, err := p.Send(msgConfig); err != nil {
+					slog.Error("Sending message failed",
+						"extension", p.Name(), "error", err)
+				}
+
 				return errors.New("invalid target")
 			}
 
@@ -153,11 +165,9 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 			msgConfig.ReplyToMessageID = message.MessageID
 
-			button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", "t.me/talice_bot?start=pgvissingup")
+			key := uuid.New().String()
 
-			cbData := CBDataSingUpRequest
-			button.CallbackData = &cbData
-
+			button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", fmt.Sprintf("t.me/talice_bot?start=pgvissingup-%s", key))
 			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 				[]tgbotapi.InlineKeyboardButton{
 					button,
@@ -167,6 +177,8 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 			}
+
+			p.keys = append(p.keys, key)
 		default:
 			return fmt.Errorf("unknown command: %s", command)
 		}
