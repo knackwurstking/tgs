@@ -112,7 +112,8 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			}
 
 			// ApiKey message
-			msgConfig = tgbotapi.NewMessage(message.From.ID, user.ApiKey)
+			msgConfig = tgbotapi.NewMessage(message.From.ID, fmt.Sprintf("`%s`", user.ApiKey))
+			msgConfig.ParseMode = "MarkdownV2"
 
 			if _, err := p.Send(msgConfig); err != nil {
 				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
