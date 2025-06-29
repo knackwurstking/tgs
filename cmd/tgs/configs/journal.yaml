@@ -25,7 +25,7 @@ units:
           output: cat
         - name: op-manga-dl
           output: cat
-        - name: tgs-server
+        - name: tgs
           output: cat
         - name: test-oauth
           output: cat

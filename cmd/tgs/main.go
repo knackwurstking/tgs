@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	applicationName = "tgs-server"
+	applicationName = "tgs"
 )
 
 func main() {

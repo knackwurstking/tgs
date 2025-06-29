@@ -9,7 +9,7 @@ init:
 	go mod tidy -v
 
 run:
-	go run --tags=${EXTENSION_TAGS} -v ./cmd/tgs-server
+	go run --tags=${EXTENSION_TAGS} -v ./cmd/tgs
 
 build:
-	go build --tags=${EXTENSION_TAGS} -v -o ./bin/tgs-server ./cmd/tgs-server
+	go build --tags=${EXTENSION_TAGS} -v -o ./bin/tgs ./cmd/tgs

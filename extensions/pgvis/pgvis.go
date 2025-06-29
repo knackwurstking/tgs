@@ -202,9 +202,8 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 
 			msgConfig.ReplyToMessageID = message.MessageID
 
-			button := tgbotapi.NewInlineKeyboardButtonData(
-				"Sing Up", "/singup",
-			)
+			button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", "t.me/talice_bot?start=pgvissingup")
+
 			cbData := CBDataSingUpRequest
 			button.CallbackData = &cbData
 

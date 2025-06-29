@@ -1,4 +1,4 @@
-# Telegram Scripts
+# Telegram Server
 
 ## Notes
 
