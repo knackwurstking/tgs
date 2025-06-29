@@ -127,7 +127,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 					tgbotapi.NewInlineKeyboardButtonURL(
 						"Registrierung",
 						fmt.Sprintf(
-							"https://knackwurstking.com/pg-vis/signup?key=%s",
+							"https://knackwurstking.com/pg-vis/signup?key=%s", // FIXME: This list does not exists yet
 							user.ApiKey,
 						),
 					),
