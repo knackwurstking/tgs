@@ -66,8 +66,6 @@ func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
 }
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
-	slog.Debug("...", "update", update)
-
 	command := update.Message.Command()
 
 	if command == "start" {
