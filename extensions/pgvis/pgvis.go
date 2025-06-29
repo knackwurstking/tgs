@@ -69,9 +69,7 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 	command := update.Message.Command()
 
 	if command == "start" {
-		if update.Message.Text == fmt.Sprintf("/start pgvissingup") {
-			return true
-		}
+		return update.Message.Text == fmt.Sprintf("/start pgvissingup")
 	}
 
 	return strings.HasPrefix(command, "pgvis")
