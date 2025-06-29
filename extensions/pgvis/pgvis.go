@@ -86,105 +86,114 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	message := update.Message
 
 	if message != nil {
-
 		switch command := message.Command(); command {
 		case "start":
-			key := strings.SplitN(message.Text, "-", 2)[1]
-			if !slices.Contains(p.keys, key) {
-				msgConfig := tgbotapi.NewMessage(message.From.ID,
-					"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
-
-				if _, err := p.Send(msgConfig); err != nil {
-					slog.Error("Sending message failed",
-						"extension", p.Name(), "error", err)
-				}
-
-				return errors.New("invalid target")
-			}
-
-			user, err := NewUser(message.From.ID, message.From.UserName)
-			if err != nil {
-				return err
-			}
-
-			// Info message
-			msgConfig := tgbotapi.NewMessage(
-				message.From.ID,
-				fmt.Sprintf(
-					"Den folgenden Api Key bitte sicher aufbewahren, "+
-						"das ist dein zugang zur App. Dieser key ist gebunden "+
-						"an deine Telegram ID.",
-				),
-			)
-
-			if _, err := p.Send(msgConfig); err != nil {
-				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-			}
-
-			// ApiKey message
-			msgConfig = tgbotapi.NewMessage(message.From.ID, fmt.Sprintf("`%s`", user.ApiKey))
-			msgConfig.ParseMode = "MarkdownV2"
-
-			if _, err := p.Send(msgConfig); err != nil {
-				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-			}
-
-			// Link to the pg-vis server singup page
-			msgConfig = tgbotapi.NewMessage(message.From.ID,
-				"Zur registrierung gehts hier lang")
-
-			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
-				[]tgbotapi.InlineKeyboardButton{
-					tgbotapi.NewInlineKeyboardButtonURL(
-						"Registrierung",
-						fmt.Sprintf(
-							"https://knackwurstking.com/pg-vis/signup?key=%s", // FIXME: This link does not exists yet
-							user.ApiKey,
-						),
-					),
-				},
-			)
-
-			if _, err := p.Send(msgConfig); err != nil {
-				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-			}
+			return p.handleStartPGVisSingUp(message)
 
 		case "pgvissingup":
-			if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
-				return errors.New("invalid target")
-			}
-
-			msgConfig := tgbotapi.NewMessage(
-				message.Chat.ID,
-				fmt.Sprintf(
-					"Wenn du auf den \"Sing Up\" Button klickst, "+
-						"bekommst du deinen Api Key zugesendet.\n\n"+
-						"Bitte ignorieren, immer noch am testen.",
-				),
-			)
-
-			msgConfig.ReplyToMessageID = message.MessageID
-
-			key := uuid.New().String()
-
-			button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", fmt.Sprintf("t.me/talice_bot?start=pgvissingup-%s", key))
-			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
-				[]tgbotapi.InlineKeyboardButton{
-					button,
-				},
-			)
-
-			if _, err := p.Send(msgConfig); err != nil {
-				slog.Error("Sending message failed", "extension", p.Name(), "error", err)
-			}
-
-			p.keys = append(p.keys, key)
+			return p.handlePGVisSingUp(message)
 		default:
 			return fmt.Errorf("unknown command: %s", command)
 		}
-
-		return nil
 	}
 
 	return fmt.Errorf("there is nothing to do here")
+}
+
+func (p *PGVis) handleStartPGVisSingUp(message *tgbotapi.Message) error {
+	key := strings.SplitN(message.Text, "-", 2)[1]
+	if !slices.Contains(p.keys, key) {
+		msgConfig := tgbotapi.NewMessage(message.From.ID,
+			"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
+
+		if _, err := p.Send(msgConfig); err != nil {
+			slog.Error("Sending message failed",
+				"extension", p.Name(), "error", err)
+		}
+
+		return errors.New("invalid target")
+	}
+
+	user, err := NewUser(message.From.ID, message.From.UserName)
+	if err != nil {
+		return err
+	}
+
+	// Info message
+	msgConfig := tgbotapi.NewMessage(
+		message.From.ID,
+		fmt.Sprintf(
+			"Den folgenden Api Key bitte sicher aufbewahren, "+
+				"das ist dein zugang zur App. Dieser key ist gebunden "+
+				"an deine Telegram ID.",
+		),
+	)
+
+	if _, err := p.Send(msgConfig); err != nil {
+		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	}
+
+	// ApiKey message
+	msgConfig = tgbotapi.NewMessage(message.From.ID, fmt.Sprintf("`%s`", user.ApiKey))
+	msgConfig.ParseMode = "MarkdownV2"
+
+	if _, err := p.Send(msgConfig); err != nil {
+		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	}
+
+	// Link to the pg-vis server singup page
+	msgConfig = tgbotapi.NewMessage(message.From.ID,
+		"Zur registrierung gehts hier lang")
+
+	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		[]tgbotapi.InlineKeyboardButton{
+			tgbotapi.NewInlineKeyboardButtonURL(
+				"Registrierung",
+				fmt.Sprintf(
+					"https://knackwurstking.com/pg-vis/signup?key=%s", // FIXME: This link does not exists yet
+					user.ApiKey,
+				),
+			),
+		},
+	)
+
+	if _, err := p.Send(msgConfig); err != nil {
+		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	}
+
+	return nil
+}
+
+func (p *PGVis) handlePGVisSingUp(message *tgbotapi.Message) error {
+	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
+		return errors.New("invalid target")
+	}
+
+	msgConfig := tgbotapi.NewMessage(
+		message.Chat.ID,
+		fmt.Sprintf(
+			"Wenn du auf den \"Sing Up\" Button klickst, "+
+				"bekommst du deinen Api Key zugesendet.\n\n"+
+				"Bitte ignorieren, immer noch am testen.",
+		),
+	)
+
+	msgConfig.ReplyToMessageID = message.MessageID
+
+	key := uuid.New().String()
+
+	button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", fmt.Sprintf("t.me/talice_bot?start=pgvissingup-%s", key))
+	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		[]tgbotapi.InlineKeyboardButton{
+			button,
+		},
+	)
+
+	if _, err := p.Send(msgConfig); err != nil {
+		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+	}
+
+	p.keys = append(p.keys, key)
+
+	return nil
 }
