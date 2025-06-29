@@ -119,7 +119,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 			}
 
 			// Link to the pg-vis server singup page
-			msgConfig = tgbotapi.NewMessage(update.CallbackQuery.From.ID,
+			msgConfig = tgbotapi.NewMessage(message.From.ID,
 				"Zur registrierung gehts hier lang")
 
 			msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
