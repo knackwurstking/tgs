@@ -7,7 +7,7 @@
     - [x] journal
     - [x] opmanga
     - [x] stats
-    - [ ] pgvis (work-in-progress)
+    - [x] pgvis
 - [x] Use a separate config for each botcommand
 
 **Changed**:
