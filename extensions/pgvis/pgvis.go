@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CBDataSingUpRequest = "Please, sign me up!"
+	CBDataSignUpRequest = "Please, sign me up!"
 )
 
 type Data struct {
@@ -65,7 +65,7 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgvissingup", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
+	mbc.Add("/pgvissignup", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
 }
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
@@ -76,7 +76,7 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 	command := update.Message.Command()
 
 	if command == "start" {
-		return strings.HasPrefix(update.Message.Text, "/start pgvissingup-")
+		return strings.HasPrefix(update.Message.Text, "/start pgvissignup-")
 	}
 
 	return strings.HasPrefix(command, "pgvis")
@@ -92,10 +92,10 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if message != nil {
 		switch command := message.Command(); command {
 		case "start":
-			return p.handleStartPGVisSingUp(message)
+			return p.handleStartPGVisSignUp(message)
 
-		case "pgvissingup":
-			return p.handlePGVisSingUp(message)
+		case "pgvissignup":
+			return p.handlePGVisSignUp(message)
 
 		default:
 			return fmt.Errorf("unknown command: %s", command)
@@ -105,7 +105,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	return fmt.Errorf("there is nothing to do here")
 }
 
-func (p *PGVis) handleStartPGVisSingUp(message *tgbotapi.Message) error {
+func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 	key := strings.SplitN(message.Text, "-", 2)[1]
 	if !slices.Contains(p.keys, key) {
 		msgConfig := tgbotapi.NewMessage(message.From.ID,
@@ -146,7 +146,7 @@ func (p *PGVis) handleStartPGVisSingUp(message *tgbotapi.Message) error {
 		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
 	}
 
-	// Link to the pg-vis server singup page
+	// Link to the pg-vis server signup page
 	msgConfig = tgbotapi.NewMessage(message.From.ID,
 		"Zur registrierung gehts hier lang")
 
@@ -169,7 +169,7 @@ func (p *PGVis) handleStartPGVisSingUp(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (p *PGVis) handlePGVisSingUp(message *tgbotapi.Message) error {
+func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
@@ -177,7 +177,7 @@ func (p *PGVis) handlePGVisSingUp(message *tgbotapi.Message) error {
 	msgConfig := tgbotapi.NewMessage(
 		message.Chat.ID,
 		fmt.Sprintf(
-			"Wenn du auf den \"Sing Up\" Button klickst, "+
+			"Wenn du auf den \"Sign Up\" Button klickst, "+
 				"bekommst du deinen Api Key zugesendet.\n\n"+
 				"Bitte ignorieren, immer noch am testen.",
 		),
@@ -187,7 +187,7 @@ func (p *PGVis) handlePGVisSingUp(message *tgbotapi.Message) error {
 
 	key := uuid.New().String()
 
-	button := tgbotapi.NewInlineKeyboardButtonURL("Sing Up", fmt.Sprintf("t.me/talice_bot?start=pgvissingup-%s", key))
+	button := tgbotapi.NewInlineKeyboardButtonURL("Sign Up", fmt.Sprintf("t.me/talice_bot?start=pgvissignup-%s", key))
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			button,
