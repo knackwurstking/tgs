@@ -187,7 +187,7 @@ func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 
 	key := uuid.New().String()
 
-	button := tgbotapi.NewInlineKeyboardButtonURL("Sign Up", fmt.Sprintf("t.me/talice_bot?start=pgvissignup-%s", key))
+	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgvissignup-%s", key))
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			button,
