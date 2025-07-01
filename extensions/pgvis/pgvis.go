@@ -154,10 +154,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 		[]tgbotapi.InlineKeyboardButton{
 			tgbotapi.NewInlineKeyboardButtonURL(
 				"PG: Vis Server",
-				fmt.Sprintf(
-					"https://knackwurstking.com/pg-vis/signup?access_token=%s",
-					user.ApiKey,
-				),
+				"https://knackwurstking.com/pg-vis/signup",
 			),
 		},
 	)
