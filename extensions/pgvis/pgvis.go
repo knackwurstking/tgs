@@ -178,8 +178,7 @@ func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 		message.Chat.ID,
 		fmt.Sprintf(
 			"Wenn du auf den \"Sign Up\" Button klickst, "+
-				"bekommst du deinen Api Key zugesendet.\n\n"+
-				"Bitte ignorieren, immer noch am testen.",
+				"bekommst du deinen Api Key zugesendet.",
 		),
 	)
 
