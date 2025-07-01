@@ -63,5 +63,7 @@ func NewUser(id int64, userName string) (*User, error) {
 		u.ApiKey = string(out)
 	}
 
+	// TODO: Add api key for this user to the users database
+
 	return u, nil
 }
