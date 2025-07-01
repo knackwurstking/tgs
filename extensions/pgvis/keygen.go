@@ -63,7 +63,10 @@ func NewUser(id int64, userName string) (*User, error) {
 		u.ApiKey = string(out)
 	}
 
-	// TODO: Add api key for this user to the users database
+	cmd = exec.Command("pg-vis", "user", "mod", "--api-key", u.ApiKey, fmt.Sprintf("%d", u.ID))
+	if err := cmd.Run(); err != nil {
+		return u, fmt.Errorf("adding api-key for user \"%d\" failed: %s", u.ID, err.Error())
+	}
 
 	return u, nil
 }
