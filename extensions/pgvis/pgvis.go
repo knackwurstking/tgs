@@ -174,7 +174,7 @@ func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 	msgConfig := tgbotapi.NewMessage(
 		message.Chat.ID,
 		fmt.Sprintf(
-			"Wenn du auf den \"Sign Up\" Button klickst, "+
+			"Wenn du auf den \"Registrieren\" Button klickst, "+
 				"bekommst du deinen Api Key zugesendet.",
 		),
 	)
