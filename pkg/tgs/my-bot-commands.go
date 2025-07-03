@@ -34,6 +34,8 @@ func (this *MyBotCommands) Add(command string, description string, scopes []Scop
 }
 
 func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
+	bot.Request(tgbotapi.NewDeleteMyCommands())
+
 	for scope, botCommands := range this.Commands {
 		scopeSplit := strings.SplitN(scope, ":", 3)
 
