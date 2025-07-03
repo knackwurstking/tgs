@@ -65,7 +65,7 @@ func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgvissignup", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
+	mbc.Add("/pgvisregister", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
 }
 
 func (p *PGVis) Is(update tgbotapi.Update) bool {
