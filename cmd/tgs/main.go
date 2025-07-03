@@ -99,6 +99,7 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		// Add commands from extension
 		for _, e := range extensions.Register {
+			slog.Debug(fmt.Sprintf("Add bot commands %#v", e.Name()))
 			e.AddBotCommands(myBotCommands)
 		}
 

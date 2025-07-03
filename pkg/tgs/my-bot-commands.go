@@ -2,6 +2,7 @@ package tgs
 
 import (
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 
@@ -19,6 +20,8 @@ func NewMyBotCommands() *MyBotCommands {
 }
 
 func (this *MyBotCommands) Add(command string, description string, scopes []Scope) {
+	slog.Debug(fmt.Sprintf("Add \"%s\" - %s - %#v", command, description, scopes))
+
 	for _, scope := range scopes {
 		scopeString := fmt.Sprintf("%s:%d:%d", scope.Type, scope.ChatID, scope.UserID)
 
@@ -34,6 +37,8 @@ func (this *MyBotCommands) Add(command string, description string, scopes []Scop
 }
 
 func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
+	slog.Debug("Register...")
+
 	for scope, botCommands := range this.Commands {
 		scopeSplit := strings.SplitN(scope, ":", 3)
 
@@ -48,6 +53,7 @@ func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
 			UserID: scopeUserID,
 		}
 
+		slog.Debug(fmt.Sprintf("Register command: %#v", setMyCommandsConfig.Scope))
 		_, err := bot.Request(setMyCommandsConfig)
 		if err != nil {
 			return err
