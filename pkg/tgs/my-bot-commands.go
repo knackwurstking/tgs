@@ -48,12 +48,7 @@ func (this *MyBotCommands) Register(bot *tgbotapi.BotAPI) error {
 			UserID: scopeUserID,
 		}
 
-		_, err := bot.Request(tgbotapi.NewSetMyCommands())
-		if err != nil {
-			return err
-		}
-
-		_, err = bot.Request(setMyCommandsConfig)
+		_, err := bot.Request(setMyCommandsConfig)
 		if err != nil {
 			return err
 		}
