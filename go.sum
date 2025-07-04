@@ -2,6 +2,8 @@ github.com/SuperPaintman/nice v0.0.0-20211001214957-a29cd3367b17 h1:9EjaewjKeb8f
 github.com/SuperPaintman/nice v0.0.0-20211001214957-a29cd3367b17/go.mod h1:uc5MKp25kkPkWcI4gcCtGZWUSKjdZlKjrHAVZ7OXb6k=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e h1:XmA6L9IPRdUr28a+SK/oMchGgQy159wvzXA5tJ7l+40=
+github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e/go.mod h1:AFIo+02s+12CEg8Gzz9kzhCbmbq6JcKNrhHffCGA9z4=
 github.com/knackwurstking/telegram-bot-api/v5 v5.6.0 h1:nehV/ON8z6y0xXbcmnz5YY0dt70srpSYcIP7ICNFt2Y=
 github.com/knackwurstking/telegram-bot-api/v5 v5.6.0/go.mod h1:A2S0CWkNylc2phvKXWBBdD3K0iGnDBGbzRpISP2zBl8=
 github.com/lmittmann/tint v1.0.5 h1:NQclAutOfYsqs2F1Lenue6OoWCajs5wJcP3DfWVpePw=
