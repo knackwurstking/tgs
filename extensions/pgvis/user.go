@@ -11,7 +11,7 @@ import (
 
 const (
 	PGVisExitCodeNotFound      = 10
-	PGVisExitCodeAlreadyExists = 20
+	PGVisExitCodeAlreadyExists = 20 // TODO: Need to implement this
 )
 
 type User struct {
