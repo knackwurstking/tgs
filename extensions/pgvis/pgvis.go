@@ -13,10 +13,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const (
-	CBDataSignUpRequest = "Please, sign me up!"
-)
-
 type Data struct {
 	Targets *tgs.Targets `yaml:"targets,omitempty"`
 	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
@@ -76,7 +72,7 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 	command := update.Message.Command()
 
 	if command == "start" {
-		return strings.HasPrefix(update.Message.Text, "/start pgvissignup-")
+		return strings.HasPrefix(update.Message.Text, "/start pgvisregister-")
 	}
 
 	return strings.HasPrefix(command, "pgvis")
@@ -92,10 +88,10 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if message != nil {
 		switch command := message.Command(); command {
 		case "start":
-			return p.handleStartPGVisSignUp(message)
+			return p.handleStartPGVisRegister(message)
 
-		case "pgvissignup":
-			return p.handlePGVisSignUp(message)
+		case "pgvisregister":
+			return p.handlePGVisRegister(message)
 
 		default:
 			return fmt.Errorf("unknown command: %s", command)
@@ -105,7 +101,7 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	return fmt.Errorf("there is nothing to do here")
 }
 
-func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
+func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 	key := strings.SplitN(message.Text, "-", 2)[1]
 	if !slices.Contains(p.keys, key) {
 		msgConfig := tgbotapi.NewMessage(message.From.ID,
@@ -145,7 +141,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 		log.Errorf("PGVis: Send message failed: %s", err)
 	}
 
-	// Link to the pg-vis server signup page
+	// Link to the pg-vis server login page
 	msgConfig = tgbotapi.NewMessage(message.From.ID,
 		"Zur registrierung gehts hier lang")
 
@@ -153,7 +149,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 		[]tgbotapi.InlineKeyboardButton{
 			tgbotapi.NewInlineKeyboardButtonURL(
 				"PG: Vis Server",
-				"https://knackwurstking.com/pg-vis/signup",
+				"https://knackwurstking.com/pg-vis/login",
 			),
 		},
 	)
@@ -165,7 +161,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
+func (p *PGVis) handlePGVisRegister(message *tgbotapi.Message) error {
 	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
@@ -182,7 +178,7 @@ func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 
 	key := uuid.New().String()
 
-	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgvissignup-%s", key))
+	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgvisregister-%s", key))
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			button,
