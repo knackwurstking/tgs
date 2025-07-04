@@ -3,6 +3,7 @@ package pgvis
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -53,7 +54,7 @@ func NewUser(id int64, userName string) (*User, error) {
 			}
 		} else {
 			// Get the api-key from the command output
-			u.ApiKey = string(out)
+			u.ApiKey = strings.Trim(string(out), "\n\r\t ")
 		}
 	}
 
@@ -66,7 +67,7 @@ func NewUser(id int64, userName string) (*User, error) {
 				return nil, fmt.Errorf("generating a new api key failed: %s", err.Error())
 			}
 
-			u.ApiKey = string(out)
+			u.ApiKey = strings.Trim(string(out), "\n\r\t ")
 		}
 	}
 
