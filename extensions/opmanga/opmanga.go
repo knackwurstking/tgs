@@ -3,7 +3,6 @@ package opmanga
 import (
 	"errors"
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
@@ -216,11 +216,11 @@ func (o *OPManga) Handle(update tgbotapi.Update) error {
 }
 
 func (o *OPManga) replyCallbackOPMangaCommand(message *tgbotapi.Message) error {
-	slog.Debug("Handle reply callback",
-		"command", message.Command(),
-		"message.Text", message.Text,
-		"message.MessageID", message.MessageID,
-		"message.ReplyToMessage.MessageID", message.ReplyToMessage.MessageID,
+	log.Debugf(
+		"OPManga: Handle reply callback for \"%s\" (%d): text=%s; message_id=%d",
+		message.Command(), message.ReplyToMessage.MessageID,
+		message.Text,
+		message.MessageID,
 	)
 
 	arcs, err := o.arcs()
@@ -250,7 +250,7 @@ func (o *OPManga) replyCallbackOPMangaCommand(message *tgbotapi.Message) error {
 
 				_, err = o.Send(documentConfig)
 				if err != nil {
-					slog.Error("Send chapter", "error", err)
+					log.Errorf("OPManga: Send chapter failed: %s", err.Error())
 					return err
 				}
 

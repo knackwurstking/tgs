@@ -3,12 +3,12 @@ package journal
 import (
 	"errors"
 	"fmt"
-	"log/slog"
 	"os/exec"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gopkg.in/yaml.v3"
 
@@ -94,7 +94,7 @@ func (u *Units) GetOutput(name string) (data []byte, err error) {
 		)
 	}
 
-	slog.Debug("Run journalctl command", "args", cmd.Args)
+	log.Debugf("Journal: Units: Run journalctl command with args %#v", cmd.Args)
 	if data, err = cmd.CombinedOutput(); err != nil {
 		return nil, err
 	} else {
@@ -259,11 +259,11 @@ func (j *Journal) Handle(update tgbotapi.Update) error {
 }
 
 func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
-	slog.Debug("Handle reply callback",
-		"command", message.Command(),
-		"message.Text", message.Text,
-		"message.MessageID", message.MessageID,
-		"message.ReplyToMessage.MessageID", message.ReplyToMessage.MessageID,
+	log.Debugf(
+		"Journal: Handle reply callback for \"%s\" (%d): text=%s; message_id=%d",
+		message.Command(), message.ReplyToMessage.MessageID,
+		message.Text,
+		message.MessageID,
 	)
 
 	messageSplit := strings.Split(message.Text, " ")

@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/SuperPaintman/nice/cli"
+	"github.com/charmbracelet/log"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/lmittmann/tint"
 	"gopkg.in/yaml.v3"
 
 	"github.com/knackwurstking/tgs/extensions"
@@ -37,55 +36,42 @@ func main() {
 
 func actionHandler() func(cmd *cli.Command) error {
 	return func(cmd *cli.Command) error {
-		var (
-			err error
-			bot *tgbotapi.BotAPI
-		)
-
-		slog.SetDefault(
-			slog.New(
-				tint.NewHandler(os.Stderr, &tint.Options{
-					AddSource: true,
-					Level:     slog.LevelDebug,
-				}),
-			),
-		)
-
-		var configHome string
-		if configHome, err = os.UserConfigDir(); err != nil {
-			return err
-		}
-
-		apiConfigPath := filepath.Join(configHome, applicationName, "api.yaml")
-		slog.Debug("API Config location", "path", apiConfigPath)
-
-		c := NewConfig()
-		if err = loadConfig(apiConfigPath, c); err != nil {
-			return err
-		}
-		if c.Token == "" {
-			return fmt.Errorf("missing token")
-		}
-
-		bot, err = tgbotapi.NewBotAPI(c.Token)
+		configHome, err := os.UserConfigDir()
 		if err != nil {
 			return err
 		}
 
-		slog.Info("Authorized bot", "username", bot.Self.UserName)
+		apiConfigPath := filepath.Join(configHome, applicationName, "api.yaml")
+
+		log.SetLevel(log.DebugLevel)
+
+		c := NewConfig()
+
+		if err = loadConfig(apiConfigPath, c); err != nil {
+			return err
+		}
+
+		if c.Token == "" {
+			return fmt.Errorf("missing token")
+		}
+
+		bot, err := tgbotapi.NewBotAPI(c.Token)
+		if err != nil {
+			return err
+		}
+
+		log.Infof("Authorized bot with username: %s", bot.Self.UserName)
 		bot.Debug = false
 
 		// Setup bots
 		for _, e := range extensions.Register {
 			if e.ConfigPath() == "" {
-				slog.Debug("Skip config for extension", "name", e.Name())
+				log.Debugf("Skip configuration for extension: %s", e.Name())
 				continue
 			}
 
 			configPath := filepath.Join(configHome, applicationName, e.ConfigPath())
-			slog.Debug("Try to load extension configuration",
-				"name", e.Name(), "path", configPath)
-
+			log.Debugf("Try to load the configuration for the \"%s\" extension", e.Name())
 			err = loadConfig(configPath, e)
 			if err != nil {
 				return err
@@ -99,7 +85,7 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		// Add commands from extension
 		for _, e := range extensions.Register {
-			slog.Debug(fmt.Sprintf("Add bot commands %#v", e.Name()))
+			log.Debugf("Add bot commands for the \"%s\" extension", e.Name())
 			e.AddBotCommands(myBotCommands)
 		}
 
@@ -112,46 +98,41 @@ func actionHandler() func(cmd *cli.Command) error {
 		updateConfig.Timeout = 60 // 1min
 
 		updateChan := bot.GetUpdatesChan(updateConfig)
-		for {
-			select {
-			case update := <-updateChan:
-				updateConfig.Offset = update.UpdateID + 1
-				go handleUpdate(update)
-			}
+		for update := range updateChan {
+			updateConfig.Offset = update.UpdateID + 1
+			go handleUpdate(update)
 		}
+
+		return nil
 	}
 }
 
 func handleUpdate(update tgbotapi.Update) {
 	if update.Message != nil {
-		slog.Debug(
-			"New update",
-			"message.Command", update.Message.Command,
-			"message.Text", update.Message.Text,
-			"message.From", update.Message.From,
-			"message.From.ID", update.Message.From.ID,
-			"message.Chat", update.Message.Chat,
+		log.Debugf(
+			"Message: Handle update from %d: %s - %s",
+			update.Message.From.ID,
+			update.Message.Command(), update.Message.Text,
 		)
-	} else {
-		slog.Debug("New update without a message",
-			"update.CallbackQuery", update.CallbackQuery,
-		)
-	}
 
-	if update.Message == nil && update.CallbackQuery == nil {
+		log.Debugf("--> From: %#v", update.Message.From)
+		log.Debugf("--> Chat: %#v", update.Message.Chat)
+	} else if update.CallbackQuery != nil {
+		log.Debugf("CallbackQuery: Handle update from %d: %#v",
+			update.Message.From.ID, update.CallbackQuery)
+	} else {
+		log.Debugf("Unknown: Handle update from %d: %#v",
+			update.Message.From.ID, update)
 		return
 	}
 
 	for _, e := range extensions.Register {
 		if e.Is(update) {
 			go func() {
-				slog.Debug("Handle update", "extension", e.Name())
+				log.Debugf("Extension: %s: Handle update", e.Name())
 
 				if err := e.Handle(update); err != nil {
-					slog.Warn("Handle update failed",
-						"extension", e.Name(),
-						"error", err,
-					)
+					log.Warnf("Extension: %s: Handle update failed: %s", e.Name(), err)
 				}
 			}()
 		}
@@ -159,6 +140,8 @@ func handleUpdate(update tgbotapi.Update) {
 }
 
 func loadConfig(path string, v any) error {
+	log.Debugf("Loading configuration from: %s", path)
+
 	extension := filepath.Ext(path)
 	if extension != ".yaml" {
 		return fmt.Errorf("unknown file type: %s", extension)

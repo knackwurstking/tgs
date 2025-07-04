@@ -3,10 +3,10 @@ package pgvis
 import (
 	"errors"
 	"fmt"
-	"log/slog"
 	"slices"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
 	"github.com/knackwurstking/tgs/pkg/tgs"
@@ -112,8 +112,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 			"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
 
 		if _, err := p.Send(msgConfig); err != nil {
-			slog.Error("Sending message failed",
-				"extension", p.Name(), "error", err)
+			log.Errorf("PGVis: Send message failed: %s", err)
 		}
 
 		return errors.New("invalid target")
@@ -135,7 +134,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+		log.Errorf("PGVis: Send message failed: %s", err)
 	}
 
 	// ApiKey message
@@ -143,7 +142,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 	msgConfig.ParseMode = "MarkdownV2"
 
 	if _, err := p.Send(msgConfig); err != nil {
-		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+		log.Errorf("PGVis: Send message failed: %s", err)
 	}
 
 	// Link to the pg-vis server signup page
@@ -160,7 +159,7 @@ func (p *PGVis) handleStartPGVisSignUp(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+		log.Errorf("PGVis: Send message failed: %s", err)
 	}
 
 	return nil
@@ -191,7 +190,7 @@ func (p *PGVis) handlePGVisSignUp(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		slog.Error("Sending message failed", "extension", p.Name(), "error", err)
+		log.Errorf("PGVis: Send message failed: %s", err)
 	}
 
 	p.keys = append(p.keys, key)

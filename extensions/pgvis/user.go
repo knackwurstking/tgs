@@ -2,10 +2,10 @@ package pgvis
 
 import (
 	"fmt"
-	"log/slog"
 	"os/exec"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/goombaio/namegenerator"
 )
 
@@ -35,7 +35,7 @@ func NewUser(id int64, userName string) (*User, error) {
 			if c, ok := err.(*exec.ExitError); !ok {
 				return nil, err
 			} else {
-				slog.Debug(fmt.Sprintf("Command failed with %d", c.ExitCode()))
+				log.Debugf("Command failed with %d", c.ExitCode())
 
 				// NOTE: For now, 10 is the code used for not found
 				if c.ExitCode() != PGVisExitCodeNotFound {
@@ -79,7 +79,7 @@ func NewUser(id int64, userName string) (*User, error) {
 
 	{ // Mod: User Name
 		if u.UserName == "" {
-			slog.Debug(fmt.Sprintf("Telegram user \"%d\" is missing a user name, generate one...", u.ID))
+			log.Debugf("Telegram user \"%d\" is missing a user name, generate one...", u.ID)
 
 			var (
 				cmd *exec.Cmd
@@ -100,7 +100,7 @@ func NewUser(id int64, userName string) (*User, error) {
 						if c.ExitCode() == PGVisExitCodeAlreadyExists {
 							continue
 						} else {
-							slog.Debug(fmt.Sprintf("...Found a new user name for \"%d\": %s", u.ID, u.UserName))
+							log.Debugf("...Found a new user name for \"%d\": %s", u.ID, u.UserName)
 							break
 						}
 					}
