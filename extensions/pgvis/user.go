@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/log"
-	"github.com/goombaio/namegenerator"
 )
 
 const (
@@ -89,9 +87,4 @@ func NewUser(id int64, userName string) (*User, error) {
 	}
 
 	return u, nil
-}
-
-func generateUserName() string {
-	g := namegenerator.NewNameGenerator(time.Now().Unix())
-	return g.Generate()
 }
