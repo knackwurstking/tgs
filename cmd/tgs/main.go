@@ -44,6 +44,7 @@ func actionHandler() func(cmd *cli.Command) error {
 		apiConfigPath := filepath.Join(configHome, applicationName, "api.yaml")
 
 		log.SetLevel(log.DebugLevel)
+		log.SetReportCaller(true)
 
 		c := NewConfig()
 
