@@ -116,6 +116,11 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 
 	user, err := NewUser(message.From.ID, message.From.UserName)
 	if err != nil {
+		p.Send(tgbotapi.NewMessage(
+			message.From.ID,
+			fmt.Sprintf("Error: %s", err.Error()),
+		))
+
 		return err
 	}
 
