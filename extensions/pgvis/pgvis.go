@@ -114,7 +114,12 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 		return errors.New("invalid target")
 	}
 
-	user, err := NewUser(message.From.ID, message.From.UserName)
+	userName := message.From.UserName
+	if userName == "" {
+		userName = strings.Trim(message.From.FirstName+" "+message.From.LastName, " ")
+	}
+
+	user, err := NewUser(message.From.ID, userName)
 	if err != nil {
 		p.Send(tgbotapi.NewMessage(
 			message.From.ID,

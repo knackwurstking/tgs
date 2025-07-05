@@ -78,15 +78,10 @@ func NewUser(id int64, userName string) (*User, error) {
 	}
 
 	{ // Mod: User Name
-		if u.UserName == "" {
-			log.Debugf("Telegram user \"%d\" is missing a user name, generate one...", u.ID)
-
-			userName := generateUserName()
-
-			cmd := exec.Command("pg-vis", "user", "mod", "--name", u.UserName, fmt.Sprintf("%d", u.ID))
-
+		if u.UserName == "" && userName != "" {
+			cmd := exec.Command("pg-vis", "user", "mod", "--name", userName, fmt.Sprintf("%d", u.ID))
 			if err := cmd.Run(); err != nil {
-				log.Error("Adding user name for \"%d\" failed: %s", u.ID, err.Error())
+				log.Error("Update user name for \"%d\" failed: %s", u.ID, err.Error())
 			} else {
 				u.UserName = userName
 			}
