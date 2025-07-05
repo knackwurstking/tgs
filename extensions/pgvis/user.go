@@ -92,19 +92,19 @@ func NewUser(id int64, userName string) (*User, error) {
 			for true {
 				u.UserName = generateUserName()
 
-				cmd = exec.Command("pg-vis", "user", "mod", fmt.Sprintf("%d", u.ID), u.UserName)
+				cmd = exec.Command("pg-vis", "user", "mod", "--name", u.UserName, fmt.Sprintf("%d", u.ID))
 
 				if err = cmd.Run(); err != nil {
-					if c, ok = err.(*exec.ExitError); !ok {
-						return nil, fmt.Errorf("adding api-key for user \"%d\" failed: %s", u.ID, err.Error())
-					} else {
+					if c, ok = err.(*exec.ExitError); ok {
 						if c.ExitCode() == PGVisExitCodeAlreadyExists {
 							continue
-						} else {
-							log.Debugf("...Found a new user name for \"%d\": %s", u.ID, u.UserName)
-							break
 						}
 					}
+
+					return nil, fmt.Errorf("adding user name for \"%d\" failed: %s", u.ID, err.Error())
+				} else {
+					log.Debugf("...Found a new user name for \"%d\": %s", u.ID, u.UserName)
+					break
 				}
 			}
 		}
