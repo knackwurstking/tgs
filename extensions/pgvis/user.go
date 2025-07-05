@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	PGVisExitCodeNotFound      = 10
-	PGVisExitCodeAlreadyExists = 20 // TODO: Need to implement this
+	PGVisExitCodeNotFound = 10
 )
 
 type User struct {
@@ -82,30 +81,14 @@ func NewUser(id int64, userName string) (*User, error) {
 		if u.UserName == "" {
 			log.Debugf("Telegram user \"%d\" is missing a user name, generate one...", u.ID)
 
-			var (
-				cmd *exec.Cmd
-				err error
-				c   *exec.ExitError
-				ok  bool
-			)
+			userName := generateUserName()
 
-			for true {
-				u.UserName = generateUserName()
+			cmd := exec.Command("pg-vis", "user", "mod", "--name", u.UserName, fmt.Sprintf("%d", u.ID))
 
-				cmd = exec.Command("pg-vis", "user", "mod", "--name", u.UserName, fmt.Sprintf("%d", u.ID))
-
-				if err = cmd.Run(); err != nil {
-					if c, ok = err.(*exec.ExitError); ok {
-						if c.ExitCode() == PGVisExitCodeAlreadyExists {
-							continue
-						}
-					}
-
-					return nil, fmt.Errorf("adding user name for \"%d\" failed: %s", u.ID, err.Error())
-				} else {
-					log.Debugf("...Found a new user name for \"%d\": %s", u.ID, u.UserName)
-					break
-				}
+			if err := cmd.Run(); err != nil {
+				log.Error("Adding user name for \"%d\" failed: %s", u.ID, err.Error())
+			} else {
+				u.UserName = userName
 			}
 		}
 	}
