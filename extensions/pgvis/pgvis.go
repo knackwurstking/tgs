@@ -159,7 +159,7 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 		[]tgbotapi.InlineKeyboardButton{
 			tgbotapi.NewInlineKeyboardButtonURL(
 				"PG: Vis Server",
-				"https://knackwurstking.com/pg-vis/login",
+				"https://knackwurstking.com/pg-vis/profile",
 			),
 		},
 	)
