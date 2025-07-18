@@ -1,6 +1,7 @@
 package pgvis
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -66,7 +67,18 @@ func NewUser(id int64, userName string) (*User, error) {
 			if err != nil {
 				return nil, err
 			}
+
+			// Modify the users api-key using the pg-vis command
+			cmd = exec.Command("pg-vis", "user", "mod", "--api-key", user.ApiKey, strconv.Itoa(int(user.ID)))
+			if err = cmd.Run(); err != nil {
+				return nil, err
+			}
 		}
+	}
+
+	// Final safety check, should never happen :)
+	if user.ApiKey == "" {
+		return nil, errors.New("failed to generate API key")
 	}
 
 	return user, nil
