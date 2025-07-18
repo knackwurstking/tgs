@@ -3,6 +3,7 @@ package pgvis
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/log"
@@ -19,72 +20,63 @@ type User struct {
 }
 
 func NewUser(id int64, userName string) (*User, error) {
-	u := &User{
+	user := &User{
 		ID:       id,
 		UserName: userName,
-		ApiKey:   "",
 	}
 
-	{ // Get user from "pg-vis" or create a new one
-		cmd := exec.Command("pg-vis", "user", "show", "--api-key", fmt.Sprintf("%d", id))
+	// Check if the user already exists in the pg-vis database
+	cmd := exec.Command("pg-vis", "user", "show", "--api-key", fmt.Sprintf("%d", id))
+	out, err := cmd.Output()
+	if err != nil {
+		// Error handling
+		c, ok := err.(*exec.ExitError)
+		if !ok {
+			return nil, err
+		}
 
-		if out, err := cmd.Output(); err != nil {
-			// Error handling
-			if c, ok := err.(*exec.ExitError); !ok {
-				return nil, err
-			} else {
-				log.Debugf("Command failed with %d", c.ExitCode())
+		log.Debugf("Command failed with %d", c.ExitCode())
 
-				// NOTE: For now, 10 is the code used for not found
-				if c.ExitCode() != PGVisExitCodeNotFound {
-					return nil, fmt.Errorf(
-						"pg-vis command failed with an exit code %d",
-						c.ExitCode(),
-					)
-				}
+		// Check if the error is due to the user not being found
+		if c.ExitCode() != PGVisExitCodeNotFound {
+			return nil, fmt.Errorf(
+				"pg-vis command failed with an exit code %d",
+				c.ExitCode(),
+			)
+		}
 
-				// Add a new user to the pg-vis database
-				cmd = exec.Command("pg-vis", "user", "add", fmt.Sprintf("%d", id), userName)
-				if err := cmd.Run(); err != nil {
-					return nil, fmt.Errorf("creating user failed: %s", err.Error())
-				}
-			}
+		// Generate a new API key first
+		user.ApiKey, err = generateApiKey()
+		if err != nil {
+			return nil, err
+		}
+
+		// Add new user with the generated API key
+		cmd = exec.Command("pg-vis", "user", "add", strconv.Itoa(int(user.ID)), user.UserName, user.ApiKey)
+		out, err = cmd.Output()
+		if err != nil {
+			return nil, err
+		}
+		user.ApiKey = strings.TrimSpace(string(out))
+	} else {
+		if out := strings.TrimSpace(string(out)); out != "" {
+			user.ApiKey = strings.TrimSpace(string(out))
 		} else {
-			// Get the api-key from the command output
-			u.ApiKey = strings.Trim(string(out), "\n\r\t ")
-		}
-	}
-
-	{ // Generate a new api key for this user if needed
-		if u.ApiKey == "" {
-			cmd := exec.Command("pg-vis", "api-key")
-
-			out, err := cmd.Output()
+			user.ApiKey, err = generateApiKey()
 			if err != nil {
-				return nil, fmt.Errorf("generating a new api key failed: %s", err.Error())
-			}
-
-			u.ApiKey = strings.Trim(string(out), "\n\r\t ")
-		}
-	}
-
-	{ // Mod: Api Key
-		cmd := exec.Command("pg-vis", "user", "mod", "--api-key", u.ApiKey, fmt.Sprintf("%d", u.ID))
-		if err := cmd.Run(); err != nil {
-			return nil, fmt.Errorf("adding api-key for user \"%d\" failed: %s", u.ID, err.Error())
-		}
-	}
-
-	{ // Mod: User Name
-		if u.UserName == "" && userName != "" {
-			cmd := exec.Command("pg-vis", "user", "mod", "--name", userName, fmt.Sprintf("%d", u.ID))
-			if err := cmd.Run(); err != nil {
-				log.Error("Update user name for \"%d\" failed: %s", u.ID, err.Error())
-			} else {
-				u.UserName = userName
+				return nil, err
 			}
 		}
 	}
 
-	return u, nil
+	return user, nil
+}
+
+func generateApiKey() (string, error) {
+	cmd := exec.Command("pg-vis", "api-key")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(out)), nil
 }
