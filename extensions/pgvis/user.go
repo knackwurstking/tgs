@@ -54,11 +54,9 @@ func NewUser(id int64, userName string) (*User, error) {
 
 		// Add new user with the generated API key
 		cmd = exec.Command("pg-vis", "user", "add", strconv.Itoa(int(user.ID)), user.UserName, user.ApiKey)
-		out, err = cmd.Output()
-		if err != nil {
+		if err = cmd.Run(); err != nil {
 			return nil, err
 		}
-		user.ApiKey = strings.TrimSpace(string(out))
 	} else {
 		if out := strings.TrimSpace(string(out)); out != "" {
 			user.ApiKey = strings.TrimSpace(string(out))
