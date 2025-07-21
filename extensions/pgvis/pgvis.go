@@ -153,13 +153,13 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 
 	// Link to the pg-vis server login page
 	msgConfig = tgbotapi.NewMessage(message.From.ID,
-		"Zur registrierung gehts hier lang")
+		"Einfach den Api Key beim Login einfügen.")
 
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			tgbotapi.NewInlineKeyboardButtonURL(
 				"PG: Vis Server",
-				"https://knackwurstking.com/pg-vis/profile",
+				"https://knackwurstking.com/pg-vis/",
 			),
 		},
 	)
