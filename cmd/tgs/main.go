@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/SuperPaintman/nice/cli"
 	"github.com/charmbracelet/log"
@@ -45,6 +46,7 @@ func actionHandler() func(cmd *cli.Command) error {
 
 		log.SetLevel(log.DebugLevel)
 		log.SetReportCaller(true)
+		log.SetTimeFormat(time.RFC3339)
 
 		c := NewConfig()
 
