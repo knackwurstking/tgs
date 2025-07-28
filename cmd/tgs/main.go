@@ -124,8 +124,7 @@ func handleUpdate(update tgbotapi.Update) {
 		log.Debugf("CallbackQuery: Handle update from %d: %#v",
 			update.Message.From.ID, update.CallbackQuery)
 	} else {
-		log.Debugf("Unknown: Handle update from %d: %#v",
-			update.Message.From.ID, update)
+		log.Debugf("Unknown: Handle update: %#v", update)
 		return
 	}
 
