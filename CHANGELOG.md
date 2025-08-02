@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v2.1.1 [2025-08-02]
+
+**Changed**:
+
+- Updated all references from "pg-vis" to "pg-press"
+- Changed "Vis" to "Presse" (German)
+
+**Fixed**:
+
+- Corrected German terminology and naming conventions
+
 ## v2.1.0 [2025-08-02]
 
 **Breaking Changes**:
