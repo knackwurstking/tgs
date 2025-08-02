@@ -1,4 +1,4 @@
-package pgvis
+package pgpress
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	PGVisExitCodeNotFound = 10
+	PGPressExitCodeNotFound = 10
 )
 
 type User struct {
@@ -39,7 +39,7 @@ func NewUser(id int64, userName string) (*User, error) {
 		log.Debugf("Command failed with %d", c.ExitCode())
 
 		// Check if the error is due to the user not being found
-		if c.ExitCode() != PGVisExitCodeNotFound {
+		if c.ExitCode() != PGPressExitCodeNotFound {
 			return nil, fmt.Errorf(
 				"pg-vis command failed with an exit code %d",
 				c.ExitCode(),

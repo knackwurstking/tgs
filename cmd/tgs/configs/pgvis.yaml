@@ -1,15 +1,15 @@
 # NOTE: This is just an example
 define:
-    - &PGVisServerChatID <number>
+  - &PGPressServerChatID <number>
 
 # `[]tgs.Scope`
 scopes:
-    - type: chat
-      chat_id: *PGVisServerChatID
+  - type: chat
+    chat_id: *PGPressServerChatID
 
 # `tgs.Targets`
 targets:
-    chats:
-        - id: *PGVisServerChatID
-          type: supergroup
-          message_thread_id: <number>
+  chats:
+    - id: *PGPressServerChatID
+      type: supergroup
+      message_thread_id: <number>

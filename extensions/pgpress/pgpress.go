@@ -1,4 +1,4 @@
-package pgvis
+package pgpress
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type Data struct {
 	Scopes  []tgs.Scope  `yaml:"scopes,omitempty"`
 }
 
-type PGVis struct {
+type PGPress struct {
 	*tgbotapi.BotAPI
 
 	data *Data
@@ -26,8 +26,8 @@ type PGVis struct {
 	keys []string
 }
 
-func New(api *tgbotapi.BotAPI) *PGVis {
-	return &PGVis{
+func New(api *tgbotapi.BotAPI) *PGPress {
+	return &PGPress{
 		data: &Data{
 			Targets: tgs.NewTargets(),
 			Scopes:  make([]tgs.Scope, 0),
@@ -40,31 +40,31 @@ func NewExtension(api *tgbotapi.BotAPI) tgs.Extension {
 	return New(api)
 }
 
-func (p *PGVis) Name() string {
-	return "pgvis"
+func (p *PGPress) Name() string {
+	return "pgpress"
 }
 
-func (p *PGVis) SetBot(api *tgbotapi.BotAPI) {
+func (p *PGPress) SetBot(api *tgbotapi.BotAPI) {
 	p.BotAPI = api
 }
 
-func (p *PGVis) ConfigPath() string {
-	return "pgvis.yaml"
+func (p *PGPress) ConfigPath() string {
+	return "pgpress.yaml"
 }
 
-func (p *PGVis) MarshalYAML() (any, error) {
+func (p *PGPress) MarshalYAML() (any, error) {
 	return p.data, nil
 }
 
-func (p *PGVis) UnmarshalYAML(value *yaml.Node) error {
+func (p *PGPress) UnmarshalYAML(value *yaml.Node) error {
 	return value.Decode(p.data)
 }
 
-func (p *PGVis) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgvisregister", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
+func (p *PGPress) AddBotCommands(mbc *tgs.MyBotCommands) {
+	mbc.Add("/pgpressregister", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
 }
 
-func (p *PGVis) Is(update tgbotapi.Update) bool {
+func (p *PGPress) Is(update tgbotapi.Update) bool {
 	if update.Message == nil {
 		return false
 	}
@@ -72,13 +72,13 @@ func (p *PGVis) Is(update tgbotapi.Update) bool {
 	command := update.Message.Command()
 
 	if command == "start" {
-		return strings.HasPrefix(update.Message.Text, "/start pgvisregister-")
+		return strings.HasPrefix(update.Message.Text, "/start pgpressregister-")
 	}
 
-	return strings.HasPrefix(command, "pgvis")
+	return strings.HasPrefix(command, "pgpress")
 }
 
-func (p *PGVis) Handle(update tgbotapi.Update) error {
+func (p *PGPress) Handle(update tgbotapi.Update) error {
 	if p.BotAPI == nil {
 		panic("BotAPI is nil!")
 	}
@@ -88,10 +88,10 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	if message != nil {
 		switch command := message.Command(); command {
 		case "start":
-			return p.handleStartPGVisRegister(message)
+			return p.handleStartPGPressRegister(message)
 
-		case "pgvisregister":
-			return p.handlePGVisRegister(message)
+		case "pgpressregister":
+			return p.handlePGPressRegister(message)
 
 		default:
 			return fmt.Errorf("unknown command: %s", command)
@@ -101,14 +101,14 @@ func (p *PGVis) Handle(update tgbotapi.Update) error {
 	return fmt.Errorf("there is nothing to do here")
 }
 
-func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
+func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 	key := strings.SplitN(message.Text, "-", 2)[1]
 	if !slices.Contains(p.keys, key) {
 		msgConfig := tgbotapi.NewMessage(message.From.ID,
 			"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
 
 		if _, err := p.Send(msgConfig); err != nil {
-			log.Errorf("PGVis: Send message failed: %s", err)
+			log.Errorf("PGPress: Send message failed: %s", err)
 		}
 
 		return errors.New("invalid target")
@@ -140,7 +140,7 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGVis: Send message failed: %s", err)
+		log.Errorf("PGPress: Send message failed: %s", err)
 	}
 
 	// ApiKey message
@@ -148,7 +148,7 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 	msgConfig.ParseMode = "MarkdownV2"
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGVis: Send message failed: %s", err)
+		log.Errorf("PGPress: Send message failed: %s", err)
 	}
 
 	// Link to the pg-vis server login page
@@ -165,13 +165,13 @@ func (p *PGVis) handleStartPGVisRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGVis: Send message failed: %s", err)
+		log.Errorf("PGPress: Send message failed: %s", err)
 	}
 
 	return nil
 }
 
-func (p *PGVis) handlePGVisRegister(message *tgbotapi.Message) error {
+func (p *PGPress) handlePGPressRegister(message *tgbotapi.Message) error {
 	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
 		return errors.New("invalid target")
 	}
@@ -188,7 +188,7 @@ func (p *PGVis) handlePGVisRegister(message *tgbotapi.Message) error {
 
 	key := uuid.New().String()
 
-	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgvisregister-%s", key))
+	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgpressregister-%s", key))
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			button,
@@ -196,7 +196,7 @@ func (p *PGVis) handlePGVisRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGVis: Send message failed: %s", err)
+		log.Errorf("PGPress: Send message failed: %s", err)
 	}
 
 	p.keys = append(p.keys, key)
