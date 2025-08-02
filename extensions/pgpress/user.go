@@ -26,8 +26,8 @@ func NewUser(id int64, userName string) (*User, error) {
 		UserName: userName,
 	}
 
-	// Check if the user already exists in the pg-vis database
-	cmd := exec.Command("pg-vis", "user", "show", "--api-key", fmt.Sprintf("%d", id))
+	// Check if the user already exists in the pg-press database
+	cmd := exec.Command("pg-press", "user", "show", "--api-key", fmt.Sprintf("%d", id))
 	out, err := cmd.Output()
 	if err != nil {
 		// Error handling
@@ -41,7 +41,7 @@ func NewUser(id int64, userName string) (*User, error) {
 		// Check if the error is due to the user not being found
 		if c.ExitCode() != PGPressExitCodeNotFound {
 			return nil, fmt.Errorf(
-				"pg-vis command failed with an exit code %d",
+				"pg-press command failed with an exit code %d",
 				c.ExitCode(),
 			)
 		}
@@ -53,7 +53,7 @@ func NewUser(id int64, userName string) (*User, error) {
 		}
 
 		// Add new user with the generated API key
-		cmd = exec.Command("pg-vis", "user", "add", strconv.Itoa(int(user.ID)), user.UserName, user.ApiKey)
+		cmd = exec.Command("pg-press", "user", "add", strconv.Itoa(int(user.ID)), user.UserName, user.ApiKey)
 		if err = cmd.Run(); err != nil {
 			return nil, err
 		}
@@ -66,8 +66,8 @@ func NewUser(id int64, userName string) (*User, error) {
 				return nil, err
 			}
 
-			// Modify the users api-key using the pg-vis command
-			cmd = exec.Command("pg-vis", "user", "mod", "--api-key", user.ApiKey, strconv.Itoa(int(user.ID)))
+			// Modify the users api-key using the pg-press command
+			cmd = exec.Command("pg-press", "user", "mod", "--api-key", user.ApiKey, strconv.Itoa(int(user.ID)))
 			if err = cmd.Run(); err != nil {
 				return nil, err
 			}
@@ -83,7 +83,7 @@ func NewUser(id int64, userName string) (*User, error) {
 }
 
 func generateApiKey() (string, error) {
-	cmd := exec.Command("pg-vis", "api-key")
+	cmd := exec.Command("pg-press", "api-key")
 	out, err := cmd.Output()
 	if err != nil {
 		return "", err

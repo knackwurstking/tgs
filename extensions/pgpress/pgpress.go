@@ -61,7 +61,7 @@ func (p *PGPress) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func (p *PGPress) AddBotCommands(mbc *tgs.MyBotCommands) {
-	mbc.Add("/pgpressregister", "Get an api key for the \"PG Vis Server\" project.", p.data.Scopes)
+	mbc.Add("/pgpressregister", "Get an api key for the \"PG Presse Server\" project.", p.data.Scopes)
 }
 
 func (p *PGPress) Is(update tgbotapi.Update) bool {
@@ -151,15 +151,15 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 		log.Errorf("PGPress: Send message failed: %s", err)
 	}
 
-	// Link to the pg-vis server login page
+	// Link to the pg-press server login page
 	msgConfig = tgbotapi.NewMessage(message.From.ID,
 		"Einfach den Api Key beim Login einfügen.")
 
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			tgbotapi.NewInlineKeyboardButtonURL(
-				"PG: Vis Server",
-				"https://knackwurstking.com/pg-vis/",
+				"PG: Presse Server",
+				"https://knackwurstking.com/pg-press/",
 			),
 		},
 	)
