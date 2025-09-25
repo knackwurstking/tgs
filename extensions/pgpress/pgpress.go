@@ -80,10 +80,18 @@ func (p *PGPress) Is(update tgbotapi.Update) bool {
 
 func (p *PGPress) Handle(update tgbotapi.Update) error {
 	if p.BotAPI == nil {
+		log.Error("PGPress extension BotAPI is nil")
 		panic("BotAPI is nil!")
 	}
 
 	message := update.Message
+	log.Debug("PGPress extension handling update",
+		"user_id", message.From.ID,
+		"username", message.From.UserName,
+		"chat_id", message.Chat.ID,
+		"command", message.Command(),
+		"message_text", message.Text,
+	)
 
 	if message != nil {
 		switch command := message.Command(); command {
@@ -102,13 +110,29 @@ func (p *PGPress) Handle(update tgbotapi.Update) error {
 }
 
 func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
+	log.Info("Processing PGPress registration start",
+		"user_id", message.From.ID,
+		"username", message.From.UserName,
+		"message_text", message.Text,
+	)
+
 	key := strings.SplitN(message.Text, "-", 2)[1]
+	log.Debug("Extracted registration key from deep link", "key", key)
+
 	if !slices.Contains(p.keys, key) {
+		log.Warn("Invalid or expired registration key",
+			"key", key,
+			"user_id", message.From.ID,
+			"available_keys_count", len(p.keys),
+		)
 		msgConfig := tgbotapi.NewMessage(message.From.ID,
 			"Tut mir leid, Aber dieser \"Deep Link\" ist abgelaufen!")
 
 		if _, err := p.Send(msgConfig); err != nil {
-			log.Errorf("PGPress: Send message failed: %s", err)
+			log.Error("Failed to send expired link message",
+				"user_id", message.From.ID,
+				"error", err,
+			)
 		}
 
 		return errors.New("invalid target")
@@ -117,10 +141,25 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 	userName := message.From.UserName
 	if userName == "" {
 		userName = strings.Trim(message.From.FirstName+" "+message.From.LastName, " ")
+		log.Debug("Using fallback username",
+			"user_id", message.From.ID,
+			"fallback_name", userName,
+		)
 	}
+
+	log.Debug("Creating PGPress user account",
+		"user_id", message.From.ID,
+		"username", userName,
+	)
 
 	user, err := NewUser(message.From.ID, userName)
 	if err != nil {
+		log.Error("Failed to create PGPress user",
+			"user_id", message.From.ID,
+			"username", userName,
+			"error", err,
+		)
+
 		p.Send(tgbotapi.NewMessage(
 			message.From.ID,
 			fmt.Sprintf("Error: %s", err.Error()),
@@ -128,6 +167,12 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 
 		return err
 	}
+
+	log.Info("PGPress user created successfully",
+		"user_id", message.From.ID,
+		"username", userName,
+		"api_key_length", len(user.ApiKey),
+	)
 
 	// Info message
 	msgConfig := tgbotapi.NewMessage(
@@ -140,7 +185,10 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGPress: Send message failed: %s", err)
+		log.Error("Failed to send info message",
+			"user_id", message.From.ID,
+			"error", err,
+		)
 	}
 
 	// ApiKey message
@@ -148,7 +196,14 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 	msgConfig.ParseMode = "MarkdownV2"
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGPress: Send message failed: %s", err)
+		log.Error("Failed to send API key message",
+			"user_id", message.From.ID,
+			"error", err,
+		)
+	} else {
+		log.Info("API key sent to user",
+			"user_id", message.From.ID,
+		)
 	}
 
 	// Link to the pg-press server login page
@@ -165,14 +220,31 @@ func (p *PGPress) handleStartPGPressRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGPress: Send message failed: %s", err)
+		log.Error("Failed to send login link message",
+			"user_id", message.From.ID,
+			"error", err,
+		)
+	} else {
+		log.Debug("Login link sent to user",
+			"user_id", message.From.ID,
+		)
 	}
 
 	return nil
 }
 
 func (p *PGPress) handlePGPressRegister(message *tgbotapi.Message) error {
+	log.Info("Processing PGPress registration command",
+		"user_id", message.From.ID,
+		"username", message.From.UserName,
+		"chat_id", message.Chat.ID,
+	)
+
 	if ok := tgs.CheckTargets(message, p.data.Targets); !ok {
+		log.Debug("PGPress registration request from unauthorized target",
+			"user_id", message.From.ID,
+			"chat_id", message.Chat.ID,
+		)
 		return errors.New("invalid target")
 	}
 
@@ -187,8 +259,13 @@ func (p *PGPress) handlePGPressRegister(message *tgbotapi.Message) error {
 	msgConfig.ReplyToMessageID = message.MessageID
 
 	key := uuid.New().String()
+	log.Debug("Generated registration deep link",
+		"key", key,
+		"user_id", message.From.ID,
+	)
 
-	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", fmt.Sprintf("t.me/talice_bot?start=pgpressregister-%s", key))
+	deepLink := fmt.Sprintf("t.me/talice_bot?start=pgpressregister-%s", key)
+	button := tgbotapi.NewInlineKeyboardButtonURL("Registrieren", deepLink)
 	msgConfig.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 		[]tgbotapi.InlineKeyboardButton{
 			button,
@@ -196,10 +273,23 @@ func (p *PGPress) handlePGPressRegister(message *tgbotapi.Message) error {
 	)
 
 	if _, err := p.Send(msgConfig); err != nil {
-		log.Errorf("PGPress: Send message failed: %s", err)
+		log.Error("Failed to send registration button",
+			"user_id", message.From.ID,
+			"chat_id", message.Chat.ID,
+			"error", err,
+		)
+	} else {
+		log.Debug("Registration button sent successfully",
+			"user_id", message.From.ID,
+			"chat_id", message.Chat.ID,
+		)
 	}
 
 	p.keys = append(p.keys, key)
+	log.Debug("Registration key stored",
+		"key", key,
+		"total_active_keys", len(p.keys),
+	)
 
 	return nil
 }

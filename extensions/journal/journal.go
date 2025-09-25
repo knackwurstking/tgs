@@ -94,12 +94,27 @@ func (u *Units) GetOutput(name string) (data []byte, err error) {
 		)
 	}
 
-	log.Debugf("Journal: Units: Run journalctl command with args %#v", cmd.Args)
+	log.Debug("Executing journalctl command",
+		"unit_name", unit.Name,
+		"output_format", output,
+		"is_user_service", isUser,
+		"command", strings.Join(cmd.Args, " "),
+	)
+
 	if data, err = cmd.CombinedOutput(); err != nil {
+		log.Error("Journalctl command failed",
+			"unit_name", unit.Name,
+			"command", strings.Join(cmd.Args, " "),
+			"error", err,
+		)
 		return nil, err
-	} else {
-		return data, nil
 	}
+
+	log.Debug("Journalctl command executed successfully",
+		"unit_name", unit.Name,
+		"output_size_bytes", len(data),
+	)
+	return data, nil
 }
 
 type TemplateData struct {
@@ -187,20 +202,42 @@ func (j *Journal) Is(update tgbotapi.Update) bool {
 
 func (j *Journal) Handle(update tgbotapi.Update) error {
 	if j.BotAPI == nil {
+		log.Error("Journal extension BotAPI is nil")
 		panic("BotAPI is nil!")
 	}
 
 	message := update.Message
+	log.Debug("Journal extension handling update",
+		"user_id", message.From.ID,
+		"username", message.From.UserName,
+		"chat_id", message.Chat.ID,
+		"command", message.Command(),
+	)
 
 	if ok := tgs.CheckTargets(message, j.data.Targets); !ok {
+		log.Debug("Journal request from unauthorized target",
+			"user_id", message.From.ID,
+			"chat_id", message.Chat.ID,
+			"command", message.Command(),
+		)
 		return errors.New("invalid target")
 	}
 
 	if message.ReplyToMessage != nil {
 		replyMessageID := message.ReplyToMessage.MessageID
 		if cb, ok := j.callbacks.Get(replyMessageID); ok {
+			log.Debug("Processing journal reply callback",
+				"reply_to_message_id", replyMessageID,
+				"user_text", message.Text,
+			)
+
 			err := cb(message)
 			if err != nil {
+				log.Error("Journal reply callback failed",
+					"reply_to_message_id", replyMessageID,
+					"error", err,
+				)
+
 				msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("`error: %s`", err))
 				msg.ParseMode = "MarkdownV2"
 				msg.ReplyToMessageID = replyMessageID
@@ -213,12 +250,21 @@ func (j *Journal) Handle(update tgbotapi.Update) error {
 
 	switch command := message.Command(); command {
 	case "journallist":
+		log.Info("Generating journal units list",
+			"user_id", message.From.ID,
+			"system_units_count", len(j.data.Units.System),
+			"user_units_count", len(j.data.Units.User),
+		)
+
 		content, err := templates.GetTemplateData(&TemplateData{
 			PageTitle:   "Journal Units",
 			SystemUnits: j.data.Units.System,
 			UserUnits:   j.data.Units.User,
 		})
 		if err != nil {
+			log.Error("Failed to generate journal units template",
+				"error", err,
+			)
 			return err
 		}
 
@@ -228,13 +274,27 @@ func (j *Journal) Handle(update tgbotapi.Update) error {
 		})
 		documentConfig.ReplyToMessageID = message.MessageID
 
+		log.Debug("Sending journal units list document",
+			"document_size_bytes", len(content),
+		)
+
 		_, err = j.Send(documentConfig)
+		if err != nil {
+			log.Error("Failed to send journal units list",
+				"error", err,
+			)
+		}
 		return err
 	case "journal":
+		log.Info("Initiating journal request",
+			"user_id", message.From.ID,
+			"username", message.From.UserName,
+		)
+
 		msgConfig := tgbotapi.NewMessage(
 			message.Chat.ID,
 			"Hey there\\! Can you send me the name of the journal?\n\n"+
-				"You’ll have about 5 minutes to respond to this message\\.\n\n"+
+				"You'll have about 5 minutes to respond to this message\\.\n\n"+
 				">You need to reply to this message for this to work\\.",
 		)
 		msgConfig.ReplyToMessageID = message.MessageID
@@ -242,14 +302,25 @@ func (j *Journal) Handle(update tgbotapi.Update) error {
 
 		msg, err := j.Send(msgConfig)
 		if err != nil {
+			log.Error("Failed to send journal request prompt",
+				"error", err,
+			)
 			return err
 		}
 
 		j.callbacks.Set(msg.MessageID, j.replyCallbackJournalCommand)
 
+		log.Debug("Journal callback registered",
+			"callback_message_id", msg.MessageID,
+			"timeout_minutes", 5,
+		)
+
 		go func() { // Auto Delete Function
 			time.Sleep(time.Minute * 5)
 			j.callbacks.Delete(msg.MessageID)
+			log.Debug("Journal callback expired and removed",
+				"callback_message_id", msg.MessageID,
+			)
 		}()
 	default:
 		return fmt.Errorf("unknown command: %s", command)
@@ -259,11 +330,12 @@ func (j *Journal) Handle(update tgbotapi.Update) error {
 }
 
 func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
-	log.Debugf(
-		"Journal: Handle reply callback for \"%s\" (%d): text=%s; message_id=%d",
-		message.Command(), message.ReplyToMessage.MessageID,
-		message.Text,
-		message.MessageID,
+	log.Info("Processing journal unit request",
+		"user_id", message.From.ID,
+		"username", message.From.UserName,
+		"requested_text", message.Text,
+		"reply_to_message_id", message.ReplyToMessage.MessageID,
+		"message_id", message.MessageID,
 	)
 
 	messageSplit := strings.Split(message.Text, " ")
@@ -290,8 +362,17 @@ func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	)
 
 	if level == "user" || level == "" {
+		log.Debug("Searching user units",
+			"search_terms", messageSplit,
+			"available_units", len(j.data.Units.User),
+		)
+
 		for _, unit := range j.data.Units.User {
 			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
+				log.Info("Found matching user unit",
+					"unit_name", unit.Name,
+					"unit_output", unit.Output,
+				)
 				content, err = j.data.Units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
 				break
@@ -300,8 +381,17 @@ func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	}
 
 	if level == "system" || level == "" {
+		log.Debug("Searching system units",
+			"search_terms", messageSplit,
+			"available_units", len(j.data.Units.System),
+		)
+
 		for _, unit := range j.data.Units.System {
 			if slices.Contains(messageSplit, strings.ToLower(unit.Name)) {
+				log.Info("Found matching system unit",
+					"unit_name", unit.Name,
+					"unit_output", unit.Output,
+				)
 				content, err = j.data.Units.GetOutput(unit.Name)
 				fileName = fmt.Sprintf("%s.log", unit.Name)
 				break
@@ -310,12 +400,27 @@ func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	}
 
 	if err != nil {
+		log.Error("Failed to get journal output",
+			"error", err,
+			"search_terms", strings.Join(messageSplit, " "),
+		)
 		return err
 	}
 
 	if len(content) == 0 {
+		log.Warn("No journal unit found matching request",
+			"search_terms", strings.Join(messageSplit, " "),
+			"available_user_units", len(j.data.Units.User),
+			"available_system_units", len(j.data.Units.System),
+		)
 		return fmt.Errorf("unit not found: %s", strings.Join(messageSplit, " "))
 	}
+
+	log.Info("Sending journal logs",
+		"unit_file_name", fileName,
+		"log_size_bytes", len(content),
+		"user_id", message.From.ID,
+	)
 
 	documentConfig := tgbotapi.NewDocument(message.Chat.ID, tgbotapi.FileBytes{
 		Name:  fileName,
@@ -324,5 +429,11 @@ func (j *Journal) replyCallbackJournalCommand(message *tgbotapi.Message) error {
 	documentConfig.ReplyToMessageID = message.MessageID
 
 	_, err = j.Send(documentConfig)
+	if err != nil {
+		log.Error("Failed to send journal document",
+			"file_name", fileName,
+			"error", err,
+		)
+	}
 	return err
 }
