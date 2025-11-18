@@ -60,8 +60,8 @@ export LAUNCHD_SERVICE_FILE_CONTENT
 macos-install:
 	@echo "Installing $(BINARY_NAME) for macOS..."
 	@mkdir -p $(INSTALL_DIR)
-	@cp $(BIN_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
-	@chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
+	@sudo cp $(BIN_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
+	@sudo chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "$$LAUNCHD_SERVICE_FILE_CONTENT" > $(SERVICE_FILE)
 	@echo "$(BINARY_NAME) installed successfully"
 
