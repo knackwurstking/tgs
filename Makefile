@@ -7,7 +7,7 @@ EXTENSION_TAGS := stats,ip,journal,opmanga,pgpress
 BIN_DIR := ./bin
 INSTALL_DIR := /usr/local/bin
 SERVICE_FILE := $(HOME)/Library/LaunchAgents/com.$(BINARY_NAME).plist
-LOG_FILE := $(HOME)/Library/Application\ Support/$(BINARY_NAME).log
+LOG_FILE := $(HOME)/Library/Application Support/$(BINARY_NAME).log
 
 .PHONY: all clean init run build macos-install macos-start-service \
 	macos-stop-service macos-restart-service macos-print-service macos-watch-service
@@ -51,6 +51,12 @@ define LAUNCHD_SERVICE_FILE_CONTENT
 
 	<key>StandardErrorPath</key>
 	<string>$(LOG_FILE)</string>
+
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
 </dict>
 </plist>
 endef
