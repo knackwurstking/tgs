@@ -5,15 +5,12 @@ EXTENSION_TAGS := stats,ip,journal,opmanga,pgpress
 
 # Directories and paths
 BIN_DIR := ./bin
-
-# Service configuration
-LAUNCHD_SERVICE_FILE := ~/Library/LaunchAgents/com.$(BINARY_NAME).plist
-
-# Logs
-SERVICE_LOG := $(HOME)/Library/Application Support/$(BINARY_NAME).log
+INSTALL_DIR := /usr/local/bin
+SERVICE_FILE := $(HOME)/Library/LaunchAgents/com.$(BINARY_NAME).plist
+LOG_FILE := $(HOME)/Library/Application\ Support/$(BINARY_NAME).log
 
 .PHONY: all clean init run build macos-install macos-start-service \
-	 macos-stop-service macos-print-service macos-watch-service
+	macos-stop-service macos-restart-service macos-print-service macos-watch-service
 
 all: init build
 
@@ -29,8 +26,6 @@ run:
 build:
 	go build --tags=${EXTENSION_TAGS} -v -o $(BIN_DIR)/$(BINARY_NAME) ./cmd/tgs
 
-# TODO: ...
-
 # Create launchd service file for macOS
 define LAUNCHD_SERVICE_FILE_CONTENT
 <?xml version="1.0" encoding="UTF-8"?>
@@ -42,20 +37,20 @@ define LAUNCHD_SERVICE_FILE_CONTENT
 
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/bin/$(BINARY_NAME)</string>
+		<string>$(INSTALL_DIR)/$(BINARY_NAME)</string>
 	</array>
 
 	<key>RunAtLoad</key>
 	<true/>
 
 	<key>KeepAlive</key>
-	<true/>
+	<false/>
 
 	<key>StandardOutPath</key>
-	<string>$(SERVICE_LOG)</string>
+	<string>$(LOG_FILE)</string>
 
 	<key>StandardErrorPath</key>
-	<string>$(SERVICE_LOG)</string>
+	<string>$(LOG_FILE)</string>
 </dict>
 </plist>
 endef
@@ -64,21 +59,21 @@ export LAUNCHD_SERVICE_FILE_CONTENT
 
 macos-install:
 	@echo "Installing $(BINARY_NAME) for macOS..."
-	mkdir -p /usr/local/bin
-	sudo cp $(BIN_DIR)/$(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
-	sudo chmod +x /usr/local/bin/$(BINARY_NAME)
-	@echo "$$LAUNCHD_SERVICE_FILE_CONTENT" > $(LAUNCHD_SERVICE_FILE)
+	@mkdir -p $(INSTALL_DIR)
+	@cp $(BIN_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
+	@chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
+	@echo "$$LAUNCHD_SERVICE_FILE_CONTENT" > $(SERVICE_FILE)
 	@echo "$(BINARY_NAME) installed successfully"
 
 macos-start-service:
 	@echo "Starting $(BINARY_NAME) service..."
-	launchctl load -w $(LAUNCHD_SERVICE_FILE)
-	launchctl start com.$(BINARY_NAME)
+	@launchctl load -w $(SERVICE_FILE)
+	@launchctl start com.$(BINARY_NAME)
 
 macos-stop-service:
 	@echo "Stopping $(BINARY_NAME) service..."
-	launchctl stop com.$(BINARY_NAME)
-	launchctl unload -w $(LAUNCHD_SERVICE_FILE)
+	@launchctl stop com.$(BINARY_NAME)
+	@launchctl unload -w $(SERVICE_FILE)
 
 macos-restart-service:
 	@echo "Restarting $(BINARY_NAME) service..."
@@ -90,11 +85,11 @@ macos-print-service:
 	@launchctl print gui/$$(id -u)/com.$(BINARY_NAME) || echo "Service not loaded or running"
 
 macos-watch-service:
-	@echo "$(BINARY_NAME) watch server logs @ \"$(SERVICE_LOG)\":"
-	@if [ -f "$(SERVICE_LOG)" ]; then \
+	@echo "$(BINARY_NAME) watch server logs @ \"$(LOG_FILE)\":"
+	@if [ -f "$(LOG_FILE)" ]; then \
 		echo "Watching logs... Press Ctrl+C to stop"; \
-		tail -f "$(SERVICE_LOG)"; \
+		tail -f "$(LOG_FILE)"; \
 	else \
 		echo "Log file not found. Make sure the service is running or has been started."; \
-		echo "Log file path: \"$(SERVICE_LOG)\""; \
+		echo "Log file path: \"$(LOG_FILE)\""; \
 	fi
