@@ -1,7 +1,7 @@
 # Project configuration
 BINARY_NAME := tgs
 
-EXTENSION_TAGS := stats,ip,journal,opmanga,pgpress
+EXTENSION_TAGS := stats,ip,opmanga,pgpress
 
 # Directories and paths
 BIN_DIR := ./bin
