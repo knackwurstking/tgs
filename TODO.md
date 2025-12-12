@@ -1,0 +1,2 @@
+- Add new plugin for a service which will periotically check my website if it's up or down.
+- Integrate a feature to send notifications via Telegram when the website status changes.
